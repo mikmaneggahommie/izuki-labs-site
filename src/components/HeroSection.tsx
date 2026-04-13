@@ -14,43 +14,45 @@ const images = [
   { src: "/images/7.jpg", alt: "Design Work 7" },
 ];
 
-// Staircase positions — diagonal cascade like nickzoutendijk.nl
-const positions = [
-  { x: 0, y: 0, rotate: -2, w: 280, h: 360, z: 7 },
-  { x: 90, y: 50, rotate: 1.5, w: 250, h: 320, z: 6 },
-  { x: 180, y: 100, rotate: -1, w: 240, h: 310, z: 5 },
-  { x: 40, y: 160, rotate: 2.5, w: 230, h: 300, z: 4 },
-  { x: 150, y: 200, rotate: -1.5, w: 220, h: 290, z: 3 },
-  { x: -30, y: 260, rotate: 1, w: 210, h: 280, z: 2 },
-  { x: 120, y: 310, rotate: -2, w: 200, h: 270, z: 1 },
+// Staircase end positions — diagonal cascade like nickzoutendijk.nl
+const endPositions = [
+  { x: 0, y: 0, rotate: 0, w: 320, h: 400, z: 7 }, // The main card stays mostly still
+  { x: 140, y: 80, rotate: 2, w: 280, h: 360, z: 6 },
+  { x: 260, y: 160, rotate: -2, w: 260, h: 340, z: 5 },
+  { x: 380, y: 240, rotate: 1, w: 240, h: 320, z: 4 },
+  { x: 500, y: 320, rotate: -1.5, w: 220, h: 300, z: 3 },
+  { x: 620, y: 400, rotate: 2.5, w: 200, h: 280, z: 2 },
+  { x: 740, y: 480, rotate: -1, w: 180, h: 260, z: 1 },
 ];
-
-const marqueeText =
-  "izuki.labs is a Social Media Designer and Visual Architect focused on brand identity, content systems & digital growth. — ";
 
 export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const staircaseRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // GSAP parallax on images
+    // GSAP scroll trigger for unstacking animation
     const loadGSAP = async () => {
       try {
         const gsap = (await import("gsap")).default;
         const { ScrollTrigger } = await import("gsap/ScrollTrigger");
         gsap.registerPlugin(ScrollTrigger);
 
-        const imgs = containerRef.current?.querySelectorAll(".hero-parallax-img");
+        const imgs = containerRef.current?.querySelectorAll(".staircase-image");
         if (!imgs) return;
 
+        // Unstacking animation: scrubbed through scroll
         imgs.forEach((img, i) => {
+          if (i === 0) return; // Main card stays anchored
           gsap.to(img, {
-            y: (i + 1) * -60,
+            x: endPositions[i].x,
+            y: endPositions[i].y,
+            rotation: endPositions[i].rotate,
             ease: "none",
             scrollTrigger: {
               trigger: containerRef.current,
               start: "top top",
               end: "bottom top",
-              scrub: 1.5,
+              scrub: 1,
             },
           });
         });
@@ -65,105 +67,86 @@ export default function HeroSection() {
   return (
     <section
       ref={containerRef}
-      className="section-dark relative min-h-screen flex flex-col justify-center overflow-hidden pt-20 pb-16"
+      className="section-dark relative h-[250vh]" // Tall section to allow scrolling
     >
-      <div className="max-w-[1400px] mx-auto w-full px-6 md:px-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center min-h-[80vh]">
-          {/* Left — Typography */}
-          <div className="relative z-10">
+      <div className="sticky top-0 h-screen w-full flex flex-col justify-end overflow-hidden pb-16">
+        <div className="max-w-[1400px] mx-auto w-full px-6 md:px-10 h-full relative">
+          
+          {/* Images Stack - Centered */}
+          <div 
+            ref={staircaseRef}
+            className="absolute top-1/2 left-1/2 -translate-x-1/4 md:-translate-x-1/2 -translate-y-1/2 w-full max-w-[800px] h-full pointer-events-none hidden md:block"
+          >
+            {images.map((img, i) => (
+              <motion.div
+                key={img.src}
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: 0.2 + (images.length - i) * 0.05,
+                  duration: 0.8,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="staircase-image absolute rounded-2xl overflow-hidden shadow-2xl"
+                style={{
+                  left: 0,
+                  top: 0,
+                  width: endPositions[i].w,
+                  height: endPositions[i].h,
+                  zIndex: endPositions[i].z,
+                  // Initially all stacked perfectly straight
+                  transform: "translate(0,0) rotate(0deg)",
+                }}
+              >
+                <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  fill
+                  className="object-cover"
+                  sizes={`${endPositions[i].w}px`}
+                  priority={i < 3}
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Typography - Bottom Left aligned */}
+          <div className="relative z-20 flex flex-col justify-end h-full pb-10">
             <motion.h1
               initial={{ opacity: 0, y: 60 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="font-display text-hero text-white"
+              className="font-display text-[15vw] md:text-[8vw] leading-[0.85] tracking-tighter text-white uppercase font-extrabold"
             >
-              izuki<span className="accent-square" />labs
+              izuki<span className="text-[#FF3F11]">.</span><br />
+              labs
             </motion.h1>
-
-            {/* Marquee */}
+            
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5, duration: 1 }}
-              className="mt-8 overflow-hidden"
+              className="mt-6 max-w-xl"
             >
-              <div className="marquee-track">
-                {[...Array(3)].map((_, i) => (
-                  <span
-                    key={i}
-                    className="text-body-large text-white/60 whitespace-nowrap mr-4"
-                    style={{ fontFamily: "var(--font-inter)" }}
-                  >
-                    {marqueeText}
-                  </span>
-                ))}
-              </div>
+              <p className="text-body-large text-white/80 font-medium">
+                Izuki Labs is a Social Media Design architecture focussed on brand identity, content systems & exponential digital growth.
+              </p>
             </motion.div>
           </div>
 
-          {/* Right — Cascading Image Staircase */}
-          <div className="relative h-[600px] lg:h-[700px] hidden md:block">
-            <div className="staircase-container">
-              {images.map((img, i) => (
-                <motion.div
-                  key={img.src}
-                  initial={{ opacity: 0, y: 80, rotate: positions[i].rotate * 2 }}
-                  animate={{ opacity: 1, y: 0, rotate: positions[i].rotate }}
-                  transition={{
-                    delay: 0.2 + i * 0.12,
-                    duration: 0.9,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                  className="hero-parallax-img staircase-image"
-                  style={{
-                    left: positions[i].x,
-                    top: positions[i].y,
-                    width: positions[i].w,
-                    height: positions[i].h,
-                    zIndex: positions[i].z,
-                    transform: `rotate(${positions[i].rotate}deg)`,
-                  }}
-                >
-                  <Image
-                    src={img.src}
-                    alt={img.alt}
-                    fill
-                    className="object-cover"
-                    sizes={`${positions[i].w}px`}
-                    priority={i < 3}
-                  />
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
           {/* Mobile: single hero image */}
-          <div className="relative h-[400px] md:hidden rounded-lg overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] h-[60vh] md:hidden rounded-2xl overflow-hidden shadow-2xl">
             <Image
               src="/images/1.JPG"
               alt="Mikiyas Daniel"
               fill
-              className="object-cover"
+              className="object-cover pointer-events-none"
               priority
             />
           </div>
         </div>
       </div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
-      >
-        <span className="text-label text-white/30">(Scroll down)</span>
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="w-[1px] h-8 bg-white/20"
-        />
-      </motion.div>
     </section>
   );
 }

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -11,8 +10,32 @@ export default function Header() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    
+    // Enable global smooth scroll
+    document.documentElement.style.scrollBehavior = "smooth";
+    
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      document.documentElement.style.scrollBehavior = "auto";
+    };
   }, []);
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    setMenuOpen(false);
+    
+    // If it's a hash link on the same page, do smooth scroll
+    if (href.startsWith("#")) {
+      e.preventDefault();
+      const targetId = href.substring(1);
+      const elem = document.getElementById(targetId);
+      if (elem) {
+        elem.scrollIntoView({ behavior: "smooth" });
+      }
+    } else if (href === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   return (
     <>
@@ -25,17 +48,17 @@ export default function Header() {
       >
         <div className="grid grid-cols-4 items-center px-6 md:px-10 py-4 md:py-5">
           {/* Brand */}
-          <Link href="/" className="font-display text-sm md:text-base font-bold tracking-tight text-white hover:opacity-70 transition-opacity">
+          <a href="/" onClick={(e) => handleNavClick(e, "/")} className="font-display text-sm md:text-base font-bold tracking-tight text-white hover:opacity-70 transition-opacity">
             izuki.labs
-          </Link>
+          </a>
 
           {/* Location */}
-          <span className="text-label text-white/50 hidden md:block text-center">
+          <span className="text-label text-white/50 hidden md:block text-center cursor-default">
             Addis Ababa
           </span>
 
           {/* Role */}
-          <span className="text-label text-white/50 hidden md:block text-center">
+          <span className="text-label text-white/50 hidden md:block text-center cursor-default">
             Social Media Designer
           </span>
 
@@ -75,13 +98,13 @@ export default function Header() {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ delay: i * 0.08, duration: 0.4 }}
                 >
-                  <Link
+                  <a
                     href={item.href}
-                    onClick={() => setMenuOpen(false)}
+                    onClick={(e) => handleNavClick(e, item.href)}
                     className="font-display text-4xl md:text-6xl font-bold tracking-tight text-white hover:text-[#FF3F11] transition-colors"
                   >
                     {item.label}
-                  </Link>
+                  </a>
                 </motion.div>
               ))}
 

@@ -173,7 +173,7 @@ export default function PricingSection() {
         </div>
 
         {/* Pricing Cards — order: Basic, Remote Designer (center), Starter */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12 items-start mt-8">
           {packages.map((pkg) => (
             <div
               key={pkg.id}

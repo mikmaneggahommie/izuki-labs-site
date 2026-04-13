@@ -9,7 +9,8 @@ const accounts = [
     handle: "@atmosphere_251",
     url: "https://www.instagram.com/atmosphere_251/",
     category: "Event Branding & Atmosphere Design",
-    image: "/images/4.jpg",
+    // Replace with a real post ID if needed
+    embedUrl: "https://www.instagram.com/p/DAnXl4wM3b-/embed",
     description:
       "Full social media identity for Addis Ababa's premier event brand — from stories to feed aesthetics.",
   },
@@ -17,7 +18,8 @@ const accounts = [
     handle: "@loline_mag",
     url: "https://www.instagram.com/loline_mag/",
     category: "Editorial & Creative Direction",
-    image: "/images/5.jpg",
+    // Replace with a real post ID if needed
+    embedUrl: "https://www.instagram.com/p/C9H8uKCMaWf/embed",
     description:
       "Visual direction and content design for a digital lifestyle and culture magazine.",
   },
@@ -53,21 +55,6 @@ export default function WorkShowcase() {
               },
             }
           );
-        });
-
-        // Parallax on phone mockups
-        const mockups = sectionRef.current?.querySelectorAll(".phone-parallax");
-        mockups?.forEach((mockup) => {
-          gsap.to(mockup, {
-            y: -40,
-            ease: "none",
-            scrollTrigger: {
-              trigger: mockup,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: 2,
-            },
-          });
         });
       } catch (e) {
         console.warn("GSAP not available:", e);
@@ -110,46 +97,30 @@ export default function WorkShowcase() {
         </div>
 
         {/* Work Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16">
           {accounts.map((account, i) => (
-            <a
+            <div
               key={account.handle}
-              href={account.url}
-              target="_blank"
-              rel="noopener noreferrer"
               className="work-card group block"
             >
-              <div className="relative overflow-hidden rounded-lg mb-6">
-                {/* Phone Mockup */}
-                <div className="relative aspect-[4/5] bg-[#ddd] rounded-lg overflow-hidden">
-                  <Image
-                    src={account.image}
-                    alt={account.handle}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
+              <div className="relative overflow-hidden rounded-2xl mb-8 flex items-center justify-center bg-gray-50 aspect-[4/5] shadow-sm">
+                
+                {/* Instagram Iframe Embed */}
+                <iframe
+                  className="w-[320px] md:w-[350px] max-w-[100%] h-[500px] md:h-[550px] border border-gray-200 rounded-lg shadow-sm bg-white mx-auto z-10"
+                  src={`${account.embedUrl}`}
+                  frameBorder="0"
+                  scrolling="no"
+                  allowTransparency={true}
+                  allow="encrypted-media"
+                ></iframe>
 
-                  {/* Phone mockup overlay */}
-                  <div className="phone-parallax absolute bottom-6 right-6 z-10">
-                    <div className="phone-mockup" style={{ width: 180, height: 360 }}>
-                      <div className="phone-mockup-notch" />
-                      <div className="phone-mockup-screen">
-                        <Image
-                          src={account.image}
-                          alt={`${account.handle} phone`}
-                          fill
-                          className="object-cover"
-                          sizes="180px"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                {/* Subtle Background elements to make it look premium */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-gray-100/50 to-gray-200/20 blur-2xl -z-10"></div>
               </div>
 
               {/* Card Info */}
-              <div className="flex items-start justify-between">
+              <a href={account.url} target="_blank" rel="noopener noreferrer" className="flex items-start justify-between group-hover:opacity-80 transition-opacity cursor-pointer">
                 <div>
                   <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-[#1A1A1A] group-hover:text-[#FF3F11] transition-colors">
                     {account.handle}
@@ -161,12 +132,12 @@ export default function WorkShowcase() {
                 <span className="text-[#1A1A1A]/30 group-hover:text-[#FF3F11] transition-colors text-2xl">
                   ↗
                 </span>
-              </div>
+              </a>
 
-              <p className="text-sm text-[#1A1A1A]/60 mt-3 max-w-md leading-relaxed">
+              <p className="text-sm text-[#1A1A1A]/60 mt-4 max-w-md leading-relaxed">
                 {account.description}
               </p>
-            </a>
+            </div>
           ))}
         </div>
       </div>

@@ -50,8 +50,7 @@ export default function ContactFooter() {
         {/* CTA Area */}
         <div className="contact-text text-center mb-20">
           <p className="text-body-large text-white/60 max-w-2xl mx-auto mb-12">
-            If you have a project to discuss or want to learn more, let&apos;s
-            talk
+            With 4+ years of graphic design experience, I craft scalable content systems for ambitious brands. If you have a project to discuss, let&apos;s talk.
           </p>
 
           {/* Rotating Circle CTA with Face */}
@@ -177,22 +176,22 @@ export default function ContactFooter() {
             <ul className="space-y-3">
               <li>
                 <a
-                  href="https://www.instagram.com/atmosphere_251/"
+                  href="https://www.instagram.com/izuki.labs/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-white/60 hover:text-white transition-colors"
                 >
-                  Instagram — @atmosphere_251
+                  Instagram — @izuki.labs
                 </a>
               </li>
               <li>
                 <a
-                  href="https://www.instagram.com/loline_mag/"
+                  href="https://www.tiktok.com/@izuki.labs"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-white/60 hover:text-white transition-colors"
                 >
-                  Instagram — @loline_mag
+                  TikTok — @izuki.labs
                 </a>
               </li>
             </ul>
