@@ -2,25 +2,52 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, X, Send, User, Phone, Mail } from "lucide-react";
+import { MessageSquare, X, Send, User, Phone, Mail, Loader2 } from "lucide-react";
 
 export default function LeadChatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({ name: "", phone: "", email: "" });
+  const [messages, setMessages] = useState<{role: string, content: string}[]>([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
     if (step < 3) setStep(step + 1);
     else {
-      // Logic for Supabase / API later
       setStep(4);
+      setMessages([{ role: "assistant", content: `Hey ${formData.name}! I'm the Izuki Labs architect. How can I help you build your brand today?` }]);
+    }
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    const userMessage = { role: "user", content: input };
+    setMessages(prev => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        body: JSON.stringify({ messages: [...messages, userMessage] }),
+      });
+      const data = await res.json();
+      if (data.content) {
+        setMessages(prev => [...prev, data]);
+      }
+    } catch (err) {
+      console.error("Chat Error:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <>
-      {/* Floating Toggle */}
       <motion.button
         data-cursor="CHAT"
         onClick={() => setIsOpen(!isOpen)}
@@ -41,7 +68,6 @@ export default function LeadChatbot() {
         </AnimatePresence>
       </motion.button>
 
-      {/* Chat Window */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -55,9 +81,10 @@ export default function LeadChatbot() {
               <p className="text-xs opacity-80 uppercase tracking-widest font-mono">izuki.labs support</p>
             </div>
 
-            <div className="p-8 space-y-6">
+            <div className={cn("p-6 space-y-6 max-h-[400px] overflow-y-auto custom-scrollbar", step === 4 && "min-h-[300px]")}>
               {step <= 3 ? (
                 <form onSubmit={handleNext} className="space-y-6">
+                  {/* ... (Previous input fields) */}
                   <div className="space-y-2">
                     <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                       {step === 1 ? "Your Name" : step === 2 ? "Contact Number" : "Email Address"}
@@ -86,24 +113,47 @@ export default function LeadChatbot() {
                   </button>
                 </form>
               ) : (
-                <motion.div 
-                  initial={{ opacity: 0 }} 
-                  animate={{ opacity: 1 }} 
-                  className="text-center py-8 space-y-4"
-                >
-                  <p className="text-sm font-medium">Thank you, {formData.name}!</p>
-                  <p className="text-xs text-muted-foreground">Our team will reach out to you within 24 hours.</p>
-                  <button 
-                    onClick={() => setIsOpen(false)}
-                    className="mt-4 text-accent text-[10px] font-bold uppercase tracking-widest"
-                  >
-                    Close Window
-                  </button>
-                </motion.div>
+                <div className="space-y-4">
+                  {messages.map((m, i) => (
+                    <motion.div 
+                      key={i} 
+                      initial={{ opacity: 0, y: 10 }} 
+                      animate={{ opacity: 1, y: 0 }}
+                      className={cn(
+                        "p-3 rounded-2xl text-sm max-w-[85%]",
+                        m.role === "assistant" ? "bg-white/5 mr-auto" : "bg-accent/10 ml-auto text-accent"
+                      )}
+                    >
+                      {m.content}
+                    </motion.div>
+                  ))}
+                  {isLoading && (
+                    <div className="flex justify-start">
+                      <Loader2 className="w-4 h-4 animate-spin opacity-40" />
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
-            {/* Progress Bar */}
+            {step === 4 && (
+              <form onSubmit={handleSendMessage} className="p-4 border-t border-white/10 flex gap-2">
+                <input 
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs flex-1 outline-none focus:ring-1 focus:ring-accent"
+                  placeholder="Ask anything..."
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                />
+                <button 
+                  type="submit"
+                  disabled={isLoading}
+                  className="bg-accent p-2 rounded-xl text-accent-foreground disabled:opacity-50"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </form>
+            )}
+
             {step <= 3 && (
               <div className="h-1 bg-white/5">
                 <motion.div 
@@ -117,4 +167,8 @@ export default function LeadChatbot() {
       </AnimatePresence>
     </>
   );
+}
+
+function cn(...inputs: any[]) {
+  return inputs.filter(Boolean).join(" ");
 }
