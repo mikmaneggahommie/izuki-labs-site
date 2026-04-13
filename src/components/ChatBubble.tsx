@@ -75,7 +75,7 @@ export default function ChatBubble() {
       {/* Bubble Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="chat-bubble-btn"
+        className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[100] w-14 h-14 bg-[#FF3F11] rounded-full flex items-center justify-center text-white shadow-[0_10px_40px_rgba(255,63,17,0.4)]"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         aria-label="Open chat"
@@ -88,7 +88,7 @@ export default function ChatBubble() {
               animate={{ rotate: 0, opacity: 1 }}
               exit={{ rotate: 90, opacity: 0 }}
             >
-              <X className="w-5 h-5" />
+              <X className="w-6 h-6" />
             </motion.div>
           ) : (
             <motion.div
@@ -97,7 +97,7 @@ export default function ChatBubble() {
               animate={{ rotate: 0, opacity: 1 }}
               exit={{ rotate: -90, opacity: 0 }}
             >
-              <MessageSquare className="w-5 h-5" />
+              <MessageSquare className="w-6 h-6" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -111,7 +111,7 @@ export default function ChatBubble() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="chat-panel"
+            className="fixed bottom-24 right-4 md:bottom-28 md:right-10 z-[90] w-[calc(100vw-2rem)] md:w-[380px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col"
           >
             {/* Header */}
             <div className="p-5 border-b border-[#1A1A1A]/10">

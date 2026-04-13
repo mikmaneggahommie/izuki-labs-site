@@ -80,8 +80,8 @@ export default function HeroSection() {
             {images.map((img, i) => (
               <motion.div
                 key={img.src}
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 40, x: 0, rotate: 0 }}
+                animate={{ opacity: 1, y: 0, x: 0, rotate: 0 }}
                 transition={{
                   delay: 0.2 + (images.length - i) * 0.05,
                   duration: 0.8,
@@ -94,8 +94,6 @@ export default function HeroSection() {
                   width: endPositions[i].w,
                   height: endPositions[i].h,
                   zIndex: endPositions[i].z,
-                  // Initially all stacked perfectly straight
-                  transform: "translate(0,0) rotate(0deg)",
                 }}
               >
                 <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
