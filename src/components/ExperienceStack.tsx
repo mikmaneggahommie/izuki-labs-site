@@ -15,27 +15,27 @@ const images = [
 ];
 
 export default function ExperienceStack() {
-  const [phase, setPhase] = useState<"stacked" | "unstacked" | "iterating" | "restacking">("stacked");
+  const [phase, setPhase] = useState<"stacked" | "unstacked" | "focus" | "consolidate">("stacked");
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Animation Loop: Stacked -> Unstacked -> Iterate through images -> Restacked
+  // Animation Sequence Loop
   useEffect(() => {
     const timer = setTimeout(() => {
       if (phase === "stacked") setPhase("unstacked");
-      else if (phase === "unstacked") setPhase("iterating");
-      else if (phase === "restacking") setPhase("stacked");
-    }, 2000);
+      else if (phase === "unstacked") setPhase("focus");
+      else if (phase === "consolidate") setPhase("stacked");
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, [phase]);
 
-  // Handle iteration through images
+  // Handle Focus iteration
   useEffect(() => {
-    if (phase === "iterating") {
+    if (phase === "focus") {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => {
           if (prev === images.length - 1) {
-            setPhase("restacking");
+            setPhase("consolidate");
             return 0;
           }
           return prev + 1;
@@ -46,53 +46,116 @@ export default function ExperienceStack() {
   }, [phase]);
 
   return (
-    <div className="relative flex items-center justify-center w-full h-[600px] overflow-hidden">
-      <AnimatePresence mode="popLayout">
-        {images.map((src, index) => {
-          const isCurrent = index === currentIndex;
-          const isStacked = phase === "stacked" || phase === "restacking";
-          
-          return (
-            <motion.div
-              key={src}
-              initial={false}
-              animate={{
-                x: isStacked ? index * 4 : (isCurrent ? 0 : (index - currentIndex) * 120),
-                y: isStacked ? index * -4 : 0,
-                rotateZ: isStacked ? index * 2 : 0,
-                scale: isCurrent ? 1 : 0.8,
-                zIndex: isCurrent ? 50 : 10 - Math.abs(index - currentIndex),
-                opacity: phase === "iterating" && !isCurrent ? 0.3 : 1,
-              }}
-              transition={{
-                type: "spring",
-                stiffness: 260,
-                damping: 20,
-              }}
-              className="absolute w-[300px] h-[400px] rounded-2xl overflow-hidden liquid-glass shadow-liquid"
-            >
-              <Image
-                src={src}
-                alt={`Experience ${index}`}
-                fill
-                className="object-cover"
-                priority={index === 0}
-              />
-              {/* Grainy Noise Overlay integrated in CSS but applied via class */}
-              <div className="absolute inset-0 noise-overlay opacity-5" />
-            </motion.div>
-          );
-        })}
-      </AnimatePresence>
-
-      {/* Hero Text Overlay (Minimalist) */}
-      <div className="absolute bottom-12 left-12 z-50 mix-blend-difference text-white">
-        <h1 className="text-6xl font-bold tracking-tighter uppercase leading-none">
-          Experience <br /> Stacks
+    <div className="relative w-full h-screen overflow-hidden bg-black flex items-center justify-center">
+      {/* Background Typography (Massive) */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+        <h1 className="text-[20vw] font-black uppercase tracking-tighter text-white/5 leading-none select-none">
+          IZUKI<span className="text-white/10">.</span>LABS
         </h1>
-        <p className="mt-4 text-sm opacity-60 max-w-xs font-mono">
-          PHASE: {phase.toUpperCase()}
-        </p>
+      </div>
+
+      <div className="relative w-full h-[80vh] max-w-7xl mx-auto">
+        <AnimatePresence mode="popLayout">
+          {images.map((src, index) => {
+            const isCurrent = index === currentIndex;
+            
+            // Positioning Logic for "Staircase" Cascade
+            const cascadeX = (index - 3) * 120; // Staggered X
+            const cascadeY = (index - 3) * 60;  // Staggered Y
+            
+            // Variants
+            const variants = {
+              stacked: {
+                x: index * 4,
+                y: index * -4,
+                rotateZ: index * 2,
+                scale: 0.9,
+                opacity: 1,
+                zIndex: 10 + index,
+              },
+              unstacked: {
+                x: cascadeX,
+                y: cascadeY,
+                rotateZ: (index - 3) * 5,
+                scale: 1,
+                opacity: 0.8,
+                zIndex: 20 + index,
+              },
+              focus: {
+                x: isCurrent ? 0 : cascadeX * 1.5,
+                y: isCurrent ? 0 : cascadeY * 1.5 - 100,
+                rotateZ: isCurrent ? 0 : (index - 3) * 10,
+                scale: isCurrent ? 1.2 : 0.6,
+                zIndex: isCurrent ? 100 : 20 + index,
+                opacity: isCurrent ? 1 : 0.3,
+              },
+              consolidate: {
+                x: 0,
+                y: 0,
+                rotateZ: 0,
+                scale: 0.8,
+                opacity: 0,
+                zIndex: 10,
+              }
+            };
+
+            return (
+              <motion.div
+                key={src}
+                initial="stacked"
+                animate={phase}
+                variants={variants}
+                transition={{
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 18,
+                  mass: 0.8
+                }}
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[450px] rounded-[2rem] overflow-hidden liquid-glass border-white/20 shadow-2xl"
+              >
+                <Image
+                  src={src}
+                  alt={`Experience ${index}`}
+                  fill
+                  className="object-cover"
+                  priority={index < 2}
+                  sizes="350px"
+                />
+                <div className="absolute inset-0 noise-overlay opacity-5" />
+                
+                {/* Image Label (Architectural Mono) */}
+                <div className="absolute bottom-6 left-6 flex flex-col gap-1">
+                  <span className="text-[10px] font-mono uppercase tracking-[0.3em] opacity-40">Artifact</span>
+                  <span className="text-xs font-bold uppercase tracking-widest">{src.split('.')[0].slice(1)}</span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+
+      {/* Foreground Typography */}
+      <div className="absolute bottom-24 left-12 z-[101]">
+        <motion.div
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          className="flex flex-col gap-2"
+        >
+          <h2 className="text-7xl font-black uppercase tracking-tighter leading-[0.85]">
+            Experience <br /> <span className="text-white/40">Architecture</span>
+          </h2>
+          <div className="flex items-center gap-4 mt-4">
+            <div className="h-[2px] w-12 bg-white" />
+            <p className="text-xs font-mono uppercase tracking-[0.5em] opacity-60">
+              Phase_{phase.toUpperCase()}
+            </p>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Decorative Index Counter */}
+      <div className="absolute top-12 right-12 z-[101] font-mono text-sm tracking-tighter opacity-20">
+        [{currentIndex + 1} / {images.length}]
       </div>
     </div>
   );
