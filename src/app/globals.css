@@ -17,7 +17,7 @@
 
   /* Glassmorphism */
   --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.1);
   --glass-blur: 20px;
 
   /* Shadows - 5-layer soft shadows */
@@ -25,21 +25,21 @@
 }
 
 :root {
-  /* Radix-inspired Dark Mode Palette (Default) */
-  --background: 0 0% 5%; /* #0D0D0D */
+  /* High-Contrast Monochromatic Palette */
+  --background: 0 0% 0%; /* #000000 */
   --foreground: 0 0% 100%; /* #FFFFFF */
 
-  --accent: 250 100% 63%; /* Vivid Purple */
-  --accent-foreground: 0 0% 100%;
+  --accent: 0 0% 100%; /* Pure White Accent */
+  --accent-foreground: 0 0% 0%;
 
-  --muted: 0 0% 15%;
-  --muted-foreground: 0 0% 65%;
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 50%;
 
-  --border: 0 0% 20%;
-  --input: 0 0% 20%;
-  --ring: 250 100% 63%;
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+  --ring: 0 0% 100%;
 
-  --radius: 1rem;
+  --radius: 1.5rem;
 }
 
 @layer base {
@@ -49,9 +49,10 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    cursor: none; /* Hide default cursor for LiquidCursor */
   }
 
-  /* Noise Overlay */
+  /* Noise Overlay - Intensified */
   .noise-overlay {
     pointer-events: none;
     position: fixed;
@@ -59,11 +60,12 @@
     width: 100%;
     height: 100%;
     z-index: 9999;
-    opacity: 0.02;
+    opacity: 0.05;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    filter: contrast(120%) brightness(100%);
   }
 
-  /* Liquid Glass Utility */
+  /* Liquid Glass Utility - Higher Contrast */
   .liquid-glass {
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));

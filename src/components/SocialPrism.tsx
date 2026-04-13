@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Instagram, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { InstagramIcon } from "@/components/Icons";
 import { cn } from "@/lib/utils";
 
 const socialAccounts = [
@@ -51,7 +52,7 @@ export default function SocialPrism() {
               <div className="flex items-center justify-between mb-12">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full liquid-glass flex items-center justify-center border-white/10">
-                    <Instagram className="w-6 h-6" />
+                    <InstagramIcon className="w-6 h-6" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-black uppercase tracking-tight">{account.handle}</h3>
