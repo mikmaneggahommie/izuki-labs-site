@@ -1,29 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
-import Image from "next/image";
-
-const accounts = [
-  {
-    handle: "@atmosphere_251",
-    url: "https://www.instagram.com/atmosphere_251/",
-    category: "Event Branding & Atmosphere Design",
-    // Replace with a real post ID if needed
-    embedUrl: "https://www.instagram.com/p/DAnXl4wM3b-/embed",
-    description:
-      "Full social media identity for Addis Ababa's premier event brand — from stories to feed aesthetics.",
-  },
-  {
-    handle: "@loline_mag",
-    url: "https://www.instagram.com/loline_mag/",
-    category: "Editorial & Creative Direction",
-    // Replace with a real post ID if needed
-    embedUrl: "https://www.instagram.com/p/C9H8uKCMaWf/embed",
-    description:
-      "Visual direction and content design for a digital lifestyle and culture magazine.",
-  },
-];
+import Script from "next/script";
 
 export default function WorkShowcase() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -70,6 +48,7 @@ export default function WorkShowcase() {
       id="work"
       className="section-light py-24 md:py-32"
     >
+      <Script src="https://elfsightcdn.com/platform.js" strategy="lazyOnload" />
       <div className="max-w-[1400px] mx-auto px-6 md:px-10">
         {/* Section Header */}
         <div className="mb-20">
@@ -96,49 +75,9 @@ export default function WorkShowcase() {
           </div>
         </div>
 
-        {/* Work Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16">
-          {accounts.map((account, i) => (
-            <div
-              key={account.handle}
-              className="work-card group block"
-            >
-              <div className="relative overflow-hidden rounded-2xl mb-8 flex items-center justify-center bg-gray-50 aspect-[4/5] shadow-sm">
-                
-                {/* Instagram Iframe Embed */}
-                <iframe
-                  className="w-[320px] md:w-[350px] max-w-[100%] h-[500px] md:h-[550px] border border-gray-200 rounded-lg shadow-sm bg-white mx-auto z-10"
-                  src={`${account.embedUrl}`}
-                  frameBorder="0"
-                  scrolling="no"
-                  allowTransparency={true}
-                  allow="encrypted-media"
-                ></iframe>
-
-                {/* Subtle Background elements to make it look premium */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-gray-100/50 to-gray-200/20 blur-2xl -z-10"></div>
-              </div>
-
-              {/* Card Info */}
-              <a href={account.url} target="_blank" rel="noopener noreferrer" className="flex items-start justify-between group-hover:opacity-80 transition-opacity cursor-pointer">
-                <div>
-                  <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-[#1A1A1A] group-hover:text-[#FF3F11] transition-colors">
-                    {account.handle}
-                  </h3>
-                  <p className="text-meta text-[#1A1A1A]/50 mt-1">
-                    {account.category}
-                  </p>
-                </div>
-                <span className="text-[#1A1A1A]/30 group-hover:text-[#FF3F11] transition-colors text-2xl">
-                  ↗
-                </span>
-              </a>
-
-              <p className="text-sm text-[#1A1A1A]/60 mt-4 max-w-md leading-relaxed">
-                {account.description}
-              </p>
-            </div>
-          ))}
+        {/* Elfsight Widget Integration */}
+        <div className="w-full relative z-10 bg-white/50 rounded-3xl p-4 md:p-8 shadow-sm border border-gray-100">
+          <div className="elfsight-app-8ceec645-dcea-42d1-8f53-17d46a861c3f" data-elfsight-app-lazy></div>
         </div>
       </div>
     </section>
