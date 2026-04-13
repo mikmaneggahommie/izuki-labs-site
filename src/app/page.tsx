@@ -1,47 +1,46 @@
-import SpinningCircle from "@/components/SpinningCircle";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-background relative overflow-hidden">
-      {/* Background Ambience */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 blur-[120px] rounded-full animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/5 blur-[120px] rounded-full delay-1000" />
+    <main className="section-dark min-h-screen flex flex-col items-center justify-center px-6 relative">
+      <div className="text-center max-w-2xl">
+        <h1 className="font-display text-hero text-white mb-6">
+          izuki<span className="accent-square" />labs
+        </h1>
 
-      <div className="z-10 text-center space-y-12">
-        <header className="space-y-4">
-          <p className="text-accent font-mono text-xs uppercase tracking-[0.5em] animate-fade-in">
-            Architecture of Influence
-          </p>
-          <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-tight">
-            IZUKI<span className="text-accent">.</span>LABS
-          </h1>
-        </header>
+        <p className="text-body-large text-white/40 mb-12">
+          Full portfolio under construction
+        </p>
 
-        <nav className="flex flex-col items-center gap-8">
-          <Link 
-            href="/SocialmediaPackage"
-            data-cursor="EXPLORE"
-            className="group relative px-12 py-6 rounded-2xl liquid-glass border-white/5 overflow-hidden transition-all hover:scale-105"
+        <Link
+          href="/SocialmediaPackage"
+          className="inline-flex items-center gap-3 bg-white text-black px-8 py-4 rounded-lg font-display font-bold text-sm uppercase tracking-widest hover:bg-[#FF3F11] hover:text-white transition-all duration-300"
+        >
+          Social Media Packages
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+
+        <div className="mt-16 flex flex-col gap-3 text-sm text-white/30">
+          <a
+            href="mailto:it.mikiyas.daniel@gmail.com"
+            className="hover:text-white transition-colors"
           >
-            <div className="relative z-10 flex items-center gap-3">
-              <span className="text-xl font-bold uppercase tracking-widest">Social Media Package</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </div>
-            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-          </Link>
-
-          <div className="flex gap-6 text-[10px] font-mono uppercase tracking-widest opacity-40">
-            <span>Portfolio</span>
-            <span>Architecture</span>
-            <span>Contact</span>
-          </div>
-        </nav>
+            it.mikiyas.daniel@gmail.com
+          </a>
+          <a
+            href="https://t.me/snowplugwalk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white transition-colors"
+          >
+            Telegram — @snowplugwalk
+          </a>
+        </div>
       </div>
 
-      <div className="absolute bottom-12">
-        <SpinningCircle text="IZUKI.LABS • EST 2026 • " size={160} />
+      <div className="absolute bottom-8 text-xs text-white/15">
+        © 2026 izuki.labs
       </div>
     </main>
   );

@@ -1,55 +1,43 @@
-import ExperienceStack from "@/components/ExperienceStack";
-import PricingMatrix from "@/components/PricingMatrix";
-import ServiceMenu from "@/components/ServiceMenu";
-import SocialPrism from "@/components/SocialPrism";
-import HighlightSlider from "@/components/HighlightSlider";
-import LeadChatbot from "@/components/LeadChatbot";
-import SpinningCircle from "@/components/SpinningCircle";
+import Header from "@/components/Header";
+import HeroSection from "@/components/HeroSection";
+import WorkShowcase from "@/components/WorkShowcase";
+import AboutMarquee from "@/components/AboutMarquee";
+import PricingSection from "@/components/PricingSection";
+import CaseStudy from "@/components/CaseStudy";
+import PoliciesAccordion from "@/components/PoliciesAccordion";
+import ContactFooter from "@/components/ContactFooter";
+import ChatBubble from "@/components/ChatBubble";
 
 export default function SocialMediaPackagePage() {
   return (
-    <main className="min-h-screen bg-background">
-      {/* 1. Hero Section */}
-      <section className="min-h-screen flex flex-col items-center justify-center pt-24">
-        <ExperienceStack />
-      </section>
+    <>
+      <Header />
 
-      {/* 2. Pricing Section */}
-      <section id="pricing">
-        <PricingMatrix />
-        <ServiceMenu />
-      </section>
+      <main>
+        {/* Hero — Black bg, cascading images, massive text */}
+        <HeroSection />
 
-      {/* 3. Social Proof Section */}
-      <section id="social">
-        <SocialPrism />
-      </section>
+        {/* Selected Work — Off-white bg, phone mockups */}
+        <WorkShowcase />
 
-      {/* 4. Case Study Section */}
-      <section id="cases">
-        <HighlightSlider />
-      </section>
+        {/* About — Black bg, text reveal */}
+        <AboutMarquee />
 
-      {/* 5. Footer with Spinning Motif */}
-      <footer className="py-24 border-t border-white/5 flex flex-col items-center justify-center gap-12">
-        <div className="text-center">
-          <p className="text-muted-foreground font-mono text-xs uppercase tracking-widest mb-4">Ready to architect your brand?</p>
-          <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">
-            Build the <br /> Atmosphere
-          </h2>
-        </div>
-        
-        <div data-cursor="JOIN">
-          <SpinningCircle text="JOIN IZUKI • START GROWING • " size={240} />
-        </div>
+        {/* Pricing — Off-white bg, 3 cards */}
+        <PricingSection />
 
-        <div className="text-[10px] font-mono opacity-20 uppercase tracking-[0.5em] mt-12">
-          © 2026 IZUKI.LABS • ALL RIGHTS RESERVED
-        </div>
-      </footer>
+        {/* Case Study — Black bg, before/after */}
+        <CaseStudy />
 
-      {/* Persistent Assistant */}
-      <LeadChatbot />
-    </main>
+        {/* Policies — Off-white bg, accordion */}
+        <PoliciesAccordion />
+
+        {/* Contact & Footer — Black bg */}
+        <ContactFooter />
+      </main>
+
+      {/* Floating Chat */}
+      <ChatBubble />
+    </>
   );
 }

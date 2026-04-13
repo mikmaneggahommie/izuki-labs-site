@@ -1,75 +1,384 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════
+   izuki.labs — Design System
+   Inspired by nickzoutendijk.nl
+   ═══════════════════════════════════════════ */
+
 @theme {
-  /* Colors */
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
+  --color-bg-dark: #000000;
+  --color-bg-light: #E8E8E3;
+  --color-text-dark: #1A1A1A;
+  --color-text-light: #FFFFFF;
+  --color-accent: #FF3F11;
+  --color-muted: #999999;
+  --color-border-dark: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Reset & Base ─── */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: #000;
+  color: #fff;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+/* ─── Scrollbar ─── */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #000;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ─── Typography ─── */
+
+.font-display {
+  font-family: var(--font-syne), system-ui, sans-serif;
+}
+
+.text-hero {
+  font-size: clamp(3rem, 10vw, 10rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.text-section {
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.text-body-large {
+  font-size: clamp(1.25rem, 2.5vw, 2.2rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+.text-label {
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.text-meta {
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  opacity: 0.6;
+}
+
+/* ─── Section Backgrounds ─── */
+
+.section-dark {
+  background: var(--color-bg-dark);
+  color: var(--color-text-light);
+}
+
+.section-light {
+  background: var(--color-bg-light);
+  color: var(--color-text-dark);
+}
+
+/* ─── Marquee Animation ─── */
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.333%); }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* ─── Text Reveal (GSAP-enhanced, CSS fallback) ─── */
+
+.reveal-line {
+  overflow: hidden;
+}
+
+.reveal-line > * {
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-line.revealed > * {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ─── Image Cards ─── */
+
+.image-card {
+  overflow: hidden;
+  border-radius: 0.5rem;
+  position: relative;
+}
+
+.image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.image-card:hover img {
+  transform: scale(1.05);
+}
+
+/* ─── Staircase Hero Images ─── */
+
+.staircase-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.staircase-image {
+  position: absolute;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.staircase-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ─── Accent Square (nickzoutendijk marker) ─── */
+
+.accent-square {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  background: var(--color-accent);
+  border-radius: 2px;
+  margin-left: 0.1em;
+  vertical-align: middle;
+}
+
+/* ─── Pricing Cards ─── */
+
+.pricing-card {
+  background: #fff;
+  color: var(--color-text-dark);
+  border-radius: 1rem;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pricing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.15);
+}
+
+.pricing-card.featured {
+  background: var(--color-text-dark);
+  color: #fff;
+  transform: scale(1.02);
+}
+
+.pricing-card.featured:hover {
+  transform: scale(1.02) translateY(-4px);
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.4);
+}
+
+/* ─── Rotating CTA Circle ─── */
+
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
+
+/* ─── Before/After Slider ─── */
+
+.comparison-slider {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  cursor: ew-resize;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.comparison-slider img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* ─── Accordion ─── */
+
+.accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  transition: opacity 0.3s;
+}
+
+.accordion-trigger:hover {
+  opacity: 0.7;
+}
+
+/* ─── Chat Bubble ─── */
+
+.chat-bubble-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: #fff;
+  color: #000;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chat-bubble-btn:hover {
+  transform: scale(1.1);
+}
+
+.chat-panel {
+  position: fixed;
+  bottom: 6rem;
+  right: 2rem;
+  width: 380px;
+  max-height: 560px;
+  background: #fff;
+  color: #1A1A1A;
+  border-radius: 1rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Phone Mockup ─── */
+
+.phone-mockup {
+  position: relative;
+  width: 280px;
+  height: 560px;
+  background: #1a1a1a;
+  border-radius: 2.5rem;
+  padding: 0.75rem;
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.4);
+}
+
+.phone-mockup-screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 2rem;
+  overflow: hidden;
+  background: #000;
+}
+
+.phone-mockup-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.phone-mockup-notch {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 35%;
+  height: 1.75rem;
+  background: #1a1a1a;
+  border-radius: 0 0 1rem 1rem;
+  z-index: 2;
+}
+
+/* ─── Responsive ─── */
+
+@media (max-width: 768px) {
+  .text-hero {
+    font-size: clamp(2.5rem, 12vw, 5rem);
+  }
   
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-
-  /* Glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-blur: 20px;
-
-  /* Shadows - 5-layer soft shadows */
-  --shadow-liquid: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-
-:root {
-  /* High-Contrast Monochromatic Palette */
-  --background: 0 0% 0%; /* #000000 */
-  --foreground: 0 0% 100%; /* #FFFFFF */
-
-  --accent: 0 0% 100%; /* Pure White Accent */
-  --accent-foreground: 0 0% 0%;
-
-  --muted: 0 0% 10%;
-  --muted-foreground: 0 0% 50%;
-
-  --border: 0 0% 15%;
-  --input: 0 0% 15%;
-  --ring: 0 0% 100%;
-
-  --radius: 1.5rem;
-}
-
-@layer base {
-  * {
-    @apply border-border;
+  .phone-mockup {
+    width: 220px;
+    height: 440px;
   }
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
-    cursor: none; /* Hide default cursor for LiquidCursor */
-  }
-
-  /* Noise Overlay - Intensified */
-  .noise-overlay {
-    pointer-events: none;
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 9999;
-    opacity: 0.05;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    filter: contrast(120%) brightness(100%);
-  }
-
-  /* Liquid Glass Utility - Higher Contrast */
-  .liquid-glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-liquid);
+  
+  .chat-panel {
+    width: calc(100vw - 2rem);
+    right: 1rem;
+    bottom: 5rem;
   }
 }
