@@ -28,6 +28,12 @@ Known visitor details:
 - Name: ${userInfo?.name || "Unknown"}
 - Phone: ${userInfo?.phone || "Unknown"}
 - Email: ${userInfo?.email || "Unknown"}
+
+IMPORTANT: 
+- Stay strictly within the Izuki Labs knowledge base. 
+- If asked about "20k plan", refer to the Remote Designer.
+- Keep responses under 3 sentences unless technical details are requested.
+- Maintain a sharp, premium, and calm tone.
 `;
 
     // Format the conversation history for Gemini (excluding the final message which is sent below)
@@ -43,7 +49,7 @@ Known visitor details:
           role: "model",
           parts: [
             {
-              text: "Understood. I’ll answer with a premium, concise, systems-first tone.",
+              text: "Understood. I am now acting as the Izuki Labs studio concierge. I will be direct, systems-focused, and premium in my advice.",
             },
           ],
         },
