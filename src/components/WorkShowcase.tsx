@@ -49,9 +49,9 @@ export default function WorkShowcase() {
       className="section-light py-24 md:py-32"
     >
       <Script src="https://elfsightcdn.com/platform.js" strategy="lazyOnload" />
-      <div className="max-w-[1400px] mx-auto px-6 md:px-10">
+      <div className="max-w-7xl mx-auto px-8 md:px-16 lg:px-24">
         {/* Section Header */}
-        <div className="mb-20">
+        <div className="mb-24 text-center">
           <p className="text-label text-[#1A1A1A]/40 mb-4">Selected Work</p>
           <h2 className="font-display text-section text-[#1A1A1A]">
             Social media accounts

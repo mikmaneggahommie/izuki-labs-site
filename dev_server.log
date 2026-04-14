@@ -20,3 +20,720 @@
 [browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
 [browser] Image with src "/images/1.JPG" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
  GET / 200 in 605ms (next.js: 19ms, application-code: 587ms)
+ GET / 200 in 274ms (next.js: 8ms, application-code: 267ms)
+ GET / 200 in 215ms (next.js: 5ms, application-code: 210ms)
+ GET /SocialmediaPackage 200 in 673ms (next.js: 11ms, application-code: 662ms)
+[browser] Image with src "/images/1.JPG" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+✓ Compiled in 246ms
+✓ Compiled in 27ms
+✓ Compiled in 61ms
+✓ Compiled in 34ms
+ GET /SocialmediaPackage 200 in 387ms (next.js: 19ms, application-code: 368ms)
+✓ Compiled in 127ms
+✓ Compiled in 102ms
+ GET /SocialmediaPackage 200 in 215ms (next.js: 24ms, application-code: 191ms)
+[browser] Image with src "/images/1.JPG" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+✓ Compiled in 81ms
+✓ Compiled in 110ms
+✓ Compiled in 1712ms
+✓ Compiled in 0ms
+ GET /SocialmediaPackage 200 in 367ms (next.js: 69ms, application-code: 299ms)
+ GET /SocialmediaPackage 200 in 1822ms (next.js: 620ms, application-code: 1202ms)
+ GET /SocialmediaPackage 200 in 353ms (next.js: 212ms, application-code: 140ms)
+ GET /SocialmediaPackage 200 in 1868ms (next.js: 664ms, application-code: 1204ms)
+ GET /SocialmediaPackage 200 in 249ms (next.js: 136ms, application-code: 113ms)
+ GET /SocialmediaPackage 200 in 1080ms (next.js: 199ms, application-code: 881ms)
+ GET /SocialmediaPackage 200 in 799ms (next.js: 27ms, application-code: 772ms)
+ GET /SocialmediaPackage 200 in 461ms (next.js: 18ms, application-code: 443ms)
+[browser] Image with src "/images/1.JPG" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/images/1.JPG" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/images/1.JPG" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+✓ Compiled in 220ms
+⨯ ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  [90m66 |[0m           </div>
+  [90m67 |[0m         </div>
+[31m[1m>[0m [90m68 |[0m       </header>
+  [90m   |[0m                [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m69 |[0m
+  [90m   |[0m [31m[1m^[0m
+[31m[1m>[0m [90m70 |[0m       {[90m/* Full-screen Menu Overlay */[0m}
+  [90m   |[0m [31m[1m^^^^^^[0m
+  [90m71 |[0m       <[33mAnimatePresence[0m>
+  [90m72 |[0m         {menuOpen && (
+  [90m73 |[0m           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx
+
+
+⨯ ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  [90m66 |[0m           </div>
+  [90m67 |[0m         </div>
+[31m[1m>[0m [90m68 |[0m       </header>
+  [90m   |[0m                [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m69 |[0m
+  [90m   |[0m [31m[1m^[0m
+[31m[1m>[0m [90m70 |[0m       {[90m/* Full-screen Menu Overlay */[0m}
+  [90m   |[0m [31m[1m^^^^^^[0m
+  [90m71 |[0m       <[33mAnimatePresence[0m>
+  [90m72 |[0m         {menuOpen && (
+  [90m73 |[0m           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx
+
+
+⨯ ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  [90m66 |[0m           </div>
+  [90m67 |[0m         </div>
+[31m[1m>[0m [90m68 |[0m       </header>
+  [90m   |[0m                [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m69 |[0m
+  [90m   |[0m [31m[1m^[0m
+[31m[1m>[0m [90m70 |[0m       {[90m/* Full-screen Menu Overlay */[0m}
+  [90m   |[0m [31m[1m^^^^^^[0m
+  [90m71 |[0m       <[33mAnimatePresence[0m>
+  [90m72 |[0m         {menuOpen && (
+  [90m73 |[0m           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx
+
+
+⨯ ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  [90m66 |[0m           </div>
+  [90m67 |[0m         </div>
+[31m[1m>[0m [90m68 |[0m       </header>
+  [90m   |[0m                [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m69 |[0m
+  [90m   |[0m [31m[1m^[0m
+[31m[1m>[0m [90m70 |[0m       {[90m/* Full-screen Menu Overlay */[0m}
+  [90m   |[0m [31m[1m^^^^^^[0m
+  [90m71 |[0m       <[33mAnimatePresence[0m>
+  [90m72 |[0m         {menuOpen && (
+  [90m73 |[0m           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx
+
+
+⨯ ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  [90m66 |[0m           </div>
+  [90m67 |[0m         </div>
+[31m[1m>[0m [90m68 |[0m       </header>
+  [90m   |[0m                [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m69 |[0m
+  [90m   |[0m [31m[1m^[0m
+[31m[1m>[0m [90m70 |[0m       {[90m/* Full-screen Menu Overlay */[0m}
+  [90m   |[0m [31m[1m^^^^^^[0m
+  [90m71 |[0m       <[33mAnimatePresence[0m>
+  [90m72 |[0m         {menuOpen && (
+  [90m73 |[0m           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx
+
+
+✓ Compiled in 473ms
+⨯ ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  [90m66 |[0m           </div>
+  [90m67 |[0m         </div>
+[31m[1m>[0m [90m68 |[0m       </header>
+  [90m   |[0m                [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m69 |[0m
+  [90m   |[0m [31m[1m^[0m
+[31m[1m>[0m [90m70 |[0m       {[90m/* Full-screen Menu Overlay */[0m}
+  [90m   |[0m [31m[1m^^^^^^[0m
+  [90m71 |[0m       <[33mAnimatePresence[0m>
+  [90m72 |[0m         {menuOpen && (
+  [90m73 |[0m           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx
+
+
+⨯ ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  [90m66 |[0m           </div>
+  [90m67 |[0m         </div>
+[31m[1m>[0m [90m68 |[0m       </header>
+  [90m   |[0m                [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m69 |[0m
+  [90m   |[0m [31m[1m^[0m
+[31m[1m>[0m [90m70 |[0m       {[90m/* Full-screen Menu Overlay */[0m}
+  [90m   |[0m [31m[1m^^^^^^[0m
+  [90m71 |[0m       <[33mAnimatePresence[0m>
+  [90m72 |[0m         {menuOpen && (
+  [90m73 |[0m           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx
+
+
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+ GET /SocialmediaPackage 500 in 1932ms (next.js: 1692ms, application-code: 240ms)
+ GET /SocialmediaPackage 500 in 1936ms (next.js: 1846ms, application-code: 90ms)
+ GET /SocialmediaPackage 500 in 2.1s (next.js: 2.0s, application-code: 74ms)
+ GET /SocialmediaPackage 500 in 2.1s (next.js: 2.1s, application-code: 60ms)
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+⨯ ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  [90m66 |[0m           </div>
+  [90m67 |[0m         </div>
+[31m[1m>[0m [90m68 |[0m       </header>
+  [90m   |[0m                [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m69 |[0m
+  [90m   |[0m [31m[1m^[0m
+[31m[1m>[0m [90m70 |[0m       {[90m/* Full-screen Menu Overlay */[0m}
+  [90m   |[0m [31m[1m^^^^^^[0m
+  [90m71 |[0m       <[33mAnimatePresence[0m>
+  [90m72 |[0m         {menuOpen && (
+  [90m73 |[0m           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx
+
+
+⨯ ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  [90m66 |[0m           </div>
+  [90m67 |[0m         </div>
+[31m[1m>[0m [90m68 |[0m       </header>
+  [90m   |[0m                [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m69 |[0m
+  [90m   |[0m [31m[1m^[0m
+[31m[1m>[0m [90m70 |[0m       {[90m/* Full-screen Menu Overlay */[0m}
+  [90m   |[0m [31m[1m^^^^^^[0m
+  [90m71 |[0m       <[33mAnimatePresence[0m>
+  [90m72 |[0m         {menuOpen && (
+  [90m73 |[0m           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx
+
+
+⨯ ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  [90m66 |[0m           </div>
+  [90m67 |[0m         </div>
+[31m[1m>[0m [90m68 |[0m       </header>
+  [90m   |[0m                [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m69 |[0m
+  [90m   |[0m [31m[1m^[0m
+[31m[1m>[0m [90m70 |[0m       {[90m/* Full-screen Menu Overlay */[0m}
+  [90m   |[0m [31m[1m^^^^^^[0m
+  [90m71 |[0m       <[33mAnimatePresence[0m>
+  [90m72 |[0m         {menuOpen && (
+  [90m73 |[0m           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx
+
+
+ GET /SocialmediaPackage 500 in 54ms (next.js: 29ms, application-code: 25ms)
+ GET /SocialmediaPackage 500 in 58ms (next.js: 43ms, application-code: 14ms)
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] Uncaught Error: ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx
+
+
+    at <unknown> (Error: ./Desktop/Social Media Package/src/components/Header.tsx:68:16)
+    at <unknown> (Error: (./Desktop/Social Media Package/src/components/Header.tsx:68:16)
+[browser] Uncaught Error: ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx
+
+
+    at <unknown> (Error: ./Desktop/Social Media Package/src/components/Header.tsx:68:16)
+    at <unknown> (Error: (./Desktop/Social Media Package/src/components/Header.tsx:68:16)
+[browser] Uncaught Error: ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx
+
+
+    at <unknown> (Error: ./Desktop/Social Media Package/src/components/Header.tsx:68:16)
+    at <unknown> (Error: (./Desktop/Social Media Package/src/components/Header.tsx:68:16)
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+[browser] ./Desktop/Social Media Package/src/components/Header.tsx:68:16
+Expected '</', got 'jsx text'
+  66 |           </div>
+  67 |         </div>
+> 68 |       </header>
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |
+     | ^
+> 70 |       {/* Full-screen Menu Overlay */}
+     | ^^^^^^
+  71 |       <AnimatePresence>
+  72 |         {menuOpen && (
+  73 |           <motion.div
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./Desktop/Social Media Package/src/components/Header.tsx
+    ./Desktop/Social Media Package/src/app/SocialmediaPackage/page.tsx 
+ GET /SocialmediaPackage 200 in 446ms (next.js: 145ms, application-code: 300ms)
+ GET /SocialmediaPackage 200 in 531ms (next.js: 5ms, application-code: 525ms)
+ GET /SocialmediaPackage 200 in 538ms (next.js: 84ms, application-code: 454ms)
+ GET /SocialmediaPackage 200 in 422ms (next.js: 41ms, application-code: 381ms)
+[browser] Image with src "/images/1.JPG" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/images/1.JPG" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/images/1.JPG" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+✓ Compiled in 35ms
+✓ Compiled in 31ms

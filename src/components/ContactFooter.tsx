@@ -48,50 +48,29 @@ export default function ContactFooter() {
     >
       <div className="max-w-[1400px] mx-auto px-6 md:px-10">
         {/* CTA Area */}
-        <div className="contact-text text-center mb-20">
-          <p className="text-body-large text-white/60 max-w-2xl mx-auto mb-12">
+        <div className="contact-text text-center mb-0">
+          <h2 className="font-display text-section text-white mb-8">
+            Let&apos;s build your<br />
+            digital identity
+          </h2>
+          <p className="text-body-large text-white/60 max-w-2xl mx-auto mb-16">
             With 4+ years of graphic design experience, I craft scalable content systems for ambitious brands. If you have a project to discuss, let&apos;s talk.
           </p>
 
-          {/* Rotating Circle CTA with Face */}
-          <div className="flex justify-center">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
             <a
               href="mailto:it.mikiyas.daniel@gmail.com"
-              className="relative group"
+              className="px-10 py-5 bg-[#FF3F11] text-white font-display font-bold uppercase tracking-widest text-sm rounded-full hover:scale-105 transition-transform shadow-2xl"
             >
-              {/* Rotating text */}
-              <svg
-                viewBox="0 0 200 200"
-                className="spin-slow w-48 h-48 md:w-56 md:h-56"
-              >
-                <defs>
-                  <path
-                    id="contactCirclePath"
-                    d="M 100, 100 m -80, 0 a 80,80 0 1,1 160,0 a 80,80 0 1,1 -160,0"
-                  />
-                </defs>
-                <text
-                  className="fill-white text-[11px] font-bold uppercase"
-                  style={{ letterSpacing: "0.25em" }}
-                >
-                  <textPath xlinkHref="#contactCirclePath">
-                    SEND A MESSAGE • GET IN TOUCH • SEND A MESSAGE • GET IN TOUCH •
-                  </textPath>
-                </text>
-              </svg>
-
-              {/* Center face */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-white/20 group-hover:border-[#FF3F11] transition-colors duration-500 group-hover:scale-110 transform transition-transform">
-                  <Image
-                    src="/images/1.JPG"
-                    alt="Mikiyas Daniel"
-                    width={112}
-                    height={112}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-              </div>
+              Start a Project
+            </a>
+            <a
+              href="https://t.me/snowplugwalk"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-10 py-5 bg-white/5 text-white border border-white/10 backdrop-blur-md font-display font-bold uppercase tracking-widest text-sm rounded-full hover:bg-white/10 transition-colors"
+            >
+              Message via Telegram
             </a>
           </div>
         </div>

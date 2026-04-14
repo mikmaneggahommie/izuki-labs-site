@@ -67,9 +67,9 @@ export default function CaseStudy() {
       id="cases"
       className="section-dark py-24 md:py-32"
     >
-      <div className="max-w-[1400px] mx-auto px-6 md:px-10 case-content">
+      <div className="max-w-7xl mx-auto px-8 md:px-16 lg:px-24 case-content">
         {/* Header */}
-        <div className="mb-16">
+        <div className="mb-24 text-center">
           <p className="text-label text-white/40 mb-4">Case Study</p>
           <h2 className="font-display text-section text-white">
             This month&apos;s
@@ -86,7 +86,7 @@ export default function CaseStudy() {
           onPointerUp={onPointerUp}
           onPointerLeave={onPointerUp}
           onPointerMove={onPointerMove}
-          className="comparison-slider relative aspect-[16/9] w-full max-w-5xl mx-auto mb-16"
+          className="comparison-slider relative aspect-[16/9] w-full max-w-4xl mx-auto mb-20 shadow-2xl overflow-hidden rounded-2xl border border-white/5"
           style={{ touchAction: "none" }}
         >
           {/* Before — full background */}
@@ -145,17 +145,17 @@ export default function CaseStudy() {
         </div>
 
         {/* Case Study Text */}
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-2xl mx-auto text-center md:text-left">
           <h3 className="font-display text-2xl font-bold tracking-tight text-white mb-6">
             InVision Africa — 5th Round Student Registration
           </h3>
-          <p className="text-white/50 leading-relaxed mb-4">
+          <p className="text-white/50 leading-relaxed mb-6">
             InVision Africa approached me to overhaul their social media
             presence and create a compelling post for their 5th round student
             registration campaign. The brief was clear: make it impossible to
             scroll past.
           </p>
-          <p className="text-white/50 leading-relaxed mb-4">
+          <p className="text-white/50 leading-relaxed mb-6">
             After implementing the new design system — with bold typography,
             structured layouts, and an attention-grabbing color palette — the
             results spoke for themselves.

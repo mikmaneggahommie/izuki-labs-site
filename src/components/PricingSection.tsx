@@ -157,23 +157,23 @@ export default function PricingSection() {
       id="pricing"
       className="section-light py-24 md:py-32"
     >
-      <div className="max-w-[1400px] mx-auto px-6 md:px-10">
+      <div className="max-w-7xl mx-auto px-8 md:px-16 lg:px-24">
         {/* Header */}
-        <div className="mb-20">
+        <div className="mb-24 text-center">
           <p className="text-label text-[#1A1A1A]/40 mb-4">
             Fixed Monthly Retainer
           </p>
           <h2 className="font-display text-section text-[#1A1A1A]">
             Pricing<span className="accent-square" />
           </h2>
-          <p className="text-sm text-[#1A1A1A]/50 mt-4 max-w-lg leading-relaxed">
+          <p className="text-sm text-[#1A1A1A]/50 mt-6 max-w-lg mx-auto leading-relaxed">
             Choose a package that fits your brand. All packages include
             dedicated design support with predictable monthly costs.
           </p>
         </div>
 
         {/* Pricing Cards — order: Basic, Remote Designer (center), Starter */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12 items-start mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 xl:gap-16 items-start mt-12">
           {packages.map((pkg) => (
             <div
               key={pkg.id}

@@ -47,7 +47,7 @@ export default function AboutMarquee() {
       id="about"
       className="section-dark py-24 md:py-40"
     >
-      <div className="max-w-[1400px] mx-auto px-6 md:px-10">
+      <div className="max-w-7xl mx-auto px-8 md:px-16 lg:px-24">
         {/* Large text block — line-by-line reveal */}
         <div className="max-w-5xl">
           <div className="overflow-hidden mb-6">

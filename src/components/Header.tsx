@@ -46,29 +46,33 @@ export default function Header() {
           backdropFilter: scrolled ? "blur(20px)" : "none",
         }}
       >
-        <div className="grid grid-cols-4 items-center px-6 md:px-10 py-4 md:py-5">
-          {/* Brand */}
-          <a href="/" onClick={(e) => handleNavClick(e, "/")} className="font-display text-sm md:text-base font-bold tracking-tight text-white hover:opacity-70 transition-opacity">
-            izuki.labs
-          </a>
+        <div className="max-w-7xl mx-auto w-full px-8 md:px-16 lg:px-24">
+          <div className="grid grid-cols-2 md:grid-cols-4 items-center py-4 md:py-6">
+            {/* Brand */}
+            <a href="/" onClick={(e) => handleNavClick(e, "/")} className="font-display text-base font-bold tracking-tight text-white hover:opacity-70 transition-opacity">
+              izuki.labs
+            </a>
 
-          {/* Location */}
-          <span className="text-label text-white/50 hidden md:block text-center cursor-default">
-            Addis Ababa
-          </span>
+            {/* Location */}
+            <span className="text-label text-white/50 hidden md:block text-center cursor-default">
+              Addis Ababa
+            </span>
 
-          {/* Role */}
-          <span className="text-label text-white/50 hidden md:block text-center cursor-default">
-            Social Media Designer
-          </span>
+            {/* Role */}
+            <span className="text-label text-white/50 hidden md:block text-center cursor-default">
+              Social Media Designer
+            </span>
 
-          {/* Menu Toggle */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="text-sm font-medium text-white hover:opacity-70 transition-opacity text-right bg-transparent border-none cursor-pointer"
-          >
-            {menuOpen ? "Close" : "Menu"}
-          </button>
+            {/* Menu Toggle */}
+            <div className="text-right">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="text-sm font-bold uppercase tracking-widest text-white hover:opacity-70 transition-opacity bg-transparent border-none cursor-pointer"
+              >
+                {menuOpen ? "Close" : "Menu"}
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 

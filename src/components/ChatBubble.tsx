@@ -1,74 +1,110 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, X, Send, ArrowRight } from "lucide-react";
+import { MessageSquare, X, Send } from "lucide-react";
+
+type FlowState = "COLLECTING_NAME" | "COLLECTING_PHONE" | "COLLECTING_EMAIL" | "CHATTING";
 
 export default function ChatBubble() {
   const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState(1);
+  const [flowState, setFlowState] = useState<FlowState>("COLLECTING_NAME");
   const [formData, setFormData] = useState({ name: "", phone: "", email: "" });
-  const [messages, setMessages] = useState<{ role: string; content: string }[]>(
-    []
-  );
+  const [messages, setMessages] = useState<{ role: string; content: string }[]>([
+    {
+      role: "assistant",
+      content: "Hi! I'm the izuki.labs assistant. 👋 What's your name?",
+    },
+  ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSubmitInfo = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (step < 3) {
-      setStep(step + 1);
-    } else {
-      setStep(4);
-      setMessages([
-        {
-          role: "assistant",
-          content: `Hey ${formData.name}! 👋 I'm the izuki.labs assistant. Ask me anything about our pricing, packages, or services.`,
-        },
-      ]);
-    }
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      scrollToBottom();
+    }
+  }, [messages, isLoading, isOpen]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    const userMessage = { role: "user", content: input };
+    const userContent = input.trim();
+    const userMessage = { role: "user", content: userContent };
+    
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [...messages, userMessage],
-          userInfo: formData,
-        }),
-      });
-      const data = await res.json();
-      if (data.content) {
-        setMessages((prev) => [...prev, data]);
-      }
-    } catch {
+    // Artificial delay for "typing" feel
+    const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+    await delay(1000);
+
+    if (flowState === "COLLECTING_NAME") {
+      setFormData((prev) => ({ ...prev, name: userContent }));
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content:
-            "Sorry, I'm having trouble connecting. Please try reaching out directly via email or Telegram.",
+          content: `Nice to meet you, ${userContent}! What's your phone number so we can reach out?`,
         },
       ]);
-    } finally {
+      setFlowState("COLLECTING_PHONE");
       setIsLoading(false);
+    } else if (flowState === "COLLECTING_PHONE") {
+      setFormData((prev) => ({ ...prev, phone: userContent }));
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Got it. And your email address?",
+        },
+      ]);
+      setFlowState("COLLECTING_EMAIL");
+      setIsLoading(false);
+    } else if (flowState === "COLLECTING_EMAIL") {
+      setFormData((prev) => ({ ...prev, email: userContent }));
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Perfect! I've saved your details. How can I facilitate your brand architecture today? You can ask about our pricing, packages, or specific services.",
+        },
+      ]);
+      setFlowState("CHATTING");
+      setIsLoading(false);
+    } else {
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [...messages, userMessage],
+            userInfo: formData,
+          }),
+        });
+        const data = await res.json();
+        if (data.content) {
+          setMessages((prev) => [...prev, data]);
+        }
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: "Sorry, I'm having trouble connecting. Please try reaching out directly via email or Telegram.",
+          },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
-
-  const stepLabels = ["Your name", "Phone number", "Email address"];
-  const stepPlaceholders = ["e.g. Abebe Kebede", "e.g. 0912345678", "e.g. abebe@gmail.com"];
-  const stepTypes = ["text", "tel", "email"];
-  const stepKeys = ["name", "phone", "email"] as const;
 
   return (
     <>
@@ -111,131 +147,96 @@ export default function ChatBubble() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-24 right-4 md:bottom-28 md:right-10 z-[90] w-[calc(100vw-2rem)] md:w-[380px] h-[70vh] max-h-[580px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col"
+            className="fixed bottom-24 right-4 md:bottom-28 md:right-10 z-[90] w-[calc(100vw-2rem)] md:w-[380px] h-[75vh] max-h-[600px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="p-5 border-b border-[#1A1A1A]/10">
+            <div className="p-5 border-b border-[#1A1A1A]/10 bg-white/50 backdrop-blur-sm sticky top-0 z-10">
               <h3 className="font-display text-lg font-bold tracking-tight text-[#1A1A1A]">
                 izuki.labs
               </h3>
               <p className="text-xs text-[#1A1A1A]/40 mt-0.5">
-                Ask about pricing, packages, or services
+                AI Brand Architect
               </p>
             </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-5" style={{ maxHeight: 350 }}>
-              {step <= 3 ? (
-                <form onSubmit={handleSubmitInfo} className="space-y-5">
-                  {/* Progress */}
-                  <div className="flex gap-1">
-                    {[1, 2, 3].map((s) => (
-                      <div
-                        key={s}
-                        className="h-1 flex-1 rounded-full transition-colors"
-                        style={{
-                          background:
-                            s <= step ? "#1A1A1A" : "rgba(26,26,26,0.1)",
-                        }}
-                      />
-                    ))}
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-medium text-[#1A1A1A]/50 block mb-2">
-                      {stepLabels[step - 1]}
-                    </label>
-                    <input
-                      required
-                      type={stepTypes[step - 1]}
-                      placeholder={stepPlaceholders[step - 1]}
-                      value={formData[stepKeys[step - 1]]}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          [stepKeys[step - 1]]: e.target.value,
-                        })
-                      }
-                      className="w-full border border-[#1A1A1A]/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/20 bg-transparent text-[#1A1A1A]"
-                      autoFocus
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full bg-[#1A1A1A] text-white py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-[#333] transition-colors"
-                  >
-                    {step < 3 ? "Continue" : "Start Chat"}
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-
-                  {step === 1 && (
-                    <p className="text-xs text-[#1A1A1A]/30 text-center">
-                      Or call directly:{" "}
-                      <a href="tel:+251954676421" className="underline">
-                        +251 954 676 421
-                      </a>
-                    </p>
-                  )}
-                </form>
-              ) : (
-                <div className="space-y-4">
-                  {messages.map((m, i) => (
+            {/* Messages Content */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {messages.map((m, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className={`p-3.5 rounded-2xl text-[13px] leading-relaxed max-w-[85%] ${
+                    m.role === "assistant"
+                      ? "bg-[#F4F4F4] text-[#1A1A1A] rounded-tl-none mr-auto shadow-sm"
+                      : "bg-[#1A1A1A] text-white rounded-tr-none ml-auto shadow-md"
+                  }`}
+                >
+                  {m.content}
+                </motion.div>
+              ))}
+              
+              {isLoading && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-[#F4F4F4] text-[#1A1A1A] p-3.5 rounded-2xl rounded-tl-none mr-auto shadow-sm flex gap-1"
+                >
+                  {[0, 1, 2].map((i) => (
                     <motion.div
                       key={i}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className={`p-3 rounded-lg text-sm leading-relaxed max-w-[85%] ${
-                        m.role === "assistant"
-                          ? "bg-[#f5f5f0] text-[#1A1A1A] mr-auto"
-                          : "bg-[#1A1A1A] text-white ml-auto"
-                      }`}
-                    >
-                      {m.content}
-                    </motion.div>
+                      animate={{ opacity: [0.3, 1, 0.3] }}
+                      transition={{
+                        repeat: Infinity,
+                        duration: 1,
+                        delay: i * 0.2,
+                      }}
+                      className="w-1.5 h-1.5 rounded-full bg-[#1A1A1A]/30"
+                    />
                   ))}
-                  {isLoading && (
-                    <div className="flex gap-1 px-3 py-2">
-                      {[0, 1, 2].map((i) => (
-                        <motion.div
-                          key={i}
-                          animate={{ opacity: [0.3, 1, 0.3] }}
-                          transition={{
-                            repeat: Infinity,
-                            duration: 1,
-                            delay: i * 0.2,
-                          }}
-                          className="w-1.5 h-1.5 rounded-full bg-[#1A1A1A]/30"
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
+                </motion.div>
               )}
+              <div ref={messagesEndRef} />
             </div>
 
-            {/* Chat Input */}
-            {step === 4 && (
-              <form
-                onSubmit={handleSendMessage}
-                className="p-4 border-t border-[#1A1A1A]/10 flex gap-2"
-              >
+            {/* Input Area */}
+            <form
+              onSubmit={handleSendMessage}
+              className="p-4 border-t border-[#1A1A1A]/10 bg-white"
+            >
+              <div className="relative flex items-center">
                 <input
-                  className="flex-1 border border-[#1A1A1A]/10 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#1A1A1A]/20 bg-transparent text-[#1A1A1A]"
-                  placeholder="Type a message..."
+                  autoFocus
+                  className="w-full border border-[#1A1A1A]/10 rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-[#1A1A1A]/10 bg-[#F9F9F9] text-[#1A1A1A] pr-12 transition-all placeholder:text-gray-400"
+                  placeholder={
+                    flowState === "COLLECTING_NAME" ? "Type your name..." :
+                    flowState === "COLLECTING_PHONE" ? "Enter phone number..." :
+                    flowState === "COLLECTING_EMAIL" ? "Enter your email..." : 
+                    "Ask me anything..."
+                  }
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
+                  disabled={isLoading}
                 />
                 <button
                   type="submit"
-                  disabled={isLoading}
-                  className="bg-[#1A1A1A] text-white p-2.5 rounded-lg disabled:opacity-40 hover:bg-[#333] transition-colors"
+                  disabled={isLoading || !input.trim()}
+                  className="absolute right-2 p-1.5 bg-[#1A1A1A] text-white rounded-lg disabled:bg-gray-200 transition-colors"
                 >
                   <Send className="w-4 h-4" />
                 </button>
-              </form>
-            )}
+              </div>
+              
+              {flowState === "COLLECTING_NAME" && !input && (
+                <p className="text-[10px] text-[#1A1A1A]/30 text-center mt-3">
+                  Or reach out directly via{" "}
+                  <a href="tel:+251954676421" className="underline font-semibold text-[#1A1A1A]/50">
+                    +251 954 676 421
+                  </a>
+                </p>
+              )}
+            </form>
           </motion.div>
         )}
       </AnimatePresence>
