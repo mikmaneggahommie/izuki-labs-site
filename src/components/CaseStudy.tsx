@@ -39,10 +39,11 @@ export default function CaseStudy() {
 
         gsap.fromTo(
           revealTargets,
-          { y: 40, opacity: 0 },
+          { y: 40, opacity: 0, filter: "blur(10px)" },
           {
             y: 0,
             opacity: 1,
+            filter: "blur(0px)",
             duration: 0.9,
             stagger: 0.12,
             ease: "power3.out",
@@ -57,7 +58,7 @@ export default function CaseStudy() {
       cleanup = () => context.revert();
     };
 
-    runReveal();
+    void runReveal();
 
     return () => {
       active = false;
@@ -77,25 +78,34 @@ export default function CaseStudy() {
 
   return (
     <section ref={sectionRef} id="cases" className="section-shell">
-      <div className="content-shell">
-        <div data-case-reveal className="mx-auto max-w-5xl text-center">
-          <div className="section-label-row justify-center">
-            <span className="accent-square accent-square--tiny" aria-hidden />
-            <span className="section-label">Case Study</span>
+      <div className="content-shell space-y-14">
+        <div
+          data-case-reveal
+          className="grid gap-8 border-b border-white/10 pb-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,0.5fr)] lg:items-end"
+        >
+          <div className="space-y-5">
+            <div className="section-label-row">
+              <span className="accent-square accent-square--tiny" aria-hidden />
+              <span className="section-label">Case Study</span>
+            </div>
+
+            <h2 className="display-title max-w-[10ch]">
+              InVision Africa
+              <span className="accent-square" aria-hidden />
+            </h2>
           </div>
 
-          <h2 className="display-title mt-5 max-w-[12ch] mx-auto">
-            THIS MONTH&apos;S HIGHLIGHTED DESIGN
-            <span className="accent-square" aria-hidden />
-          </h2>
-
-          <p className="section-label mt-5">April 2026</p>
+          <p className="body-copy max-w-[34ch] lg:justify-self-end">
+            A before-and-after look at how I tightened the hierarchy, clarified
+            the messaging, and pushed the campaign toward a stronger
+            registration response.
+          </p>
         </div>
 
-        <div data-case-reveal className="mt-16 px-0 md:px-8">
+        <div data-case-reveal>
           <div
             ref={containerRef}
-            className="relative mx-auto aspect-[16/9] w-full max-w-[900px] overflow-hidden rounded-[12px] border border-white/10 bg-[#0A0A0A] shadow-[0_25px_90px_rgba(0,0,0,0.45)]"
+            className="relative mx-auto aspect-[16/9] w-full max-w-[1120px] overflow-hidden rounded-[18px] border border-white/10 bg-[#0A0A0A] shadow-[0_28px_90px_rgba(0,0,0,0.42)]"
             onPointerDown={(event) => {
               setDragging(true);
               updateSlider(event.clientX);
@@ -114,7 +124,7 @@ export default function CaseStudy() {
                 src="/images/case-study/before.jpg"
                 alt="Before design"
                 fill
-                sizes="(max-width: 900px) 100vw, 900px"
+                sizes="(max-width: 1120px) 100vw, 1120px"
                 className="object-cover grayscale"
               />
             </div>
@@ -124,7 +134,7 @@ export default function CaseStudy() {
                 src="/images/case-study/after.jpg"
                 alt="After design"
                 fill
-                sizes="(max-width: 900px) 100vw, 900px"
+                sizes="(max-width: 1120px) 100vw, 1120px"
                 className="object-cover"
               />
             </motion.div>
@@ -134,12 +144,7 @@ export default function CaseStudy() {
               style={{ left: sliderLeft }}
             >
               <div className="absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black text-white shadow-[0_14px_40px_rgba(0,0,0,0.45)]">
-                <svg
-                  viewBox="0 0 20 20"
-                  className="h-5 w-5"
-                  fill="none"
-                  aria-hidden
-                >
+                <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" aria-hidden>
                   <path
                     d="M6 10H2m0 0 3-3m-3 3 3 3m9-3h4m0 0-3-3m3 3-3 3"
                     stroke="currentColor"
@@ -160,27 +165,35 @@ export default function CaseStudy() {
           </div>
         </div>
 
-        <div data-case-reveal className="mx-auto mt-20 max-w-[700px] space-y-6 text-left">
-          <h3 className="text-[28px] font-bold tracking-[-0.03em] text-white">
-            InVision Africa — 5th Round Student Registration
-          </h3>
+        <div
+          data-case-reveal
+          className="grid gap-8 lg:grid-cols-[minmax(0,0.38fr)_minmax(0,0.72fr)]"
+        >
+          <div className="space-y-2">
+            <p className="section-label text-white/42">Campaign</p>
+            <p className="text-[18px] font-medium leading-[1.5] text-white">
+              5th Round Student Registration
+            </p>
+            <p className="section-label text-white/35">April 2026</p>
+          </div>
 
-          <p className="body-copy">
-            InVision Africa needed a campaign visual with stronger hierarchy,
-            sharper messaging, and a more immediate sense of urgency for their
-            fifth-round student registration push.
-          </p>
+          <div className="space-y-5">
+            <p className="body-copy">
+              The original campaign needed stronger hierarchy, sharper
+              messaging, and a more immediate sense of urgency for the launch.
+            </p>
 
-          <p className="body-copy">
-            The redesign tightened the layout, elevated contrast, and organized
-            the information into a cleaner social-first system that could stop
-            the scroll and communicate fast.
-          </p>
+            <p className="body-copy">
+              I redesigned the visual system to tighten the spacing, increase
+              contrast, and organize the information into a cleaner, faster,
+              more social-first layout.
+            </p>
 
-          <p className="text-[17px] font-semibold leading-[1.7] text-white">
-            The result was a more confident registration campaign that improved
-            clarity, attention, and conversion momentum across the launch.
-          </p>
+            <p className="text-[18px] font-semibold leading-[1.7] text-white">
+              The result is a more confident campaign that improves clarity,
+              attention, and conversion momentum across the registration push.
+            </p>
+          </div>
         </div>
       </div>
     </section>

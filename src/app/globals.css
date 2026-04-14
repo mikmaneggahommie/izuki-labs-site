@@ -45,7 +45,7 @@
   --accent: #ff4425;
   --accent-strong: #ff2300;
   --accent-soft: rgba(255, 68, 37, 0.18);
-  --container: 1400px;
+  --container: 1320px;
   --section-padding-y: clamp(7.5rem, 10vw, 10rem);
   --section-padding-x: max(4vw, 1.1rem);
   --radius: 16px;
@@ -136,7 +136,67 @@ button {
 }
 
 .site-main {
-  background: #000000;
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+.experience-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.experience-aura {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 42rem;
+  height: 42rem;
+  margin-left: -21rem;
+  margin-top: -21rem;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255, 68, 37, 0.14), rgba(255, 68, 37, 0.04) 32%, transparent 66%);
+  filter: blur(20px);
+  opacity: 0.9;
+}
+
+.experience-gradient {
+  position: absolute;
+  inset: auto;
+  border-radius: 999px;
+  filter: blur(90px);
+  opacity: 0.3;
+}
+
+.experience-gradient--top {
+  top: -12rem;
+  right: -8rem;
+  width: 36rem;
+  height: 36rem;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08), transparent 70%);
+}
+
+.experience-gradient--bottom {
+  right: -10rem;
+  bottom: -14rem;
+  width: 44rem;
+  height: 44rem;
+  background: radial-gradient(circle, rgba(255, 68, 37, 0.08), transparent 72%);
+}
+
+.experience-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.07;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 120px 120px;
+  mask-image: radial-gradient(circle at center, black 40%, transparent 82%);
 }
 
 .section-shell {
@@ -289,50 +349,40 @@ button {
 .hero-copy {
   position: absolute;
   left: 0;
-  bottom: clamp(1rem, 4vh, 2.2rem);
+  bottom: clamp(1rem, 4vh, 2.4rem);
   z-index: 1;
-  max-width: min(46rem, 56vw);
-}
-
-.hero-eyebrow {
-  font-size: clamp(11px, 0.95vw, 13px);
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.44);
+  max-width: min(44rem, 56vw);
 }
 
 .hero-wordmark {
-  display: flex;
-  flex-direction: column;
-  margin-top: clamp(0.55rem, 1.5vw, 1rem);
-  font-size: clamp(84px, 13.5vw, 210px);
+  display: grid;
+  gap: clamp(0.25rem, 0.65vw, 0.55rem);
+  font-size: clamp(78px, 11vw, 170px);
   font-weight: 900;
-  letter-spacing: -0.11em;
-  line-height: 0.76;
+  letter-spacing: -0.065em;
+  line-height: 0.84;
   text-transform: uppercase;
-  font-stretch: condensed;
-  transform: scaleX(0.84);
-  transform-origin: left center;
 }
 
-.hero-wordmark span {
-  display: block;
+.hero-wordmark-line {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(0.45rem, 1vw, 0.95rem);
 }
 
-.hero-description {
-  max-width: 31rem;
-  margin-top: clamp(1rem, 1.6vw, 1.4rem);
-  font-size: clamp(15px, 1.2vw, 18px);
-  line-height: 1.45;
-  letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.62);
+.hero-wordmark-dot {
+  width: clamp(12px, 0.9vw, 18px);
+  height: clamp(12px, 0.9vw, 18px);
+  flex: 0 0 clamp(12px, 0.9vw, 18px);
+  border-radius: 999px;
+  background: var(--accent);
+  transform: translateY(-0.08em);
 }
 
 .hero-stage {
   position: absolute;
   inset: 0;
-  overflow: hidden;
+  overflow: visible;
   pointer-events: none;
   perspective: 1800px;
   z-index: 2;
@@ -340,8 +390,8 @@ button {
 
 .hero-unit {
   position: absolute;
-  top: clamp(5.75rem, 15vh, 9.5rem);
-  left: clamp(53%, 59vw, 64%);
+  top: clamp(8rem, 19vh, 11.5rem);
+  left: clamp(52%, 58vw, 62%);
   opacity: 0;
 }
 
@@ -353,12 +403,12 @@ button {
   position: absolute;
   top: 0;
   left: 0;
-  width: clamp(220px, 24vw, 350px);
+  width: clamp(220px, 23vw, 360px);
   aspect-ratio: 0.78;
   overflow: hidden;
   border-radius: 24px;
   background: #070707;
-  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
   transform-style: preserve-3d;
   will-change: transform;
 }
@@ -479,16 +529,16 @@ button {
   }
 
   .hero-wordmark {
-    font-size: clamp(74px, 14vw, 156px);
+    font-size: clamp(72px, 13vw, 138px);
   }
 
   .hero-unit {
-    top: clamp(6rem, 13vh, 8rem);
-    left: clamp(45%, 51vw, 56%);
+    top: clamp(7rem, 15vh, 9rem);
+    left: clamp(43%, 49vw, 54%);
   }
 
   .hero-card {
-    width: clamp(190px, 31vw, 280px);
+    width: clamp(190px, 30vw, 290px);
     border-radius: 20px;
   }
 }
@@ -513,29 +563,22 @@ button {
   }
 
   .hero-copy {
-    max-width: min(17rem, 72vw);
+    max-width: min(18rem, 76vw);
     bottom: 0.9rem;
   }
 
   .hero-wordmark {
-    font-size: clamp(58px, 18vw, 96px);
-    line-height: 0.79;
-    transform: scaleX(0.9);
-  }
-
-  .hero-description {
-    max-width: 15.5rem;
-    font-size: 14px;
-    line-height: 1.42;
+    font-size: clamp(58px, 16vw, 94px);
+    line-height: 0.86;
   }
 
   .hero-unit {
-    top: 4.85rem;
-    left: 41%;
+    top: 6rem;
+    left: 36%;
   }
 
   .hero-card {
-    width: clamp(160px, 43vw, 220px);
+    width: clamp(160px, 42vw, 220px);
     border-radius: 16px;
   }
 }

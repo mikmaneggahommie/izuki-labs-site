@@ -35,7 +35,7 @@ export default function ChatBubble() {
           {
             role: "assistant",
             content:
-              "The hosted version keeps chat lightweight, so live AI replies are off here. Reach me directly and I’ll reply personally.",
+              "The hosted version keeps chat lightweight, so live AI replies are off here. Reach out directly and I’ll reply personally.",
           },
         ]
   );
@@ -269,7 +269,7 @@ export default function ChatBubble() {
                   href="mailto:it.mikiyas.daniel@gmail.com"
                   className="flex h-11 items-center justify-center rounded-[8px] bg-[#E8503A] px-4 text-[14px] font-medium text-white transition-opacity hover:opacity-90"
                 >
-                  Email Mikiyas
+                  Email Me
                 </a>
                 <a
                   href="https://t.me/snowplugwalk"
