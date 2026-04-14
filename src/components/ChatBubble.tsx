@@ -32,20 +32,24 @@ export default function ChatBubble() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasAutoOpened, setHasAutoOpened] = useState(false);
+  const [isNearBottom, setIsNearBottom] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      const clientHeight = window.innerHeight;
+      const nearBottom = scrollTop + clientHeight >= scrollHeight - 350;
+      
+      setIsNearBottom(nearBottom);
+
       if (hasAutoOpened || isOpen) {
         return;
       }
 
-      const scrollHeight = document.documentElement.scrollHeight;
-      const scrollTop = window.scrollY;
-      const clientHeight = window.innerHeight;
-
-      // Trigger if user is near the bottom (footer reached)
-      if (scrollTop + clientHeight >= scrollHeight - 200) {
+      // Trigger auto-open if user is near the bottom (footer reached)
+      if (nearBottom) {
         setIsOpen(true);
         setHasAutoOpened(true);
         setMessages((current) => [
@@ -193,7 +197,9 @@ export default function ChatBubble() {
         <motion.button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-8 right-8 z-[100] flex h-14 w-14 items-center justify-center rounded-full border border-white/15 bg-[#111111] text-white shadow-[0_20px_60px_rgba(0,0,0,0.5)] transition-colors hover:border-[#E8503A] md:bottom-8 md:right-8"
+          className={`fixed bottom-8 right-8 z-[100] flex h-14 w-14 items-center justify-center rounded-full border border-white/15 bg-[#111111] text-white shadow-[0_20px_60px_rgba(0,0,0,0.5)] transition-colors hover:border-[#FF0000] md:bottom-8 md:right-8 ${
+            isNearBottom ? "animate-dot-pulse" : ""
+          }`}
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.96 }}
           aria-label="Open chat"
