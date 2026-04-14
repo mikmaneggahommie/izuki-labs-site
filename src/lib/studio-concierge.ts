@@ -5,19 +5,22 @@ type UserInfo = {
 };
 
 const packagesReply =
-  "I work through three retainers: Essentials at 7,500 Birr for focused monthly support, Growth Plan at 12,000 Birr for heavier content systems, and Remote Designer at 20,000 Birr for ongoing high-touch design support across campaigns and brand work.";
+  "I offer three monthly retainers: Essentials (7,500 Birr) for focused support, Growth (12,000 Birr) for content systems, and the Remote Designer (20,000 Birr) which includes unlimited posts, source files, and content calendar collaboration.";
+
+const remoteDesignerReply =
+  "The Remote Designer plan (20,000 Birr/month) is my highest-tier support. It includes unlimited single-image posts, up to 10 carousels per month, source files, priority 24-48h turnaround, and support across all platforms including TikTok and LinkedIn.";
 
 const timelineReply =
-  "Most projects start with clear art direction, then move into fast iteration cycles. Smaller retainers can start within a few days, while broader systems or campaign launches usually need a short kickoff to map goals, deliverables, and cadence.";
+  "Standard turnaround is 24-48 hours for Remote Designer and Growth plans, and 72 hours for Essentials. Most projects kickoff within 3-5 days once the system is defined.";
 
 const servicesReply =
-  "I design social media identities, campaign launches, content calendars, brand assets, and monthly visual systems that keep everything feeling sharp and consistent.";
+  "I specialize in social media identities, high-fidelity campaign launches, content calendars, and brand systems. I focus on motion-first visual packages that stay consistent across Instagram, Telegram, TikTok, and more.";
 
 const processReply =
-  "The process is simple: define the direction, build the system, tighten the details, and keep the output consistent month after month. I focus on work that feels premium at first glance and still holds up in everyday use.";
+  "We work on a sequential queue: I handle up to 2 active tasks at a time to ensure maximum quality. You get unlimited revisions within the original scope on the Remote Designer plan.";
 
 const contactReply =
-  "The fastest way to move is to send the brief by email or Telegram. If you already know the goal, send that. If it is still rough, send the idea and I will help shape the direction.";
+  "The best way to start is by sending your brief to it.mikiyas.daniel@gmail.com or messaging me directly on Telegram @snowplugwalk. We can hop on a call once the direction is clear.";
 
 export const studioSystemPrompt = `
 You are the izuki.labs studio concierge.
@@ -29,6 +32,7 @@ Voice:
 - Do not dump the entire package list unless specifically asked. Instead, recommend the best package based on their needs.
 - Never say you are an AI model. Speak as the studio concierge for izuki.labs.
 - DO NOT answer questions outside the scope of Izuki Labs services.
+- If asked about "20k plan" or "best value", refer to the Remote Designer package.
 
 Business context:
 - I am based in Addis Ababa and work with ambitious brands that want a sharper visual presence.
@@ -43,8 +47,7 @@ Clients pay a monthly fee for ongoing design support based on their selected pac
 
 # 📦 PACKAGES
 
-## 🟢 Package 1 — Remote Designer (Best Value)
-**20,000 Birr / month**
+## 🔴 Remote Designer (20,000 Birr / month) — Best Value
 ### Includes:
 * Unlimited single-image social media posts (fair use applies)
 * Unlimited revisions (within original request scope)
@@ -59,81 +62,21 @@ Clients pay a monthly fee for ongoing design support based on their selected pac
 * Source files included (PSD, Illustrator, etc.)
 
 ### Discounted Add-Ons:
-* Logo Design: 2,500 Birr
-* YouTube Thumbnail: 300 Birr
-* Brand Identity Kit: 4,500 Birr
-* Extra Fast Delivery (under 12 hrs): 500 Birr
+* Logo Design: 2,500 Birr | Brand Identity Kit: 4,500 Birr
 
-## 🔵 Package 2 — Growth Plan
-**12,000 Birr / month**
+## 🔵 Growth Plan (12,000 Birr / month)
 ### Includes:
-* Up to 12 posts/month
-* 3 revision rounds per design
-* 48-hour turnaround per post
-* Instagram & Telegram only
-* No stories or carousels
-* No content calendar
-* No source files
+* Up to 12 posts/month | 3 revision rounds | 48-hour turnaround
+* Instagram & Telegram only | No stories or carousels
 
-### Add-Ons:
-* Extra post: 1,350 Birr
-* Stories / Reels cover: 350 Birr
-* Carousel (max 6 slides): 850 Birr
-* Extra revision: 50 Birr
-* Major redesign: 250 Birr
-* Rush (under 24 hrs): 250 Birr
-* Source files: 50 Birr/file
-* Logo Design: 3,500 Birr
-* YouTube Thumbnail: 400 Birr
-* Brand Identity Kit: 6,000 Birr
-* Extra Fast Delivery (under 12 hrs): 700 Birr
-
-## ⚪ Package 3 — Essentials Plan
-**7,500 Birr / month**
+## ⚪ Essentials Plan (7,500 Birr / month)
 ### Includes:
-* Up to 6 posts/month
-* 2 revision rounds per design
-* 72-hour turnaround per post
-* Instagram & Telegram only
+* Up to 6 posts/month | 2 revision rounds | 72-hour turnaround
 * Static posts only (no stories, no carousels)
-* No content calendar
-* No source files
 
-### Add-Ons:
-* Extra post: 1,500 Birr
-* Stories / Reels cover: 500 Birr
-* Carousel (max 4 slides, max 2/month): 2,000 Birr
-* Extra revision: 100 Birr
-* Major redesign: 350 Birr
-* Rush (under 24 hrs): 350 Birr
-* Source files: 150 Birr/file
-* Logo Design: 4,000 Birr
-* YouTube Thumbnail: 500 Birr
-* Brand Identity Kit: 7,000 Birr
-* Extra Fast Delivery (under 12 hrs): 900 Birr
-
-# 📐 DEFINITIONS
-- **Standard Post**: A single-image design (promos, quotes, announcements, simple visuals).
-- **Non-Standard Work**: Handled as add-ons or limited items (carousels, logos, branding, thumbnails, complex compositions).
-
-# 🔁 REVISION POLICY
-- What counts as a revision: Text changes, Color adjustments, Minor layout tweaks.
-- What is NOT a revision: New concept, New design direction, Major visual change (These are New Requests or Major Redesigns).
-
-# 🔄 WORKFLOW POLICY
-- Max 2 active tasks at a time.
-- New requests enter a queue system.
-- Work is completed sequentially.
-- Turnaround time applies per task, not per batch.
-
-# ⚖️ FAIR USE POLICY
-- "Unlimited" applies to: Total volume over time.
-- "Unlimited" does NOT mean: Unlimited simultaneous work, Instant bulk delivery.
-
-# 🚫 SCOPE CONTROL RULES
-- Once a design is approved, further changes may be billed.
-- Large changes after approval = new request.
-- Repeated direction changes may be treated as scope change.
+# 🔄 WORKFLOW
+- Max 2 active tasks at a time. Work is completed sequentially.
+- Revisions include text, color, and minor layout tweaks. Major direction changes are new requests.
 === END KNOWLEDGE BASE ===
 `.trim();
 
@@ -141,9 +84,11 @@ export function getStudioConciergeReply(message: string, userInfo: UserInfo = {}
   const input = message.toLowerCase();
   const namePrefix = userInfo.name ? `${userInfo.name}, ` : "";
 
-  if (
-    /(price|pricing|package|packages|cost|rate|birr|budget)/.test(input)
-  ) {
+  if (/(20k|20,000|remote|best value)/.test(input)) {
+    return `${namePrefix}${remoteDesignerReply}`;
+  }
+
+  if (/(price|pricing|package|packages|cost|rate|birr|budget)/.test(input)) {
     return `${namePrefix}${packagesReply}`;
   }
 
