@@ -76,7 +76,7 @@ export default function WorkShowcase() {
         </div>
 
         {/* Elfsight Widget Integration */}
-        <div className="w-full relative z-10 bg-white/50 rounded-3xl p-4 md:p-8 shadow-sm border border-gray-100">
+        <div className="w-full relative z-10 bg-white/50 rounded-3xl p-4 md:p-8 shadow-sm border border-gray-100 min-h-[400px] flex items-center justify-center">
           <div className="elfsight-app-8ceec645-dcea-42d1-8f53-17d46a861c3f" data-elfsight-app-lazy></div>
         </div>
       </div>

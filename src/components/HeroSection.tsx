@@ -15,14 +15,15 @@ const images = [
 ];
 
 // Staircase end positions — diagonal cascade like nickzoutendijk.nl
+// Using more compact spacing for smaller screens
 const endPositions = [
-  { x: 0, y: 0, rotate: 0, w: 320, h: 400, z: 7 }, // The main card stays mostly still
-  { x: 140, y: 80, rotate: 2, w: 280, h: 360, z: 6 },
-  { x: 260, y: 160, rotate: -2, w: 260, h: 340, z: 5 },
-  { x: 380, y: 240, rotate: 1, w: 240, h: 320, z: 4 },
-  { x: 500, y: 320, rotate: -1.5, w: 220, h: 300, z: 3 },
-  { x: 620, y: 400, rotate: 2.5, w: 200, h: 280, z: 2 },
-  { x: 740, y: 480, rotate: -1, w: 180, h: 260, z: 1 },
+  { x: 0, y: 0, rotate: 0, w: 300, h: 380, z: 7 }, 
+  { x: "12%", y: "10%", rotate: 2, w: 260, h: 340, z: 6 },
+  { x: "24%", y: "20%", rotate: -2, w: 240, h: 320, z: 5 },
+  { x: "36%", y: "30%", rotate: 1, w: 220, h: 300, z: 4 },
+  { x: "48%", y: "40%", rotate: -1.5, w: 200, h: 280, z: 3 },
+  { x: "60%", y: "50%", rotate: 2.5, w: 180, h: 260, z: 2 },
+  { x: "72%", y: "60%", rotate: -1, w: 160, h: 240, z: 1 },
 ];
 
 export default function HeroSection() {
@@ -134,7 +135,7 @@ export default function HeroSection() {
           </div>
 
           {/* Mobile: single hero image */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] h-[60vh] md:hidden rounded-2xl overflow-hidden shadow-2xl">
+          <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[50vh] md:hidden rounded-2xl overflow-hidden shadow-2xl">
             <Image
               src="/images/1.JPG"
               alt="Mikiyas Daniel"

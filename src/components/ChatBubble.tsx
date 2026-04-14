@@ -111,7 +111,7 @@ export default function ChatBubble() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-24 right-4 md:bottom-28 md:right-10 z-[90] w-[calc(100vw-2rem)] md:w-[380px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col"
+            className="fixed bottom-24 right-4 md:bottom-28 md:right-10 z-[90] w-[calc(100vw-2rem)] md:w-[380px] h-[70vh] max-h-[580px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col"
           >
             {/* Header */}
             <div className="p-5 border-b border-[#1A1A1A]/10">
