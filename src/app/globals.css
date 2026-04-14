@@ -351,7 +351,7 @@ button {
 .hero-stage {
   position: absolute;
   inset: 0;
-  overflow: visible;
+  overflow: hidden;
   pointer-events: none;
   perspective: 1800px;
   z-index: 2;
@@ -359,8 +359,9 @@ button {
 
 .hero-unit {
   position: absolute;
-  top: clamp(16rem, 36vh, 24rem);
-  left: clamp(67%, 73vw, 79%);
+  top: 50%;
+  left: 56%;
+  transform: translateY(-50%);
   opacity: 0;
 }
 
@@ -502,8 +503,8 @@ button {
   }
 
   .hero-unit {
-    top: clamp(13rem, 28vh, 18rem);
-    left: clamp(61%, 66vw, 71%);
+    top: 50%;
+    left: 52%;
   }
 
   .hero-card {
@@ -542,8 +543,8 @@ button {
   }
 
   .hero-unit {
-    top: clamp(12rem, 24vh, 15rem);
-    left: clamp(50%, 56vw, 60%);
+    top: 48%;
+    left: 46%;
   }
 
   .hero-card {
