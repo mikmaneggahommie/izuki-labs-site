@@ -4,6 +4,8 @@ import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef } from "react";
 
+import { assetPath } from "@/lib/asset-path";
+
 const workAccounts = [
   {
     name: "Atmosphere",
@@ -109,7 +111,7 @@ export default function WorkShowcase() {
           </p>
         </div>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-2">
+        <div className="mt-10 grid gap-8 lg:grid-cols-2">
           {workAccounts.map((account) => (
             <a
               key={account.handle}
@@ -117,13 +119,13 @@ export default function WorkShowcase() {
               href={account.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex h-full flex-col gap-8 rounded-[18px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-8 transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)]"
+              className="group flex h-full flex-col gap-9 rounded-[24px] border border-white/8 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.06),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-8 transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)]"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="relative h-14 w-14 overflow-hidden rounded-full">
                     <Image
-                      src={account.avatar}
+                      src={assetPath(account.avatar)}
                       alt={account.name}
                       fill
                       sizes="56px"
@@ -155,11 +157,11 @@ export default function WorkShowcase() {
 
               <p className="body-copy">{account.summary}</p>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-4">
                 {account.previews.map((preview, previewIndex) => (
                   <div key={`${account.handle}-${previewIndex}`} className="work-preview">
                     <Image
-                      src={preview}
+                      src={assetPath(preview)}
                       alt={`${account.name} preview ${previewIndex + 1}`}
                       fill
                       sizes="(max-width: 1023px) 30vw, 150px"

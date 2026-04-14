@@ -1,37 +1,5 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: "Neue Haas Grotesk Display Pro";
-  src: url("/fonts/NeueHaasDisplayRoman.ttf") format("truetype");
-  font-display: swap;
-  font-style: normal;
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: "Neue Haas Grotesk Display Pro";
-  src: url("/fonts/NeueHaasDisplayMediu.ttf") format("truetype");
-  font-display: swap;
-  font-style: normal;
-  font-weight: 500;
-}
-
-@font-face {
-  font-family: "Neue Haas Grotesk Display Pro";
-  src: url("/fonts/NeueHaasDisplayBold.ttf") format("truetype");
-  font-display: swap;
-  font-style: normal;
-  font-weight: 700;
-}
-
-@font-face {
-  font-family: "Neue Haas Grotesk Display Pro";
-  src: url("/fonts/NeueHaasDisplayBlack.ttf") format("truetype");
-  font-display: swap;
-  font-style: normal;
-  font-weight: 900;
-}
-
 :root {
   --site-bg: #000000;
   --surface: #0a0a0a;
@@ -76,7 +44,7 @@ body {
   overflow-x: hidden;
   background: var(--site-bg);
   color: var(--text-primary);
-  font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+  font-family: var(--font-neue-haas-display), sans-serif;
 }
 
 body,
@@ -84,7 +52,7 @@ button,
 input,
 textarea,
 select {
-  font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+  font-family: var(--font-neue-haas-display), sans-serif;
 }
 
 a {
@@ -336,31 +304,32 @@ button {
 
 .hero-shell {
   min-height: 100svh;
-  padding-top: clamp(5.2rem, 7vw, 6.25rem);
+  padding-top: clamp(5rem, 7vw, 6rem);
+  padding-bottom: 0;
   overflow: hidden;
 }
 
 .hero-viewport {
   position: relative;
-  min-height: calc(100svh - clamp(5.2rem, 7vw, 6.25rem));
+  min-height: calc(100svh - clamp(5rem, 7vw, 6rem));
   overflow: hidden;
 }
 
 .hero-copy {
   position: absolute;
   left: 0;
-  bottom: clamp(1rem, 4vh, 2.4rem);
+  bottom: clamp(0.75rem, 2.5vh, 1.6rem);
   z-index: 1;
-  max-width: min(44rem, 56vw);
+  max-width: min(34rem, 40vw);
 }
 
 .hero-wordmark {
   display: grid;
-  gap: clamp(0.25rem, 0.65vw, 0.55rem);
-  font-size: clamp(78px, 11vw, 170px);
+  gap: clamp(0.55rem, 0.95vw, 0.85rem);
+  font-size: clamp(78px, 11vw, 176px);
   font-weight: 900;
-  letter-spacing: -0.065em;
-  line-height: 0.84;
+  letter-spacing: -0.045em;
+  line-height: 0.86;
   text-transform: uppercase;
 }
 
@@ -390,8 +359,8 @@ button {
 
 .hero-unit {
   position: absolute;
-  top: clamp(8rem, 19vh, 11.5rem);
-  left: clamp(52%, 58vw, 62%);
+  top: clamp(16rem, 36vh, 24rem);
+  left: clamp(67%, 73vw, 79%);
   opacity: 0;
 }
 
@@ -403,12 +372,12 @@ button {
   position: absolute;
   top: 0;
   left: 0;
-  width: clamp(220px, 23vw, 360px);
+  width: clamp(220px, 24vw, 360px);
   aspect-ratio: 0.78;
   overflow: hidden;
-  border-radius: 24px;
-  background: #070707;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+  border-radius: 26px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(7, 7, 7, 1));
+  box-shadow: 0 34px 110px rgba(0, 0, 0, 0.55);
   transform-style: preserve-3d;
   will-change: transform;
 }
@@ -418,8 +387,8 @@ button {
   inset: 0;
   content: "";
   background:
-    linear-gradient(140deg, rgba(255, 255, 255, 0.16), transparent 28%),
-    linear-gradient(180deg, transparent 62%, rgba(0, 0, 0, 0.38));
+    linear-gradient(140deg, rgba(255, 255, 255, 0.18), transparent 28%),
+    linear-gradient(180deg, transparent 58%, rgba(0, 0, 0, 0.4));
   mix-blend-mode: screen;
   pointer-events: none;
   z-index: 1;
@@ -484,7 +453,7 @@ button {
 .work-preview {
   position: relative;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 14px;
   aspect-ratio: 1 / 1;
   background: #050505;
 }
@@ -525,7 +494,7 @@ button {
 
 @media (max-width: 1023px) {
   .hero-copy {
-    max-width: min(28rem, 54vw);
+    max-width: min(24rem, 44vw);
   }
 
   .hero-wordmark {
@@ -533,13 +502,13 @@ button {
   }
 
   .hero-unit {
-    top: clamp(7rem, 15vh, 9rem);
-    left: clamp(43%, 49vw, 54%);
+    top: clamp(13rem, 28vh, 18rem);
+    left: clamp(61%, 66vw, 71%);
   }
 
   .hero-card {
     width: clamp(190px, 30vw, 290px);
-    border-radius: 20px;
+    border-radius: 22px;
   }
 }
 
@@ -564,22 +533,22 @@ button {
 
   .hero-copy {
     max-width: min(18rem, 76vw);
-    bottom: 0.9rem;
+    bottom: 0.85rem;
   }
 
   .hero-wordmark {
     font-size: clamp(58px, 16vw, 94px);
-    line-height: 0.86;
+    line-height: 0.88;
   }
 
   .hero-unit {
-    top: 6rem;
-    left: 36%;
+    top: clamp(12rem, 24vh, 15rem);
+    left: clamp(50%, 56vw, 60%);
   }
 
   .hero-card {
     width: clamp(160px, 42vw, 220px);
-    border-radius: 16px;
+    border-radius: 18px;
   }
 }
 

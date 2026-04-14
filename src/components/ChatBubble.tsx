@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { MessageSquare, Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import { getStudioConciergeReply } from "@/lib/studio-concierge";
+
 type FlowState =
   | "COLLECTING_NAME"
   | "COLLECTING_PHONE"
@@ -15,30 +17,18 @@ type Message = {
   content: string;
 };
 
-const chatEnabled = process.env.NEXT_PUBLIC_CHAT_MODE !== "disabled";
+const backendChatEnabled = process.env.NEXT_PUBLIC_CHAT_MODE !== "disabled";
 
 export default function ChatBubble() {
   const [isOpen, setIsOpen] = useState(false);
-  const [flowState, setFlowState] = useState<FlowState>(
-    chatEnabled ? "COLLECTING_NAME" : "CHATTING"
-  );
+  const [flowState, setFlowState] = useState<FlowState>("COLLECTING_NAME");
   const [formData, setFormData] = useState({ name: "", phone: "", email: "" });
-  const [messages, setMessages] = useState<Message[]>(
-    chatEnabled
-      ? [
-          {
-            role: "assistant",
-            content: "Welcome to izuki.labs. What should I call you?",
-          },
-        ]
-      : [
-          {
-            role: "assistant",
-            content:
-              "The hosted version keeps chat lightweight, so live AI replies are off here. Reach out directly and I’ll reply personally.",
-          },
-        ]
-  );
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "assistant",
+      content: "Welcome to izuki.labs. What should I call you?",
+    },
+  ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -49,9 +39,16 @@ export default function ChatBubble() {
     }
   }, [isOpen, isLoading, messages]);
 
+  const appendAssistantMessage = (content: string) => {
+    setMessages((current) => [
+      ...current,
+      { role: "assistant", content },
+    ]);
+  };
+
   const submitMessage = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!chatEnabled || !input.trim() || isLoading) {
+    if (!input.trim() || isLoading) {
       return;
     }
 
@@ -62,17 +59,13 @@ export default function ChatBubble() {
     setInput("");
     setIsLoading(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 550));
+    await new Promise((resolve) => setTimeout(resolve, 420));
 
     if (flowState === "COLLECTING_NAME") {
       setFormData((current) => ({ ...current, name: userContent }));
-      setMessages((current) => [
-        ...current,
-        {
-          role: "assistant",
-          content: `Perfect, ${userContent}. What phone number should I use for project follow-up?`,
-        },
-      ]);
+      appendAssistantMessage(
+        `Perfect, ${userContent}. What phone number should I use for project follow-up?`
+      );
       setFlowState("COLLECTING_PHONE");
       setIsLoading(false);
       return;
@@ -80,29 +73,31 @@ export default function ChatBubble() {
 
     if (flowState === "COLLECTING_PHONE") {
       setFormData((current) => ({ ...current, phone: userContent }));
-      setMessages((current) => [
-        ...current,
-        {
-          role: "assistant",
-          content: "Great. Drop your email too and I’ll keep the thread organized.",
-        },
-      ]);
+      appendAssistantMessage(
+        "Great. Drop your email too and I’ll keep the thread organized."
+      );
       setFlowState("COLLECTING_EMAIL");
       setIsLoading(false);
       return;
     }
 
     if (flowState === "COLLECTING_EMAIL") {
-      setFormData((current) => ({ ...current, email: userContent }));
-      setMessages((current) => [
-        ...current,
-        {
-          role: "assistant",
-          content:
-            "Locked in. Ask about pricing, timelines, retainers, or the best package for your brand.",
-        },
-      ]);
+      const nextUserInfo = { ...formData, email: userContent };
+      setFormData(nextUserInfo);
+      appendAssistantMessage(
+        backendChatEnabled
+          ? "Locked in. Ask about pricing, timelines, retainers, or the best package for your brand."
+          : "Locked in. I’ve got your details in this chat, and I can still guide you through pricing, timelines, and the best package right here."
+      );
       setFlowState("CHATTING");
+      setIsLoading(false);
+      return;
+    }
+
+    const nextMessages = [...messages, userMessage];
+
+    if (!backendChatEnabled) {
+      appendAssistantMessage(getStudioConciergeReply(userContent, formData));
       setIsLoading(false);
       return;
     }
@@ -112,36 +107,20 @@ export default function ChatBubble() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: [...messages, userMessage],
+          messages: nextMessages,
           userInfo: formData,
         }),
       });
+
       const data = (await response.json()) as Partial<Message>;
 
       if (data.content && data.role === "assistant") {
-        setMessages((current) => [
-          ...current,
-          { role: "assistant", content: data.content ?? "" },
-        ]);
+        appendAssistantMessage(data.content);
       } else {
-        setMessages((current) => [
-          ...current,
-          {
-            role: "assistant",
-            content:
-              "I’m having trouble connecting right now. Reach me directly through email or Telegram and I’ll respond there.",
-          },
-        ]);
+        appendAssistantMessage(getStudioConciergeReply(userContent, formData));
       }
     } catch {
-      setMessages((current) => [
-        ...current,
-        {
-          role: "assistant",
-          content:
-            "I’m having trouble connecting right now. Reach me directly through email or Telegram and I’ll respond there.",
-        },
-      ]);
+      appendAssistantMessage(getStudioConciergeReply(userContent, formData));
     } finally {
       setIsLoading(false);
     }
@@ -169,7 +148,7 @@ export default function ChatBubble() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.96 }}
             transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-[100px] right-4 z-[95] flex max-h-[520px] w-[calc(100vw-32px)] max-w-[380px] flex-col overflow-hidden rounded-[16px] border border-white/12 bg-[#0A0A0A] shadow-[0_20px_60px_rgba(0,0,0,0.5)] md:right-8"
+            className="fixed bottom-[100px] right-4 z-[95] flex max-h-[560px] w-[calc(100vw-32px)] max-w-[390px] flex-col overflow-hidden rounded-[18px] border border-white/12 bg-[#0A0A0A] shadow-[0_20px_60px_rgba(0,0,0,0.5)] md:right-8"
           >
             <div className="flex items-start justify-between gap-4 border-b border-white/10 bg-[#111111] px-6 py-5">
               <div className="space-y-1">
@@ -180,7 +159,9 @@ export default function ChatBubble() {
                   <span className="h-2.5 w-2.5 rounded-full bg-[#E8503A]" />
                 </div>
                 <p className="text-[12px] font-medium text-white/45">
-                  {chatEnabled ? "AI Brand Architect" : "Direct Project Contact"}
+                  {backendChatEnabled
+                    ? "AI Studio Concierge"
+                    : "Studio Concierge"}
                 </p>
               </div>
 
@@ -230,11 +211,8 @@ export default function ChatBubble() {
               <div ref={messagesEndRef} />
             </div>
 
-            {chatEnabled ? (
-              <form
-                onSubmit={submitMessage}
-                className="border-t border-white/10 bg-[#111111] px-5 py-4"
-              >
+            <div className="space-y-3 border-t border-white/10 bg-[#111111] px-5 py-4">
+              <form onSubmit={submitMessage}>
                 <div className="flex items-center gap-3">
                   <input
                     autoFocus
@@ -263,11 +241,11 @@ export default function ChatBubble() {
                   </button>
                 </div>
               </form>
-            ) : (
-              <div className="space-y-3 border-t border-white/10 bg-[#111111] px-5 py-4">
+
+              <div className="grid gap-3 sm:grid-cols-2">
                 <a
                   href="mailto:it.mikiyas.daniel@gmail.com"
-                  className="flex h-11 items-center justify-center rounded-[8px] bg-[#E8503A] px-4 text-[14px] font-medium text-white transition-opacity hover:opacity-90"
+                  className="flex h-11 items-center justify-center rounded-[8px] bg-[#E8503A] px-4 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
                 >
                   Email Me
                 </a>
@@ -275,12 +253,12 @@ export default function ChatBubble() {
                   href="https://t.me/snowplugwalk"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-11 items-center justify-center rounded-[8px] border border-white/10 bg-[#1A1A1A] px-4 text-[14px] font-medium text-white transition-colors hover:border-white/20"
+                  className="flex h-11 items-center justify-center rounded-[8px] border border-white/10 bg-[#1A1A1A] px-4 text-[13px] font-medium text-white transition-colors hover:border-white/20"
                 >
                   Message On Telegram
                 </a>
               </div>
-            )}
+            </div>
           </motion.div>
         ) : null}
       </AnimatePresence>

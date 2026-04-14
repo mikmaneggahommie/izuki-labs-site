@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef } from "react";
 
 export default function ContactFooter() {
@@ -33,7 +32,7 @@ export default function ContactFooter() {
 
         gsap.fromTo(
           revealTargets,
-          { y: 40, opacity: 0, filter: "blur(10px)" },
+          { y: 44, opacity: 0, filter: "blur(10px)" },
           {
             y: 0,
             opacity: 1,
@@ -43,7 +42,7 @@ export default function ContactFooter() {
             ease: "power3.out",
             scrollTrigger: {
               trigger: sectionRef.current,
-              start: "top 80%",
+              start: "top 82%",
             },
           }
         );
@@ -62,119 +61,127 @@ export default function ContactFooter() {
 
   return (
     <footer ref={sectionRef} id="contact" className="section-shell pb-0">
-      <div className="content-shell space-y-16">
-        <div
-          data-contact-reveal
-          className="grid gap-8 border-t border-white/10 pt-14 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,0.48fr)] lg:items-end"
-        >
-          <div className="space-y-6">
-            <div className="section-label-row">
-              <span className="accent-square accent-square--tiny" aria-hidden />
-              <span className="section-label">Start A Project</span>
+      <div
+        className="content-shell flex flex-col justify-between gap-20"
+        style={{ minHeight: "calc(100svh - var(--section-padding-y))" }}
+      >
+        <div className="space-y-14">
+          <div
+            data-contact-reveal
+            className="grid gap-8 border-t border-white/10 pt-16 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,0.5fr)] lg:items-end"
+          >
+            <div className="space-y-6">
+              <div className="section-label-row">
+                <span className="accent-square accent-square--tiny" aria-hidden />
+                <span className="section-label">Start A Project</span>
+              </div>
+
+              <h2 className="display-title max-w-[8ch]">
+                Let&apos;s build the next version of your brand
+              </h2>
             </div>
 
-            <h2 className="display-title max-w-[8ch]">
-              Let&apos;s build the next version of your brand.
-              <span className="accent-square" aria-hidden />
-            </h2>
-          </div>
-
-          <div className="space-y-6 lg:justify-self-end">
-            <p className="body-copy max-w-[34ch]">
+            <p className="body-copy max-w-[34ch] lg:justify-self-end">
               If you already know what you need, send the brief. If you&apos;re
-              still shaping it, send the rough idea and I&apos;ll help you turn it
+              still shaping it, send the rough idea and I&apos;ll help turn it
               into a clear direction.
             </p>
+          </div>
 
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <a href="mailto:it.mikiyas.daniel@gmail.com" className="primary-button">
-                Start A Project
-              </a>
-              <a
-                href="https://t.me/snowplugwalk"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="secondary-button"
-              >
-                Message On Telegram
-              </a>
-            </div>
+          <div
+            data-contact-reveal
+            className="flex flex-col gap-4 sm:flex-row"
+          >
+            <a href="mailto:it.mikiyas.daniel@gmail.com" className="primary-button">
+              Start A Project
+            </a>
+            <a
+              href="https://t.me/snowplugwalk"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="secondary-button"
+            >
+              Message On Telegram
+            </a>
           </div>
         </div>
 
-        <div
-          data-contact-reveal
-          className="grid gap-10 border-t border-white/10 py-14 md:grid-cols-3"
-        >
-          <div className="space-y-5">
-            <p className="section-label">Sitemap</p>
-            <div className="space-y-2.5 text-[15px] leading-[2.2] text-white">
-              <Link href="/" className="interactive-link block">
-                Home
-              </Link>
-              <a href="#work" className="interactive-link block">
-                Work
-              </a>
-              <a href="#pricing" className="interactive-link block">
-                Pricing
-              </a>
-              <a href="#about" className="interactive-link block">
-                About
-              </a>
+        <div className="space-y-10">
+          <div
+            data-contact-reveal
+            className="grid gap-10 border-t border-white/10 pt-14 md:grid-cols-3"
+          >
+            <div className="space-y-5">
+              <p className="section-label">Sitemap</p>
+              <div className="space-y-2.5 text-[15px] leading-[2.2] text-white">
+                <a href="#top" className="interactive-link block">
+                  Home
+                </a>
+                <a href="#work" className="interactive-link block">
+                  Work
+                </a>
+                <a href="#pricing" className="interactive-link block">
+                  Pricing
+                </a>
+                <a href="#about" className="interactive-link block">
+                  About
+                </a>
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              <p className="section-label">Connect</p>
+              <div className="space-y-2.5 text-[15px] leading-[2.2] text-white">
+                <a href="tel:+251954676421" className="interactive-link block">
+                  +251 954 676 421
+                </a>
+                <a
+                  href="mailto:it.mikiyas.daniel@gmail.com"
+                  className="interactive-link block"
+                >
+                  it.mikiyas.daniel@gmail.com
+                </a>
+                <a
+                  href="https://t.me/snowplugwalk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="interactive-link block"
+                >
+                  Telegram — @snowplugwalk
+                </a>
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              <p className="section-label">Social</p>
+              <div className="space-y-2.5 text-[15px] leading-[2.2] text-white">
+                <a
+                  href="https://www.instagram.com/izuki.labs/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="interactive-link block"
+                >
+                  Instagram — @izuki.labs
+                </a>
+                <a
+                  href="https://www.tiktok.com/@izuki.labs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="interactive-link block"
+                >
+                  TikTok — @izuki.labs
+                </a>
+              </div>
             </div>
           </div>
 
-          <div className="space-y-5">
-            <p className="section-label">Connect</p>
-            <div className="space-y-2.5 text-[15px] leading-[2.2] text-white">
-              <a href="tel:+251954676421" className="interactive-link block">
-                +251 954 676 421
-              </a>
-              <a
-                href="mailto:it.mikiyas.daniel@gmail.com"
-                className="interactive-link block"
-              >
-                it.mikiyas.daniel@gmail.com
-              </a>
-              <a
-                href="https://t.me/snowplugwalk"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="interactive-link block"
-              >
-                Telegram — @snowplugwalk
-              </a>
-            </div>
+          <div
+            data-contact-reveal
+            className="flex flex-col gap-3 border-t border-white/10 py-6 text-[12px] text-white/35 md:flex-row md:items-center md:justify-between"
+          >
+            <p>© 2026 izuki.labs — All rights reserved</p>
+            <p>Based in Addis Ababa, available worldwide</p>
           </div>
-
-          <div className="space-y-5">
-            <p className="section-label">Social</p>
-            <div className="space-y-2.5 text-[15px] leading-[2.2] text-white">
-              <a
-                href="https://www.instagram.com/izuki.labs/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="interactive-link block"
-              >
-                Instagram — @izuki.labs
-              </a>
-              <a
-                href="https://www.tiktok.com/@izuki.labs"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="interactive-link block"
-              >
-                TikTok — @izuki.labs
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="border-t border-white/10 px-[var(--section-padding-x)] py-6">
-        <div className="content-shell flex flex-col gap-3 text-[12px] text-white/35 md:flex-row md:items-center md:justify-between">
-          <p>© 2026 izuki.labs — All rights reserved</p>
-          <p>Based in Addis Ababa, available worldwide</p>
         </div>
       </div>
     </footer>

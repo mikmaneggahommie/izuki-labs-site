@@ -1,5 +1,33 @@
+import localFont from "next/font/local";
 import type { Metadata } from "next";
 import "./globals.css";
+
+const neueHaasDisplay = localFont({
+  variable: "--font-neue-haas-display",
+  display: "swap",
+  src: [
+    {
+      path: "../../public/fonts/NeueHaasDisplayRoman.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/NeueHaasDisplayMediu.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/NeueHaasDisplayBold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/NeueHaasDisplayBlack.ttf",
+      weight: "900",
+      style: "normal",
+    },
+  ],
+});
 
 export const metadata: Metadata = {
   title: "izuki.labs | Social Media Design Packages",
@@ -20,7 +48,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={neueHaasDisplay.variable}>{children}</body>
     </html>
   );
 }

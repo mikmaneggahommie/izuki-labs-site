@@ -1,10 +1,13 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
+import { studioSystemPrompt } from "@/lib/studio-concierge";
+
 export async function POST(req: Request) {
   try {
-    const { messages } = (await req.json()) as {
+    const { messages, userInfo } = (await req.json()) as {
       messages: Array<{ role: string; content: string }>;
+      userInfo?: { name?: string; phone?: string; email?: string };
     };
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -19,20 +22,13 @@ export async function POST(req: Request) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const lastMessage = messages[messages.length - 1]?.content ?? "";
 
-    const systemPrompt = `
-      You are the izuki.labs AI Assistant.
-      Tone: precise, calm, premium, and concise.
+    const systemPrompt = `${studioSystemPrompt}
 
-      Context:
-      - The studio offers social media design retainers from Addis Ababa.
-      - Packages: Essentials (7,500 Birr), Growth Plan (12,000 Birr), Remote Designer (20,000 Birr).
-      - Focus on systems, visual distinction, and brand consistency.
-
-      Rules:
-      1. Keep answers direct and useful.
-      2. If someone is interested, encourage them to start a project or share their goals.
-      3. Stay aligned with the premium, editorial voice of the site.
-    `;
+Known visitor details:
+- Name: ${userInfo?.name || "Unknown"}
+- Phone: ${userInfo?.phone || "Unknown"}
+- Email: ${userInfo?.email || "Unknown"}
+`;
 
     const chat = model.startChat({
       history: [

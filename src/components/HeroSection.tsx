@@ -3,27 +3,12 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 
+import { assetPath } from "@/lib/asset-path";
+
 type HeroCard = {
   src: string;
   alt: string;
 };
-
-const heroUnits: HeroCard[][] = [
-  [
-    { src: "/images/1.JPG", alt: "Editorial surface artwork" },
-    { src: "/images/2.jpg", alt: "Campaign detail artwork" },
-    { src: "/images/6.jpg", alt: "Launch artwork" },
-    { src: "/images/4.jpg", alt: "Brand composition artwork" },
-    { src: "/images/5.jpg", alt: "Poster layout artwork" },
-  ],
-  [
-    { src: "/images/3.jpg", alt: "Mobile system artwork" },
-    { src: "/images/5.jpg", alt: "Print layout artwork" },
-    { src: "/images/7.jpg", alt: "Luminous motion artwork" },
-    { src: "/images/2.jpg", alt: "Feed design artwork" },
-    { src: "/images/4.jpg", alt: "Graphic composition artwork" },
-  ],
-];
 
 type CardState = {
   x: number;
@@ -35,31 +20,54 @@ type CardState = {
 };
 
 type LoopMetrics = {
-  centerOffset: number;
   diagonalX: number;
   diagonalY: number;
+  travelX: number;
   travelY: number;
 };
+
+const heroUnits: HeroCard[][] = [
+  [
+    { src: "/images/1.JPG", alt: "Editorial surface artwork" },
+    { src: "/images/2.jpg", alt: "Campaign detail artwork" },
+    { src: "/images/6.jpg", alt: "Launch artwork" },
+    { src: "/images/4.jpg", alt: "Brand composition artwork" },
+    { src: "/images/5.jpg", alt: "Poster layout artwork" },
+    { src: "/images/3.jpg", alt: "Mobile system artwork" },
+  ],
+  [
+    { src: "/images/7.jpg", alt: "Luminous motion artwork" },
+    { src: "/images/5.jpg", alt: "Print layout artwork" },
+    { src: "/images/2.jpg", alt: "Feed design artwork" },
+    { src: "/images/4.jpg", alt: "Graphic composition artwork" },
+    { src: "/images/1.JPG", alt: "Brand motion artwork" },
+    { src: "/images/6.jpg", alt: "Immersive launch artwork" },
+  ],
+];
 
 const getStackState = (index: number): CardState => ({
   x: 0,
   y: 0,
-  z: -index * 8,
+  z: -index * 10,
   rotationX: 0,
   rotationY: 0,
   rotationZ: 0,
 });
 
-const getFanState = (index: number, metrics: LoopMetrics): CardState => {
-  const delta = index - metrics.centerOffset;
+const getFanState = (
+  index: number,
+  count: number,
+  metrics: LoopMetrics
+): CardState => {
+  const trailIndex = count - 1 - index;
 
   return {
-    x: delta * metrics.diagonalX,
-    y: delta * metrics.diagonalY,
-    z: -Math.abs(delta) * 22,
-    rotationX: delta === 0 ? 0 : 1.25,
-    rotationY: delta === 0 ? 0 : -8,
-    rotationZ: delta === 0 ? 0 : 4,
+    x: -trailIndex * metrics.diagonalX,
+    y: -trailIndex * metrics.diagonalY,
+    z: -trailIndex * 24,
+    rotationX: trailIndex === 0 ? 0 : 1.4,
+    rotationY: trailIndex === 0 ? 0 : -10,
+    rotationZ: trailIndex === 0 ? 0 : 4.5,
   };
 };
 
@@ -103,11 +111,11 @@ export default function HeroSection() {
 
       const setCards = (
         cards: HTMLElement[],
-        state: (index: number, metrics: LoopMetrics) => CardState,
+        state: (index: number, count: number, metrics: LoopMetrics) => CardState,
         metrics: LoopMetrics
       ) => {
         cards.forEach((card, index) => {
-          const values = state(index, metrics);
+          const values = state(index, cards.length, metrics);
 
           gsap.set(card, {
             x: values.x,
@@ -126,61 +134,81 @@ export default function HeroSection() {
       const buildLoop = () => {
         timeline?.kill();
 
-        const { width, height } = firstCards[0].getBoundingClientRect();
-        if (!width || !height) {
+        const stageBounds = stageRef.current?.getBoundingClientRect();
+        const cardBounds = firstCards[firstCards.length - 1].getBoundingClientRect();
+
+        if (!stageBounds || !cardBounds.width || !cardBounds.height) {
           return;
         }
 
         const metrics: LoopMetrics = {
-          centerOffset: (firstCards.length - 1) / 2,
-          diagonalX: Math.round(width * 0.27),
-          diagonalY: Math.round(height * 0.19),
-          travelY: Math.round(height + height * 0.19 * (firstCards.length - 1) - 20),
+          diagonalX: Math.max(
+            cardBounds.width * 0.64,
+            Math.min(stageBounds.width * 0.2, cardBounds.width * 0.86)
+          ),
+          diagonalY: Math.max(
+            cardBounds.height * 0.18,
+            Math.min(stageBounds.height * 0.19, cardBounds.height * 0.3)
+          ),
+          travelX: 0,
+          travelY: 0,
         };
+
+        metrics.travelX = metrics.diagonalX * firstCards.length;
+        metrics.travelY = metrics.diagonalY * firstCards.length;
 
         setCards(firstCards, (index) => getStackState(index), metrics);
         setCards(secondCards, getFanState, metrics);
 
         gsap.set(firstUnit, { x: 0, y: 0, autoAlpha: 1 });
-        gsap.set(secondUnit, { x: 0, y: metrics.travelY, autoAlpha: 1 });
+        gsap.set(secondUnit, {
+          x: metrics.travelX,
+          y: metrics.travelY,
+          autoAlpha: 1,
+        });
 
         timeline = gsap.timeline({ repeat: -1 });
 
         timeline
-          .to({}, { duration: 1.08 })
+          .to({}, { duration: 0.85 })
           .to(
             firstCards,
             {
-              x: (index) => getFanState(index, metrics).x,
-              y: (index) => getFanState(index, metrics).y,
-              z: (index) => getFanState(index, metrics).z,
-              rotationX: (index) => getFanState(index, metrics).rotationX,
-              rotationY: (index) => getFanState(index, metrics).rotationY,
-              rotationZ: (index) => getFanState(index, metrics).rotationZ,
-              duration: 0.98,
+              x: (index) => getFanState(index, firstCards.length, metrics).x,
+              y: (index) => getFanState(index, firstCards.length, metrics).y,
+              z: (index) => getFanState(index, firstCards.length, metrics).z,
+              rotationX: (index) =>
+                getFanState(index, firstCards.length, metrics).rotationX,
+              rotationY: (index) =>
+                getFanState(index, firstCards.length, metrics).rotationY,
+              rotationZ: (index) =>
+                getFanState(index, firstCards.length, metrics).rotationZ,
+              duration: 0.96,
               ease: "expo.out",
-              stagger: { each: 0.06, from: "center" },
+              stagger: { each: 0.06, from: "end" },
             },
             "fan-a"
           )
-          .to({}, { duration: 0.18 })
+          .to({}, { duration: 0.16 })
           .to(
             firstUnit,
             {
+              x: -metrics.travelX,
               y: -metrics.travelY,
-              duration: 1.65,
-              ease: "none",
+              duration: 1.72,
+              ease: "power2.inOut",
             },
-            "push-a"
+            "slide-a"
           )
           .to(
             secondUnit,
             {
+              x: 0,
               y: 0,
-              duration: 1.65,
-              ease: "none",
+              duration: 1.72,
+              ease: "power2.inOut",
             },
-            "push-a"
+            "slide-a"
           )
           .to(
             secondCards,
@@ -191,59 +219,74 @@ export default function HeroSection() {
               rotationX: 0,
               rotationY: 0,
               rotationZ: 0,
-              duration: 0.8,
+              duration: 0.78,
               ease: "expo.out",
-              stagger: { each: 0.05, from: "edges" },
+              stagger: { each: 0.05, from: "start" },
             },
-            "push-a+=0.9"
+            "slide-a+=0.9"
           )
-          .to({}, { duration: 0.72 })
+          .to({}, { duration: 0.55 })
           .set(
             firstCards,
             {
-              x: (index) => getFanState(index, metrics).x,
-              y: (index) => getFanState(index, metrics).y,
-              z: (index) => getFanState(index, metrics).z,
-              rotationX: (index) => getFanState(index, metrics).rotationX,
-              rotationY: (index) => getFanState(index, metrics).rotationY,
-              rotationZ: (index) => getFanState(index, metrics).rotationZ,
+              x: (index) => getFanState(index, firstCards.length, metrics).x,
+              y: (index) => getFanState(index, firstCards.length, metrics).y,
+              z: (index) => getFanState(index, firstCards.length, metrics).z,
+              rotationX: (index) =>
+                getFanState(index, firstCards.length, metrics).rotationX,
+              rotationY: (index) =>
+                getFanState(index, firstCards.length, metrics).rotationY,
+              rotationZ: (index) =>
+                getFanState(index, firstCards.length, metrics).rotationZ,
             },
             "reset-a"
           )
-          .set(firstUnit, { x: 0, y: metrics.travelY }, "reset-a")
+          .set(
+            firstUnit,
+            {
+              x: metrics.travelX,
+              y: metrics.travelY,
+            },
+            "reset-a"
+          )
           .to(
             secondCards,
             {
-              x: (index) => getFanState(index, metrics).x,
-              y: (index) => getFanState(index, metrics).y,
-              z: (index) => getFanState(index, metrics).z,
-              rotationX: (index) => getFanState(index, metrics).rotationX,
-              rotationY: (index) => getFanState(index, metrics).rotationY,
-              rotationZ: (index) => getFanState(index, metrics).rotationZ,
-              duration: 0.98,
+              x: (index) => getFanState(index, secondCards.length, metrics).x,
+              y: (index) => getFanState(index, secondCards.length, metrics).y,
+              z: (index) => getFanState(index, secondCards.length, metrics).z,
+              rotationX: (index) =>
+                getFanState(index, secondCards.length, metrics).rotationX,
+              rotationY: (index) =>
+                getFanState(index, secondCards.length, metrics).rotationY,
+              rotationZ: (index) =>
+                getFanState(index, secondCards.length, metrics).rotationZ,
+              duration: 0.96,
               ease: "expo.out",
-              stagger: { each: 0.06, from: "center" },
+              stagger: { each: 0.06, from: "end" },
             },
             "fan-b"
           )
-          .to({}, { duration: 0.18 })
+          .to({}, { duration: 0.16 })
           .to(
             secondUnit,
             {
+              x: -metrics.travelX,
               y: -metrics.travelY,
-              duration: 1.65,
-              ease: "none",
+              duration: 1.72,
+              ease: "power2.inOut",
             },
-            "push-b"
+            "slide-b"
           )
           .to(
             firstUnit,
             {
+              x: 0,
               y: 0,
-              duration: 1.65,
-              ease: "none",
+              duration: 1.72,
+              ease: "power2.inOut",
             },
-            "push-b"
+            "slide-b"
           )
           .to(
             firstCards,
@@ -254,26 +297,36 @@ export default function HeroSection() {
               rotationX: 0,
               rotationY: 0,
               rotationZ: 0,
-              duration: 0.8,
+              duration: 0.78,
               ease: "expo.out",
-              stagger: { each: 0.05, from: "edges" },
+              stagger: { each: 0.05, from: "start" },
             },
-            "push-b+=0.9"
+            "slide-b+=0.9"
           )
-          .to({}, { duration: 0.72 })
+          .to({}, { duration: 0.55 })
           .set(
             secondCards,
             {
-              x: (index) => getFanState(index, metrics).x,
-              y: (index) => getFanState(index, metrics).y,
-              z: (index) => getFanState(index, metrics).z,
-              rotationX: (index) => getFanState(index, metrics).rotationX,
-              rotationY: (index) => getFanState(index, metrics).rotationY,
-              rotationZ: (index) => getFanState(index, metrics).rotationZ,
+              x: (index) => getFanState(index, secondCards.length, metrics).x,
+              y: (index) => getFanState(index, secondCards.length, metrics).y,
+              z: (index) => getFanState(index, secondCards.length, metrics).z,
+              rotationX: (index) =>
+                getFanState(index, secondCards.length, metrics).rotationX,
+              rotationY: (index) =>
+                getFanState(index, secondCards.length, metrics).rotationY,
+              rotationZ: (index) =>
+                getFanState(index, secondCards.length, metrics).rotationZ,
             },
             "reset-b"
           )
-          .set(secondUnit, { x: 0, y: metrics.travelY }, "reset-b");
+          .set(
+            secondUnit,
+            {
+              x: metrics.travelX,
+              y: metrics.travelY,
+            },
+            "reset-b"
+          );
       };
 
       buildLoop();
@@ -318,39 +371,35 @@ export default function HeroSection() {
           className="hero-stage"
           aria-label="Automated portfolio animation"
         >
-          {heroUnits.map((unit, unitIndex) => {
-            const centerIndex = Math.floor(unit.length / 2);
-
-            return (
-              <div
-                key={`hero-unit-${unitIndex}`}
-                ref={(node) => {
-                  unitRefs.current[unitIndex] = node;
-                }}
-                className="hero-unit"
-              >
-                {unit.map((card, cardIndex) => (
-                  <article
-                    key={`${card.src}-${cardIndex}`}
-                    className="hero-card"
-                    data-card-index={cardIndex}
-                    style={{
-                      zIndex: unit.length - Math.abs(cardIndex - centerIndex),
-                    }}
-                  >
-                    <Image
-                      src={card.src}
-                      alt={card.alt}
-                      fill
-                      priority={unitIndex === 0}
-                      sizes="(max-width: 767px) 44vw, (max-width: 1023px) 26vw, 360px"
-                      className="hero-card-image"
-                    />
-                  </article>
-                ))}
-              </div>
-            );
-          })}
+          {heroUnits.map((unit, unitIndex) => (
+            <div
+              key={`hero-unit-${unitIndex}`}
+              ref={(node) => {
+                unitRefs.current[unitIndex] = node;
+              }}
+              className="hero-unit"
+            >
+              {unit.map((card, cardIndex) => (
+                <article
+                  key={`${card.src}-${cardIndex}`}
+                  className="hero-card"
+                  data-card-index={cardIndex}
+                  style={{
+                    zIndex: cardIndex + 1,
+                  }}
+                >
+                  <Image
+                    src={assetPath(card.src)}
+                    alt={card.alt}
+                    fill
+                    priority={unitIndex === 0 && cardIndex === unit.length - 1}
+                    sizes="(max-width: 767px) 42vw, (max-width: 1023px) 28vw, 360px"
+                    className="hero-card-image"
+                  />
+                </article>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
     </section>

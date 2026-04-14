@@ -4,11 +4,13 @@ import Image from "next/image";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
+import { assetPath } from "@/lib/asset-path";
+
 export default function CaseStudy() {
   const [dragging, setDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
-  const sliderX = useMotionValue(52);
+  const sliderX = useMotionValue(48);
   const clipPath = useTransform(sliderX, (value) => `inset(0 ${100 - value}% 0 0)`);
   const sliderLeft = useTransform(sliderX, (value) => `${value}%`);
 
@@ -39,12 +41,12 @@ export default function CaseStudy() {
 
         gsap.fromTo(
           revealTargets,
-          { y: 40, opacity: 0, filter: "blur(10px)" },
+          { y: 48, opacity: 0, filter: "blur(12px)" },
           {
             y: 0,
             opacity: 1,
             filter: "blur(0px)",
-            duration: 0.9,
+            duration: 0.94,
             stagger: 0.12,
             ease: "power3.out",
             scrollTrigger: {
@@ -78,10 +80,10 @@ export default function CaseStudy() {
 
   return (
     <section ref={sectionRef} id="cases" className="section-shell">
-      <div className="content-shell space-y-14">
+      <div className="content-shell space-y-16">
         <div
           data-case-reveal
-          className="grid gap-8 border-b border-white/10 pb-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,0.5fr)] lg:items-end"
+          className="grid gap-8 border-b border-white/10 pb-12 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,0.52fr)] lg:items-end"
         >
           <div className="space-y-5">
             <div className="section-label-row">
@@ -96,16 +98,15 @@ export default function CaseStudy() {
           </div>
 
           <p className="body-copy max-w-[34ch] lg:justify-self-end">
-            A before-and-after look at how I tightened the hierarchy, clarified
-            the messaging, and pushed the campaign toward a stronger
-            registration response.
+            A tighter, more vertical campaign system designed to land faster in
+            feed and communicate with more urgency the moment someone sees it.
           </p>
         </div>
 
-        <div data-case-reveal>
+        <div data-case-reveal className="flex justify-center">
           <div
             ref={containerRef}
-            className="relative mx-auto aspect-[16/9] w-full max-w-[1120px] overflow-hidden rounded-[18px] border border-white/10 bg-[#0A0A0A] shadow-[0_28px_90px_rgba(0,0,0,0.42)]"
+            className="relative aspect-[9/16] w-full max-w-[430px] overflow-hidden rounded-[28px] border border-white/10 bg-[#0A0A0A] shadow-[0_28px_90px_rgba(0,0,0,0.42)]"
             onPointerDown={(event) => {
               setDragging(true);
               updateSlider(event.clientX);
@@ -121,20 +122,20 @@ export default function CaseStudy() {
           >
             <div className="absolute inset-0">
               <Image
-                src="/images/case-study/before.jpg"
+                src={assetPath("/images/case-study/before.jpg")}
                 alt="Before design"
                 fill
-                sizes="(max-width: 1120px) 100vw, 1120px"
+                sizes="(max-width: 767px) 84vw, 430px"
                 className="object-cover grayscale"
               />
             </div>
 
             <motion.div className="absolute inset-0" style={{ clipPath }}>
               <Image
-                src="/images/case-study/after.jpg"
+                src={assetPath("/images/case-study/after.jpg")}
                 alt="After design"
                 fill
-                sizes="(max-width: 1120px) 100vw, 1120px"
+                sizes="(max-width: 767px) 84vw, 430px"
                 className="object-cover"
               />
             </motion.div>
@@ -143,7 +144,7 @@ export default function CaseStudy() {
               className="absolute bottom-0 top-0 z-20 w-px bg-white"
               style={{ left: sliderLeft }}
             >
-              <div className="absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black text-white shadow-[0_14px_40px_rgba(0,0,0,0.45)]">
+              <div className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black text-white shadow-[0_14px_40px_rgba(0,0,0,0.45)]">
                 <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" aria-hidden>
                   <path
                     d="M6 10H2m0 0 3-3m-3 3 3 3m9-3h4m0 0-3-3m3 3-3 3"
@@ -156,10 +157,10 @@ export default function CaseStudy() {
               </div>
             </motion.div>
 
-            <div className="absolute bottom-4 left-4 z-30 rounded-[4px] border border-white/10 bg-black/70 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-white/68">
+            <div className="absolute left-4 top-4 z-30 rounded-full border border-white/10 bg-black/72 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white/68">
               Before
             </div>
-            <div className="absolute bottom-4 right-4 z-30 rounded-[4px] border border-white/10 bg-black/70 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-white/68">
+            <div className="absolute right-4 top-4 z-30 rounded-full border border-white/10 bg-black/72 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white/68">
               After
             </div>
           </div>
@@ -167,11 +168,11 @@ export default function CaseStudy() {
 
         <div
           data-case-reveal
-          className="grid gap-8 lg:grid-cols-[minmax(0,0.38fr)_minmax(0,0.72fr)]"
+          className="mx-auto grid max-w-[980px] gap-10 lg:grid-cols-[minmax(0,0.34fr)_minmax(0,0.66fr)]"
         >
-          <div className="space-y-2">
+          <div className="space-y-3">
             <p className="section-label text-white/42">Campaign</p>
-            <p className="text-[18px] font-medium leading-[1.5] text-white">
+            <p className="text-[19px] font-medium leading-[1.45] text-white">
               5th Round Student Registration
             </p>
             <p className="section-label text-white/35">April 2026</p>
@@ -184,14 +185,14 @@ export default function CaseStudy() {
             </p>
 
             <p className="body-copy">
-              I redesigned the visual system to tighten the spacing, increase
-              contrast, and organize the information into a cleaner, faster,
-              more social-first layout.
+              I rebuilt the visual system for a vertical-first format, tightened
+              the spacing, lifted contrast, and reorganized the information so
+              it could stop the scroll faster.
             </p>
 
             <p className="text-[18px] font-semibold leading-[1.7] text-white">
-              The result is a more confident campaign that improves clarity,
-              attention, and conversion momentum across the registration push.
+              The result is a cleaner campaign with better focus, stronger
+              momentum, and a more premium registration push.
             </p>
           </div>
         </div>
