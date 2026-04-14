@@ -351,7 +351,7 @@ button {
 .hero-stage {
   position: absolute;
   inset: 0;
-  overflow: hidden;
+  overflow: visible;
   pointer-events: none;
   perspective: 1800px;
   z-index: 2;
@@ -359,9 +359,9 @@ button {
 
 .hero-unit {
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 56%;
-  transform: translateY(-50%);
+  margin-top: calc(50vh - 200px);
   opacity: 0;
 }
 
@@ -503,8 +503,8 @@ button {
   }
 
   .hero-unit {
-    top: 50%;
-    left: 52%;
+    left: 50%;
+    margin-top: calc(50vh - 180px);
   }
 
   .hero-card {
@@ -543,8 +543,8 @@ button {
   }
 
   .hero-unit {
-    top: 48%;
-    left: 46%;
+    left: 42%;
+    margin-top: calc(50vh - 140px);
   }
 
   .hero-card {
