@@ -10,13 +10,13 @@
   --text-soft: rgba(255, 255, 255, 0.4);
   --line: rgba(255, 255, 255, 0.1);
   --line-strong: rgba(255, 255, 255, 0.16);
-  --accent: #ff4425;
-  --accent-strong: #ff2300;
-  --accent-soft: rgba(255, 68, 37, 0.18);
-  --container: 1320px;
-  --section-padding-y: clamp(7.5rem, 10vw, 10rem);
-  --section-padding-x: max(4vw, 1.1rem);
-  --radius: 16px;
+  --accent: #FF0000;
+  --accent-strong: #E60000;
+  --accent-soft: rgba(255, 0, 0, 0.12);
+  --container: 1400px;
+  --section-padding-y: clamp(8.5rem, 12vw, 12rem);
+  --section-padding-x: max(5vw, 1.25rem);
+  --radius: 0px;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   color-scheme: dark;
@@ -127,9 +127,9 @@ button {
   margin-top: -21rem;
   border-radius: 50%;
   background:
-    radial-gradient(circle, rgba(255, 68, 37, 0.14), rgba(255, 68, 37, 0.04) 32%, transparent 66%);
-  filter: blur(20px);
-  opacity: 0.9;
+    radial-gradient(circle, rgba(255, 0, 0, 0.12), transparent 70%);
+  filter: blur(40px);
+  opacity: 0.8;
 }
 
 .experience-gradient {
@@ -153,7 +153,7 @@ button {
   bottom: -14rem;
   width: 44rem;
   height: 44rem;
-  background: radial-gradient(circle, rgba(255, 68, 37, 0.08), transparent 72%);
+  background: radial-gradient(circle, rgba(255, 0, 0, 0.06), transparent 72%);
 }
 
 .experience-noise {
@@ -198,7 +198,6 @@ button {
   width: 14px;
   height: 14px;
   flex: 0 0 14px;
-  border-radius: 1px;
   background: var(--accent);
   vertical-align: baseline;
   transform: translateY(-0.08em);
@@ -344,7 +343,7 @@ button {
   width: clamp(12px, 0.9vw, 18px);
   height: clamp(12px, 0.9vw, 18px);
   flex: 0 0 clamp(12px, 0.9vw, 18px);
-  border-radius: 999px;
+  border-radius: 2px;
   background: var(--accent);
   transform: translateY(-0.08em);
 }
