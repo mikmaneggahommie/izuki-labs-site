@@ -1,169 +1,185 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
-import { motion, useMotionValue, useTransform } from "framer-motion";
 import Image from "next/image";
+import { motion, useMotionValue, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 
 export default function CaseStudy() {
-  const [isDragging, setIsDragging] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const sliderX = useMotionValue(50);
-  const clipPath = useTransform(sliderX, (v) => `inset(0 ${100 - v}% 0 0)`);
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  const handleInteraction = useCallback(
-    (clientX: number) => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-      sliderX.set((x / rect.width) * 100);
-    },
-    [sliderX]
-  );
-
-  const onPointerDown = () => setIsDragging(true);
-  const onPointerUp = () => setIsDragging(false);
-  const onPointerMove = (e: React.PointerEvent) => {
-    if (!isDragging) return;
-    handleInteraction(e.clientX);
-  };
+  const sectionRef = useRef<HTMLElement>(null);
+  const sliderX = useMotionValue(52);
+  const clipPath = useTransform(sliderX, (value) => `inset(0 ${100 - value}% 0 0)`);
+  const sliderLeft = useTransform(sliderX, (value) => `${value}%`);
 
   useEffect(() => {
-    const loadGSAP = async () => {
-      try {
-        const gsap = (await import("gsap")).default;
-        const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-        gsap.registerPlugin(ScrollTrigger);
+    let active = true;
+    let cleanup: (() => void) | undefined;
 
-        const el = sectionRef.current;
-        if (!el) return;
+    const runReveal = async () => {
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      if (reducedMotion.matches || !sectionRef.current) {
+        return;
+      }
+
+      const gsap = (await import("gsap")).default;
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      if (!active) {
+        return;
+      }
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      const context = gsap.context(() => {
+        const revealTargets =
+          sectionRef.current?.querySelectorAll("[data-case-reveal]");
+        if (!revealTargets?.length) {
+          return;
+        }
 
         gsap.fromTo(
-          el.querySelector(".case-content"),
-          { y: 60, opacity: 0 },
+          revealTargets,
+          { y: 40, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 1,
+            duration: 0.9,
+            stagger: 0.12,
             ease: "power3.out",
             scrollTrigger: {
-              trigger: el,
-              start: "top 70%",
-              toggleActions: "play none none reverse",
+              trigger: sectionRef.current,
+              start: "top 78%",
             },
           }
         );
-      } catch (e) {
-        console.warn("GSAP not available:", e);
-      }
+      }, sectionRef);
+
+      cleanup = () => context.revert();
     };
 
-    loadGSAP();
+    runReveal();
+
+    return () => {
+      active = false;
+      cleanup?.();
+    };
   }, []);
 
+  const updateSlider = (clientX: number) => {
+    if (!containerRef.current) {
+      return;
+    }
+
+    const bounds = containerRef.current.getBoundingClientRect();
+    const clamped = Math.max(0, Math.min(clientX - bounds.left, bounds.width));
+    sliderX.set((clamped / bounds.width) * 100);
+  };
+
   return (
-    <section
-      ref={sectionRef}
-      id="cases"
-      className="section-dark py-24 md:py-32"
-    >
-      <div className="max-w-7xl mx-auto px-8 md:px-16 lg:px-24 case-content">
-        {/* Header */}
-        <div className="mb-24 text-center">
-          <p className="text-label text-white/40 mb-4">Case Study</p>
-          <h2 className="font-display text-section text-white">
-            This month&apos;s
-            <br />
-            highlighted design<span className="accent-square" />
+    <section ref={sectionRef} id="cases" className="section-shell">
+      <div className="content-shell">
+        <div data-case-reveal className="mx-auto max-w-5xl text-center">
+          <div className="section-label-row justify-center">
+            <span className="accent-square accent-square--tiny" aria-hidden />
+            <span className="section-label">Case Study</span>
+          </div>
+
+          <h2 className="display-title mt-5 max-w-[12ch] mx-auto">
+            THIS MONTH&apos;S HIGHLIGHTED DESIGN
+            <span className="accent-square" aria-hidden />
           </h2>
-          <p className="text-meta text-white/40 mt-4">April 2026</p>
+
+          <p className="section-label mt-5">April 2026</p>
         </div>
 
-        {/* Before/After Slider */}
-        <div
-          ref={containerRef}
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-          onPointerLeave={onPointerUp}
-          onPointerMove={onPointerMove}
-          className="comparison-slider relative aspect-[16/9] w-full max-w-4xl mx-auto mb-20 shadow-2xl overflow-hidden rounded-2xl border border-white/5"
-          style={{ touchAction: "none" }}
-        >
-          {/* Before — full background */}
-          <div className="absolute inset-0">
-            <Image
-              src="/images/case-study/before.jpg"
-              alt="Before redesign"
-              fill
-              className="object-cover grayscale"
-              sizes="(max-width: 1200px) 100vw, 1200px"
-            />
-          </div>
-
-          {/* After — clipped overlay */}
-          <motion.div className="absolute inset-0" style={{ clipPath }}>
-            <Image
-              src="/images/case-study/after.jpg"
-              alt="After redesign"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1200px) 100vw, 1200px"
-            />
-          </motion.div>
-
-          {/* Slider handle */}
-          <motion.div
-            className="absolute top-0 bottom-0 w-[2px] bg-white z-20 pointer-events-none"
-            style={{ left: useTransform(sliderX, (v) => `${v}%`) }}
+        <div data-case-reveal className="mt-16 px-0 md:px-8">
+          <div
+            ref={containerRef}
+            className="relative mx-auto aspect-[16/9] w-full max-w-[900px] overflow-hidden rounded-[12px] border border-white/10 bg-[#0A0A0A] shadow-[0_25px_90px_rgba(0,0,0,0.45)]"
+            onPointerDown={(event) => {
+              setDragging(true);
+              updateSlider(event.clientX);
+            }}
+            onPointerMove={(event) => {
+              if (dragging) {
+                updateSlider(event.clientX);
+              }
+            }}
+            onPointerUp={() => setDragging(false)}
+            onPointerLeave={() => setDragging(false)}
+            style={{ touchAction: "none" }}
           >
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                className="text-black"
-              >
-                <path
-                  d="M6 10L2 10M2 10L5 7M2 10L5 13M14 10L18 10M18 10L15 7M18 10L15 13"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+            <div className="absolute inset-0">
+              <Image
+                src="/images/case-study/before.jpg"
+                alt="Before design"
+                fill
+                sizes="(max-width: 900px) 100vw, 900px"
+                className="object-cover grayscale"
+              />
             </div>
-          </motion.div>
 
-          {/* Labels */}
-          <div className="absolute bottom-4 left-4 z-30 px-3 py-1.5 bg-black/60 backdrop-blur-sm rounded-md text-xs font-medium text-white/70">
-            Before
-          </div>
-          <div className="absolute bottom-4 right-4 z-30 px-3 py-1.5 bg-white rounded-md text-xs font-medium text-black">
-            After
+            <motion.div className="absolute inset-0" style={{ clipPath }}>
+              <Image
+                src="/images/case-study/after.jpg"
+                alt="After design"
+                fill
+                sizes="(max-width: 900px) 100vw, 900px"
+                className="object-cover"
+              />
+            </motion.div>
+
+            <motion.div
+              className="absolute bottom-0 top-0 z-20 w-px bg-white"
+              style={{ left: sliderLeft }}
+            >
+              <div className="absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black text-white shadow-[0_14px_40px_rgba(0,0,0,0.45)]">
+                <svg
+                  viewBox="0 0 20 20"
+                  className="h-5 w-5"
+                  fill="none"
+                  aria-hidden
+                >
+                  <path
+                    d="M6 10H2m0 0 3-3m-3 3 3 3m9-3h4m0 0-3-3m3 3-3 3"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.5"
+                  />
+                </svg>
+              </div>
+            </motion.div>
+
+            <div className="absolute bottom-4 left-4 z-30 rounded-[4px] border border-white/10 bg-black/70 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-white/68">
+              Before
+            </div>
+            <div className="absolute bottom-4 right-4 z-30 rounded-[4px] border border-white/10 bg-black/70 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-white/68">
+              After
+            </div>
           </div>
         </div>
 
-        {/* Case Study Text */}
-        <div className="max-w-2xl mx-auto text-center md:text-left">
-          <h3 className="font-display text-2xl font-bold tracking-tight text-white mb-6">
+        <div data-case-reveal className="mx-auto mt-20 max-w-[700px] space-y-6 text-left">
+          <h3 className="text-[28px] font-bold tracking-[-0.03em] text-white">
             InVision Africa — 5th Round Student Registration
           </h3>
-          <p className="text-white/50 leading-relaxed mb-6">
-            InVision Africa approached me to overhaul their social media
-            presence and create a compelling post for their 5th round student
-            registration campaign. The brief was clear: make it impossible to
-            scroll past.
+
+          <p className="body-copy">
+            InVision Africa needed a campaign visual with stronger hierarchy,
+            sharper messaging, and a more immediate sense of urgency for their
+            fifth-round student registration push.
           </p>
-          <p className="text-white/50 leading-relaxed mb-6">
-            After implementing the new design system — with bold typography,
-            structured layouts, and an attention-grabbing color palette — the
-            results spoke for themselves.
+
+          <p className="body-copy">
+            The redesign tightened the layout, elevated contrast, and organized
+            the information into a cleaner social-first system that could stop
+            the scroll and communicate fast.
           </p>
-          <p className="text-white/80 font-medium leading-relaxed">
-            They saw a significant increase in student registration compared to
-            their previous campaigns, proving that strategic visual design
-            directly impacts conversion<span className="accent-square" />
+
+          <p className="text-[17px] font-semibold leading-[1.7] text-white">
+            The result was a more confident registration campaign that improved
+            clarity, attention, and conversion momentum across the launch.
           </p>
         </div>
       </div>

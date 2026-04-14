@@ -1,136 +1,152 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+
+const menuItems = [
+  { label: "Home", href: "#top" },
+  { label: "Selected Work", href: "#work" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "About", href: "#about" },
+  { label: "Contact", href: "#contact" },
+];
 
 export default function Header() {
-  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    
-    // Enable global smooth scroll
-    document.documentElement.style.scrollBehavior = "smooth";
-    
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      document.documentElement.style.scrollBehavior = "auto";
-    };
-  }, []);
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = menuOpen ? "hidden" : originalOverflow;
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [menuOpen]);
+
+  const handleAnchorClick = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
     setMenuOpen(false);
-    
-    // If it's a hash link on the same page, do smooth scroll
-    if (href.startsWith("#")) {
-      e.preventDefault();
-      const targetId = href.substring(1);
-      const elem = document.getElementById(targetId);
-      if (elem) {
-        elem.scrollIntoView({ behavior: "smooth" });
-      }
-    } else if (href === "/") {
-      e.preventDefault();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+
+    if (!href.startsWith("#")) {
+      return;
     }
+
+    event.preventDefault();
+    const target = document.getElementById(href.slice(1));
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
     <>
-      <header
-        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
-        style={{
-          background: scrolled ? "rgba(0,0,0,0.85)" : "transparent",
-          backdropFilter: scrolled ? "blur(20px)" : "none",
-        }}
-      >
-        <div className="max-w-7xl mx-auto w-full px-8 md:px-16 lg:px-24">
-          <div className="grid grid-cols-2 md:grid-cols-4 items-center py-4 md:py-6">
-            {/* Brand */}
-            <a href="/" onClick={(e) => handleNavClick(e, "/")} className="font-display text-base font-bold tracking-tight text-white hover:opacity-70 transition-opacity">
-              izuki.labs
+      <header className="fixed inset-x-0 top-0 z-50">
+        <div className="content-shell px-[var(--section-padding-x)]">
+          <div className="grid items-center gap-4 py-5 md:grid-cols-[1fr_auto_1fr]">
+            <a
+              href="#top"
+              onClick={(event) => handleAnchorClick(event, "#top")}
+              className="nav-copy interactive-link flex w-fit items-center tracking-[0.14em] text-white"
+            >
+              IZUKI.LABS
             </a>
 
-            {/* Location */}
-            <span className="text-label text-white/50 hidden md:block text-center cursor-default">
-              Addis Ababa
-            </span>
+            <div className="justify-self-start md:justify-self-center">
+              <span className="nav-copy text-white">ADDIS ABABA</span>
+            </div>
 
-            {/* Role */}
-            <span className="text-label text-white/50 hidden md:block text-center cursor-default">
-              Social Media Designer
-            </span>
-
-            {/* Menu Toggle */}
-            <div className="text-right">
+            <div className="justify-self-end">
               <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="text-sm font-bold uppercase tracking-widest text-white hover:opacity-70 transition-opacity bg-transparent border-none cursor-pointer"
+                type="button"
+                onClick={() => setMenuOpen((current) => !current)}
+                className="nav-copy interactive-link inline-flex items-center gap-3 text-white"
+                aria-expanded={menuOpen}
+                aria-label="Toggle menu"
               >
-                {menuOpen ? "Close" : "Menu"}
+                <span className="accent-square accent-square--tiny" aria-hidden />
+                <span>{menuOpen ? "CLOSE" : "MENU"}</span>
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Full-screen Menu Overlay */}
       <AnimatePresence>
-        {menuOpen && (
+        {menuOpen ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className="fixed inset-0 z-40 flex items-center justify-center"
-            style={{ background: "rgba(0,0,0,0.95)", backdropFilter: "blur(30px)" }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-2xl"
           >
-            <nav className="flex flex-col items-center gap-8">
-              {[
-                { label: "Home", href: "/" },
-                { label: "Pricing", href: "#pricing" },
-                { label: "Work", href: "#work" },
-                { label: "About", href: "#about" },
-                { label: "Contact", href: "#contact" },
-              ].map((item, i) => (
-                <motion.div
-                  key={item.label}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ delay: i * 0.08, duration: 0.4 }}
-                >
-                  <a
+            <div className="content-shell flex h-full flex-col justify-between px-[var(--section-padding-x)] pb-10 pt-28">
+              <nav className="grid gap-4">
+                {menuItems.map((item, index) => (
+                  <motion.a
+                    key={item.label}
                     href={item.href}
-                    onClick={(e) => handleNavClick(e, item.href)}
-                    className="font-display text-4xl md:text-6xl font-bold tracking-tight text-white hover:text-[#FF3F11] transition-colors"
+                    onClick={(event) => handleAnchorClick(event, item.href)}
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -18 }}
+                    transition={{
+                      duration: 0.4,
+                      delay: index * 0.06,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                    className="display-title interactive-link leading-[0.88]"
                   >
                     {item.label}
-                  </a>
-                </motion.div>
-              ))}
+                  </motion.a>
+                ))}
+              </nav>
 
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="mt-12 flex gap-8"
-              >
-                <a href="https://t.me/snowplugwalk" target="_blank" rel="noopener noreferrer" className="text-meta text-white/40 hover:text-white transition-colors">
-                  Telegram
-                </a>
-                <a href="mailto:it.mikiyas.daniel@gmail.com" className="text-meta text-white/40 hover:text-white transition-colors">
-                  Email
-                </a>
-                <a href="tel:+251954676421" className="text-meta text-white/40 hover:text-white transition-colors">
-                  Phone
-                </a>
-              </motion.div>
-            </nav>
+              <div className="grid gap-8 border-t border-white/10 pt-8 text-left md:grid-cols-3">
+                <div className="space-y-3">
+                  <p className="section-label">Location</p>
+                  <p className="body-copy text-white">Addis Ababa, Ethiopia</p>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="section-label">Connect</p>
+                  <a
+                    href="mailto:it.mikiyas.daniel@gmail.com"
+                    className="body-copy interactive-link block text-white"
+                  >
+                    it.mikiyas.daniel@gmail.com
+                  </a>
+                  <a
+                    href="tel:+251954676421"
+                    className="body-copy interactive-link block text-white"
+                  >
+                    +251 954 676 421
+                  </a>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="section-label">Social</p>
+                  <a
+                    href="https://t.me/snowplugwalk"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="body-copy interactive-link block text-white"
+                  >
+                    Telegram
+                  </a>
+                  <a
+                    href="https://www.instagram.com/izuki.labs/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="body-copy interactive-link block text-white"
+                  >
+                    Instagram
+                  </a>
+                </div>
+              </div>
+            </div>
           </motion.div>
-        )}
+        ) : null}
       </AnimatePresence>
     </>
   );

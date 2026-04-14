@@ -3,44 +3,35 @@ import { ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (
-    <main className="section-dark min-h-screen flex flex-col items-center justify-center px-6 relative">
-      <div className="text-center max-w-2xl">
-        <h1 className="font-display text-hero text-white mb-6">
-          izuki<span className="accent-square" />labs
-        </h1>
+    <main className="section-shell flex min-h-screen items-center">
+      <div className="content-shell grid gap-16 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.55fr)] lg:items-end">
+        <div className="space-y-8">
+          <div className="section-label-row">
+            <span className="accent-square accent-square--tiny" aria-hidden />
+            <span className="section-label">izuki.labs</span>
+          </div>
 
-        <p className="text-body-large text-white/40 mb-12">
-          Full portfolio under construction
-        </p>
-
-        <Link
-          href="/SocialmediaPackage"
-          className="inline-flex items-center gap-3 bg-white text-black px-8 py-4 rounded-lg font-display font-bold text-sm uppercase tracking-widest hover:bg-[#FF3F11] hover:text-white transition-all duration-300"
-        >
-          Social Media Packages
-          <ArrowRight className="w-4 h-4" />
-        </Link>
-
-        <div className="mt-16 flex flex-col gap-3 text-sm text-white/30">
-          <a
-            href="mailto:it.mikiyas.daniel@gmail.com"
-            className="hover:text-white transition-colors"
-          >
-            it.mikiyas.daniel@gmail.com
-          </a>
-          <a
-            href="https://t.me/snowplugwalk"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-white transition-colors"
-          >
-            Telegram — @snowplugwalk
-          </a>
+          <h1 className="display-title max-w-[10ch]">
+            Social media systems for brands that need visual distinction
+            <span className="accent-square" aria-hidden />
+          </h1>
         </div>
-      </div>
 
-      <div className="absolute bottom-8 text-xs text-white/15">
-        © 2026 izuki.labs
+        <div className="space-y-8 lg:justify-self-end lg:text-right">
+          <p className="body-copy max-w-xl lg:ml-auto">
+            The full package site lives one click away. Inside, you&apos;ll find
+            the editorial redesign, fixed monthly retainers, highlighted case
+            studies, and a direct path to start a project.
+          </p>
+
+          <Link
+            href="/SocialmediaPackage"
+            className="primary-button inline-flex w-fit lg:ml-auto"
+          >
+            Enter The Package Site
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
     </main>
   );

@@ -2,127 +2,137 @@
 
 import { useEffect, useRef } from "react";
 
+const columns = [
+  {
+    label: "Experience",
+    title: "Design Depth",
+    items: [
+      "4+ years of graphic design direction",
+      "Identity systems for ambitious brands",
+      "High-contrast layouts with editorial clarity",
+    ],
+  },
+  {
+    label: "Design Services",
+    title: "Design Services",
+    items: [
+      "Social media systems",
+      "Campaign art direction",
+      "Content calendars and launch visuals",
+      "Brand identity and collateral",
+    ],
+  },
+  {
+    label: "Digital Presence",
+    title: "Digital Presence",
+    items: [
+      "Instagram",
+      "TikTok",
+      "Telegram",
+      "Editorial and product storytelling",
+    ],
+  },
+];
+
 export default function AboutMarquee() {
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const loadGSAP = async () => {
-      try {
-        const gsap = (await import("gsap")).default;
-        const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-        gsap.registerPlugin(ScrollTrigger);
+    let active = true;
+    let cleanup: (() => void) | undefined;
 
-        const lines = sectionRef.current?.querySelectorAll(".about-line");
-        if (!lines) return;
-
-        lines.forEach((line, i) => {
-          gsap.fromTo(
-            line,
-            { y: 60, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.8,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: line,
-                start: "top 90%",
-                toggleActions: "play none none reverse",
-              },
-              delay: i * 0.1,
-            }
-          );
-        });
-      } catch (e) {
-        console.warn("GSAP not available:", e);
+    const runReveal = async () => {
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      if (reducedMotion.matches || !sectionRef.current) {
+        return;
       }
+
+      const gsap = (await import("gsap")).default;
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      if (!active) {
+        return;
+      }
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      const context = gsap.context(() => {
+        const revealTargets =
+          sectionRef.current?.querySelectorAll("[data-about-reveal]");
+        if (!revealTargets?.length) {
+          return;
+        }
+
+        gsap.fromTo(
+          revealTargets,
+          { y: 36, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.85,
+            stagger: 0.12,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 78%",
+            },
+          }
+        );
+      }, sectionRef);
+
+      cleanup = () => context.revert();
     };
 
-    loadGSAP();
+    runReveal();
+
+    return () => {
+      active = false;
+      cleanup?.();
+    };
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      id="about"
-      className="section-dark py-24 md:py-40"
-    >
-      <div className="max-w-7xl mx-auto px-8 md:px-16 lg:px-24">
-        {/* Large text block — line-by-line reveal */}
-        <div className="max-w-5xl">
-          <div className="overflow-hidden mb-6">
-            <p className="about-line text-body-large text-white/80 leading-[1.5]">
-              Based in Addis Ababa, Mikiyas Daniel crafts
-            </p>
-          </div>
-          <div className="overflow-hidden mb-6">
-            <p className="about-line text-body-large text-white/80 leading-[1.5]">
-              digital identities for brands seeking visual
-            </p>
-          </div>
-          <div className="overflow-hidden mb-6">
-            <p className="about-line text-body-large text-white/80 leading-[1.5]">
-              distinction. From social media systems to full
-            </p>
-          </div>
-          <div className="overflow-hidden mb-6">
-            <p className="about-line text-body-large text-white/80 leading-[1.5]">
-              brand architectures — every pixel serves
-            </p>
-          </div>
-          <div className="overflow-hidden">
-            <p className="about-line text-body-large text-white/80 leading-[1.5]">
-              a purpose<span className="accent-square" />
-            </p>
-          </div>
+    <section ref={sectionRef} id="about" className="section-shell">
+      <div className="content-shell space-y-14">
+        <div data-about-reveal className="section-label-row">
+          <span className="accent-square accent-square--tiny" aria-hidden />
+          <span className="section-label">About</span>
         </div>
 
-        {/* About + Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-24 pt-16 border-t border-white/10">
-          <div>
-            <h3 className="text-label text-white/40 mb-6">About</h3>
-            <h4 className="font-display text-xl font-bold tracking-tight text-white mb-4">
-              Experience
-            </h4>
-            <p className="text-sm text-white/50 leading-relaxed">
-              A designer focused on shaping brand identities and the visual
-              worlds around them. From building brands from scratch to designing
-              high-impact social media content — stripping away the noise to
-              focus on the essential details that make a brand look and feel
-              refined.
-            </p>
-          </div>
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,0.34fr)_minmax(0,1fr)]">
+          <div />
 
-          <div>
-            <h3 className="text-label text-white/40 mb-6">Services</h3>
-            <h4 className="font-display text-xl font-bold tracking-tight text-white mb-4">
-              Design Services
-            </h4>
-            <ul className="space-y-2 text-sm text-white/50">
-              <li>Social media design</li>
-              <li>Brand identity</li>
-              <li>Content systems</li>
-              <li>Carousel design</li>
-              <li>Stories & Reels covers</li>
-              <li>Creative direction</li>
-              <li>Logo design</li>
-            </ul>
-          </div>
+          <p data-about-reveal className="statement-copy max-w-[15ch] md:max-w-none">
+            Based in Addis Ababa, Mikiyas Daniel crafts digital identities for
+            brands seeking visual distinction. From social media systems to full
+            brand architectures, every pixel serves a purpose.
+          </p>
+        </div>
 
-          <div>
-            <h3 className="text-label text-white/40 mb-6">Platforms</h3>
-            <h4 className="font-display text-xl font-bold tracking-tight text-white mb-4">
-              Digital Presence
-            </h4>
-            <ul className="space-y-2 text-sm text-white/50">
-              <li>Instagram</li>
-              <li>Facebook</li>
-              <li>TikTok</li>
-              <li>LinkedIn</li>
-              <li>Telegram</li>
-              <li>YouTube</li>
-            </ul>
-          </div>
+        <div className="grid gap-12 border-t border-white/10 pt-16 md:grid-cols-3 md:gap-x-10 lg:gap-x-16 lg:pt-20">
+          {columns.map((column) => (
+            <div
+              key={column.title}
+              data-about-reveal
+              className="flex max-w-[26rem] flex-col gap-6"
+            >
+              <p className="text-[clamp(0.82rem,0.95vw,0.98rem)] font-medium uppercase tracking-[0.22em] text-white/42">
+                {column.label}
+              </p>
+              <h3 className="text-[clamp(2.2rem,3vw,3.85rem)] font-black leading-[0.94] tracking-[-0.055em] text-white">
+                {column.title}
+              </h3>
+              <ul className="space-y-3.5 pt-1">
+                {column.items.map((item) => (
+                  <li
+                    key={item}
+                    className="text-[clamp(1.35rem,1.72vw,2.05rem)] font-medium leading-[1.08] tracking-[-0.045em] text-white"
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
     </section>

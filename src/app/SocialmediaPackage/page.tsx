@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
+import MarqueeTicker from "@/components/MarqueeTicker";
 import WorkShowcase from "@/components/WorkShowcase";
 import AboutMarquee from "@/components/AboutMarquee";
 import PricingSection from "@/components/PricingSection";
@@ -13,30 +14,17 @@ export default function SocialMediaPackagePage() {
     <>
       <Header />
 
-      <main>
-        {/* Hero — Black bg, cascading images, massive text */}
+      <main className="site-main">
         <HeroSection />
-
-        {/* Selected Work — Off-white bg, phone mockups */}
+        <MarqueeTicker />
         <WorkShowcase />
-
-        {/* About — Black bg, text reveal */}
         <AboutMarquee />
-
-        {/* Pricing — Off-white bg, 3 cards */}
         <PricingSection />
-
-        {/* Case Study — Black bg, before/after */}
         <CaseStudy />
-
-        {/* Policies — Off-white bg, accordion */}
         <PoliciesAccordion />
-
-        {/* Contact & Footer — Black bg */}
         <ContactFooter />
       </main>
 
-      {/* Floating Chat */}
       <ChatBubble />
     </>
   );

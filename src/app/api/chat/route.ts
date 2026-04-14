@@ -3,9 +3,11 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
-    const apiKey = process.env.GEMINI_API_KEY;
+    const { messages } = (await req.json()) as {
+      messages: Array<{ role: string; content: string }>;
+    };
 
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
         { error: "GEMINI_API_KEY is not configured." },
@@ -15,39 +17,49 @@ export async function POST(req: Request) {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const lastMessage = messages[messages.length - 1]?.content ?? "";
 
-    // Extract the latest user message
-    const lastMessage = messages[messages.length - 1].content;
-
-    // Context / System Prompt for Izuki Labs
     const systemPrompt = `
-      You are the Izuki Labs AI Assistant. Your tone is high-end, futurist, and professional. 
-      You specialize in social media architecture, brand systems, and exponential digital growth.
-      
-      Service Ecosystem:
-      - Monthly Retainers (Essentials: 7.5k Birr, Growth: 12k Birr, Remote Designer: 20k Birr).
-      - Add-ons: Logo Design, Identity Kits, Fast Delivery.
-      
+      You are the izuki.labs AI Assistant.
+      Tone: precise, calm, premium, and concise.
+
+      Context:
+      - Mikiyas Daniel offers social media design retainers from Addis Ababa.
+      - Packages: Essentials (7,500 Birr), Growth Plan (12,000 Birr), Remote Designer (20,000 Birr).
+      - Focus on systems, visual distinction, and brand consistency.
+
       Rules:
-      1. Be concise. Minimalist like our design.
-      2. Focus on "Architecture" and "Systems" over simple "design".
-      3. Secure leads: If someone seems interested, guide them to use the lead capture form or call +251 954 676 421.
+      1. Keep answers direct and useful.
+      2. If someone is interested, encourage them to start a project or share their goals.
+      3. Stay aligned with the premium, editorial voice of the site.
     `;
 
     const chat = model.startChat({
       history: [
         { role: "user", parts: [{ text: systemPrompt }] },
-        { role: "model", parts: [{ text: "Acknowledged. I am the Izuki Labs AI Assistant. How can I facilitate your brand architecture today?" }] },
+        {
+          role: "model",
+          parts: [
+            {
+              text: "Understood. I’ll answer with a premium, concise, systems-first tone.",
+            },
+          ],
+        },
       ],
     });
 
     const result = await chat.sendMessage(lastMessage);
     const response = await result.response;
-    const text = response.text();
 
-    return NextResponse.json({ role: "assistant", content: text });
-  } catch (error: any) {
+    return NextResponse.json({
+      role: "assistant",
+      content: response.text(),
+    });
+  } catch (error: unknown) {
     console.error("Gemini API Error:", error);
-    return NextResponse.json({ error: "Failed to process chat" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to process chat" },
+      { status: 500 }
+    );
   }
 }

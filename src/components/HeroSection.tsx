@@ -1,154 +1,367 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 
-const images = [
-  { src: "/images/1.JPG", alt: "Mikiyas Daniel" },
-  { src: "/images/2.jpg", alt: "Design Work 2" },
-  { src: "/images/3.jpg", alt: "Design Work 3" },
-  { src: "/images/4.jpg", alt: "Design Work 4" },
-  { src: "/images/5.jpg", alt: "Design Work 5" },
-  { src: "/images/6.jpg", alt: "Design Work 6" },
-  { src: "/images/7.jpg", alt: "Design Work 7" },
+type HeroCard = {
+  src: string;
+  alt: string;
+};
+
+const heroUnits: HeroCard[][] = [
+  [
+    {
+      src: "/images/1.JPG",
+      alt: "Portrait campaign artwork",
+    },
+    {
+      src: "/images/2.jpg",
+      alt: "Editorial campaign detail",
+    },
+    {
+      src: "/images/3.jpg",
+      alt: "Interface concept artwork",
+    },
+    {
+      src: "/images/4.jpg",
+      alt: "Blue composition artwork",
+    },
+  ],
+  [
+    {
+      src: "/images/5.jpg",
+      alt: "Glass stack concept artwork",
+    },
+    {
+      src: "/images/6.jpg",
+      alt: "AI launch artwork",
+    },
+    {
+      src: "/images/7.jpg",
+      alt: "Luminous abstract artwork",
+    },
+    {
+      src: "/images/2.jpg",
+      alt: "Mobile concept artwork",
+    },
+  ],
 ];
 
-// Staircase end positions — diagonal cascade like nickzoutendijk.nl
-// Using more compact spacing for smaller screens
-const endPositions = [
-  { x: 0, y: 0, rotate: 0, w: 320, h: 420, z: 7 }, 
-  { x: "10vw", y: "10vh", rotate: 2, w: 280, h: 380, z: 6 },
-  { x: "20vw", y: "20vh", rotate: -2, w: 260, h: 360, z: 5 },
-  { x: "30vw", y: "30vh", rotate: 1, w: 240, h: 340, z: 4 },
-  { x: "40vw", y: "40vh", rotate: -1.5, w: 220, h: 320, z: 3 },
-  { x: "50vw", y: "50vh", rotate: 2.5, w: 200, h: 300, z: 2 },
-  { x: "60vw", y: "60vh", rotate: -1, w: 180, h: 280, z: 1 },
-];
+type CardState = {
+  x: number;
+  y: number;
+  z: number;
+  rotationX: number;
+  rotationY: number;
+  rotationZ: number;
+};
+
+type LoopMetrics = {
+  diagonalX: number;
+  diagonalY: number;
+  travelY: number;
+};
+
+const getStackState = (index: number): CardState => ({
+  x: 0,
+  y: 0,
+  z: -index * 12,
+  rotationX: 0,
+  rotationY: 0,
+  rotationZ: 0,
+});
+
+const getFanState = (index: number, metrics: LoopMetrics): CardState => ({
+  x: index * metrics.diagonalX,
+  y: index * metrics.diagonalY,
+  z: -index * 18,
+  rotationX: index === 0 ? 0 : 1.5,
+  rotationY: index === 0 ? 0 : -8,
+  rotationZ: index === 0 ? 0 : 4,
+});
 
 export default function HeroSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const staircaseRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const unitRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    // GSAP scroll trigger for unstacking animation
-    const loadGSAP = async () => {
-      try {
-        const gsap = (await import("gsap")).default;
-        const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-        gsap.registerPlugin(ScrollTrigger);
+    let active = true;
+    let cleanup: (() => void) | undefined;
 
-        const imgs = containerRef.current?.querySelectorAll(".staircase-image");
-        if (!imgs) return;
+    const runAnimation = async () => {
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      if (reducedMotion.matches || !stageRef.current) {
+        return;
+      }
 
-        // Unstacking animation: scrubbed through scroll
-        imgs.forEach((img, i) => {
-          if (i === 0) return; // Main card stays anchored
-          gsap.to(img, {
-            x: endPositions[i].x,
-            y: endPositions[i].y,
-            rotation: endPositions[i].rotate,
-            ease: "none",
-            scrollTrigger: {
-              trigger: containerRef.current,
-              start: "top top",
-              end: "bottom top",
-              scrub: 1,
-            },
+      const gsap = (await import("gsap")).default;
+      if (!active || !stageRef.current) {
+        return;
+      }
+
+      const [firstUnit, secondUnit] = unitRefs.current;
+      if (!firstUnit || !secondUnit) {
+        return;
+      }
+
+      const firstCards = Array.from(
+        firstUnit.querySelectorAll<HTMLElement>("[data-card-index]")
+      );
+      const secondCards = Array.from(
+        secondUnit.querySelectorAll<HTMLElement>("[data-card-index]")
+      );
+
+      if (!firstCards.length || !secondCards.length) {
+        return;
+      }
+
+      let timeline: ReturnType<typeof gsap.timeline> | undefined;
+      let resizeTimer: number | undefined;
+
+      const setCards = (
+        cards: HTMLElement[],
+        state: (index: number, metrics: LoopMetrics) => CardState,
+        metrics: LoopMetrics
+      ) => {
+        cards.forEach((card, index) => {
+          const values = state(index, metrics);
+          gsap.set(card, {
+            x: values.x,
+            y: values.y,
+            z: values.z,
+            rotationX: values.rotationX,
+            rotationY: values.rotationY,
+            rotationZ: values.rotationZ,
+            transformPerspective: 1800,
+            transformOrigin: "50% 50%",
+            force3D: true,
           });
         });
-      } catch (e) {
-        console.warn("GSAP not available:", e);
-      }
+      };
+
+      const buildLoop = () => {
+        timeline?.kill();
+
+        const { width, height } = firstCards[0].getBoundingClientRect();
+        if (!width || !height) {
+          return;
+        }
+
+        const metrics: LoopMetrics = {
+          diagonalX: Math.round(width * 0.34),
+          diagonalY: Math.round(height * 0.235),
+          travelY: Math.round(height + height * 0.235 * (firstCards.length - 1) - 18),
+        };
+
+        setCards(firstCards, (index) => getStackState(index), metrics);
+        setCards(secondCards, getFanState, metrics);
+
+        gsap.set(firstUnit, { x: 0, y: 0, autoAlpha: 1 });
+        gsap.set(secondUnit, { x: 0, y: metrics.travelY, autoAlpha: 1 });
+
+        timeline = gsap.timeline({ repeat: -1 });
+
+        timeline
+          .to({}, { duration: 0.95 })
+          .to(
+            firstCards.slice(1),
+            {
+              x: (index) => getFanState(index + 1, metrics).x,
+              y: (index) => getFanState(index + 1, metrics).y,
+              z: (index) => getFanState(index + 1, metrics).z,
+              rotationX: (index) => getFanState(index + 1, metrics).rotationX,
+              rotationY: (index) => getFanState(index + 1, metrics).rotationY,
+              rotationZ: (index) => getFanState(index + 1, metrics).rotationZ,
+              duration: 0.88,
+              ease: "expo.out",
+              stagger: 0.08,
+            },
+            "unstack-a"
+          )
+          .to({}, { duration: 0.28 })
+          .to(
+            firstUnit,
+            {
+              y: -metrics.travelY,
+              duration: 1.55,
+              ease: "none",
+            },
+            "push-a"
+          )
+          .to(
+            secondUnit,
+            {
+              y: 0,
+              duration: 1.55,
+              ease: "none",
+            },
+            "push-a"
+          )
+          .to(
+            secondCards.slice(1),
+            {
+              x: 0,
+              y: 0,
+              z: (index) => getStackState(index + 1).z,
+              rotationX: 0,
+              rotationY: 0,
+              rotationZ: 0,
+              duration: 0.74,
+              ease: "expo.out",
+              stagger: 0.07,
+            },
+            "push-a+=0.88"
+          )
+          .to({}, { duration: 0.78 })
+          .set(
+            firstCards,
+            {
+              x: (index) => getFanState(index, metrics).x,
+              y: (index) => getFanState(index, metrics).y,
+              z: (index) => getFanState(index, metrics).z,
+              rotationX: (index) => getFanState(index, metrics).rotationX,
+              rotationY: (index) => getFanState(index, metrics).rotationY,
+              rotationZ: (index) => getFanState(index, metrics).rotationZ,
+            },
+            "reset-a"
+          )
+          .set(firstUnit, { x: 0, y: metrics.travelY }, "reset-a")
+          .to(
+            secondCards.slice(1),
+            {
+              x: (index) => getFanState(index + 1, metrics).x,
+              y: (index) => getFanState(index + 1, metrics).y,
+              z: (index) => getFanState(index + 1, metrics).z,
+              rotationX: (index) => getFanState(index + 1, metrics).rotationX,
+              rotationY: (index) => getFanState(index + 1, metrics).rotationY,
+              rotationZ: (index) => getFanState(index + 1, metrics).rotationZ,
+              duration: 0.88,
+              ease: "expo.out",
+              stagger: 0.08,
+            },
+            "unstack-b"
+          )
+          .to({}, { duration: 0.28 })
+          .to(
+            secondUnit,
+            {
+              y: -metrics.travelY,
+              duration: 1.55,
+              ease: "none",
+            },
+            "push-b"
+          )
+          .to(
+            firstUnit,
+            {
+              y: 0,
+              duration: 1.55,
+              ease: "none",
+            },
+            "push-b"
+          )
+          .to(
+            firstCards.slice(1),
+            {
+              x: 0,
+              y: 0,
+              z: (index) => getStackState(index + 1).z,
+              rotationX: 0,
+              rotationY: 0,
+              rotationZ: 0,
+              duration: 0.74,
+              ease: "expo.out",
+              stagger: 0.07,
+            },
+            "push-b+=0.88"
+          )
+          .to({}, { duration: 0.78 })
+          .set(
+            secondCards,
+            {
+              x: (index) => getFanState(index, metrics).x,
+              y: (index) => getFanState(index, metrics).y,
+              z: (index) => getFanState(index, metrics).z,
+              rotationX: (index) => getFanState(index, metrics).rotationX,
+              rotationY: (index) => getFanState(index, metrics).rotationY,
+              rotationZ: (index) => getFanState(index, metrics).rotationZ,
+            },
+            "reset-b"
+          )
+          .set(secondUnit, { x: 0, y: metrics.travelY }, "reset-b");
+      };
+
+      buildLoop();
+
+      const handleResize = () => {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(buildLoop, 120);
+      };
+
+      window.addEventListener("resize", handleResize);
+
+      cleanup = () => {
+        window.removeEventListener("resize", handleResize);
+        window.clearTimeout(resizeTimer);
+        timeline?.kill();
+      };
     };
 
-    loadGSAP();
+    void runAnimation();
+
+    return () => {
+      active = false;
+      cleanup?.();
+    };
   }, []);
 
   return (
-    <section
-      ref={containerRef}
-      className="section-dark relative h-[250vh]" // Tall section to allow scrolling
-    >
-      <div className="sticky top-0 h-screen w-full flex flex-col justify-end overflow-hidden pb-16">
-        <div className="max-w-7xl mx-auto w-full px-8 md:px-16 lg:px-24 h-full relative">
-          
-          {/* Images Stack - Centered */}
-          <div 
-            ref={staircaseRef}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[800px] h-full pointer-events-none hidden md:block"
-          >
-            {images.map((img, i) => (
-              <motion.div
-                key={img.src}
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  delay: 0.2 + (images.length - i) * 0.05,
-                  duration: 0.8,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className="staircase-image absolute rounded-2xl overflow-hidden shadow-2xl"
-                style={{
-                  left: 0,
-                  top: 0,
-                  width: endPositions[i].w,
-                  height: endPositions[i].h,
-                  zIndex: endPositions[i].z,
-                }}
-              >
-                <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
-                <Image
-                  src={img.src}
-                  alt={img.alt}
-                  fill
-                  className="object-cover"
-                  sizes={`${endPositions[i].w}px`}
-                  priority={i < 3}
-                />
-              </motion.div>
-            ))}
-          </div>
+    <section id="top" className="section-shell hero-shell">
+      <div className="content-shell hero-viewport">
+        <div className="hero-copy">
+          <p className="hero-eyebrow">Social media direction, campaigns, and systems</p>
+          <h1 className="hero-wordmark" aria-label="Izuki Labs">
+            <span>IZUKI</span>
+            <span>LABS</span>
+          </h1>
+          <p className="hero-description">
+            Motion-first visual packages for brands that need a sharper presence
+            across launches, content systems, and ongoing campaigns.
+          </p>
+        </div>
 
-          {/* Typography & Marquee */}
-          <div className="relative z-20 flex flex-col justify-end h-full pb-12">
-            <motion.h1
-              initial={{ opacity: 0, y: 60 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="font-display leading-[0.85] tracking-tighter text-white uppercase font-extrabold"
-              style={{ fontSize: "clamp(4rem, 15vw, 10rem)" }}
+        <div
+          ref={stageRef}
+          className="hero-stage"
+          aria-label="Automated portfolio animation"
+        >
+          {heroUnits.map((unit, unitIndex) => (
+            <div
+              key={`hero-unit-${unitIndex}`}
+              ref={(node) => {
+                unitRefs.current[unitIndex] = node;
+              }}
+              className="hero-unit"
             >
-              izuki<span className="text-[#FF3F11]">.</span><br />
-              labs
-            </motion.h1>
-
-            {/* "Newskinda" Marquee Animation */}
-            <div className="mt-20 overflow-hidden border-y border-white/5 py-5 opacity-40 hover:opacity-100 transition-opacity">
-              <div className="marquee-track">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-12 px-6 whitespace-nowrap">
-                    <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#FF3F11]">Systems</span>
-                    <span className="text-xs font-bold uppercase tracking-[0.2em] text-white">Social Media Architecture</span>
-                    <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#FF3F11]">Growth</span>
-                    <span className="text-xs font-bold uppercase tracking-[0.2em] text-white">Visual Distinction</span>
-                    <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#FF3F11]">Architecture</span>
-                  </div>
-                ))}
-              </div>
+              {unit.map((card, cardIndex) => (
+                <article
+                  key={`${card.src}-${cardIndex}`}
+                  className="hero-card"
+                  data-card-index={cardIndex}
+                  style={{ zIndex: unit.length - cardIndex }}
+                >
+                  <Image
+                    src={card.src}
+                    alt={card.alt}
+                    fill
+                    priority={unitIndex === 0 && cardIndex === 0}
+                    sizes="(max-width: 767px) 42vw, (max-width: 1023px) 28vw, 340px"
+                    className="hero-card-image"
+                  />
+                </article>
+              ))}
             </div>
-          </div>
-
-          {/* Mobile: single hero image */}
-          <div className="absolute top-[48%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92vw] h-[48vh] md:hidden rounded-2xl overflow-hidden shadow-2xl border border-white/5">
-            <Image
-              src="/images/1.JPG"
-              alt="Mikiyas Daniel"
-              fill
-              className="object-cover object-top pointer-events-none"
-              priority
-            />
-          </div>
+          ))}
         </div>
       </div>
     </section>
