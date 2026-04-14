@@ -31,7 +31,36 @@ export default function ChatBubble() {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [hasAutoOpened, setHasAutoOpened] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (hasAutoOpened || isOpen) {
+        return;
+      }
+
+      const scrollHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      const clientHeight = window.innerHeight;
+
+      // Trigger if user is near the bottom (footer reached)
+      if (scrollTop + clientHeight >= scrollHeight - 200) {
+        setIsOpen(true);
+        setHasAutoOpened(true);
+        setMessages((current) => [
+          ...current,
+          {
+            role: "assistant",
+            content: "Got a question about a plan or timeline? Ask me anything right here.",
+          },
+        ]);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [hasAutoOpened, isOpen]);
 
   useEffect(() => {
     if (isOpen) {
