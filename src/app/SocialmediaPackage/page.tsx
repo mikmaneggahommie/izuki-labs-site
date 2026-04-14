@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import ExperienceLayer from "@/components/ExperienceLayer";
 import HeroSection from "@/components/HeroSection";
 import MarqueeTicker from "@/components/MarqueeTicker";
 import WorkShowcase from "@/components/WorkShowcase";
@@ -12,6 +13,7 @@ import ChatBubble from "@/components/ChatBubble";
 export default function SocialMediaPackagePage() {
   return (
     <>
+      <ExperienceLayer />
       <Header />
 
       <main className="site-main">

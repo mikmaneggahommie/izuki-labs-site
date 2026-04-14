@@ -4,11 +4,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "izuki.labs | Social Media Design Packages",
   description:
-    "Social media systems, brand direction, and fixed monthly design retainers by Mikiyas Daniel in Addis Ababa.",
+    "Social media systems, brand direction, and fixed monthly design retainers from Addis Ababa.",
   openGraph: {
     title: "izuki.labs | Social Media Design Packages",
     description:
-      "Social media systems, brand direction, and fixed monthly design retainers by Mikiyas Daniel in Addis Ababa.",
+      "Social media systems, brand direction, and fixed monthly design retainers from Addis Ababa.",
     type: "website",
   },
 };

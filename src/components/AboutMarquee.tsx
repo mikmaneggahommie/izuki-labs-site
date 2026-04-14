@@ -4,32 +4,33 @@ import { useEffect, useRef } from "react";
 
 const columns = [
   {
-    label: "Experience",
-    title: "Design Depth",
+    label: "What I Build",
+    title: "Systems",
     items: [
-      "4+ years of graphic design direction",
-      "Identity systems for ambitious brands",
-      "High-contrast layouts with editorial clarity",
+      "Social media identities",
+      "Campaign launches",
+      "Content calendars",
+      "Brand assets that stay consistent",
     ],
   },
   {
-    label: "Design Services",
-    title: "Design Services",
+    label: "How I Work",
+    title: "Process",
     items: [
-      "Social media systems",
-      "Campaign art direction",
-      "Content calendars and launch visuals",
-      "Brand identity and collateral",
+      "Clear art direction",
+      "Fast iteration cycles",
+      "Structured monthly support",
+      "Design decisions that feel intentional",
     ],
   },
   {
-    label: "Digital Presence",
-    title: "Digital Presence",
+    label: "What It Feels Like",
+    title: "Output",
     items: [
-      "Instagram",
-      "TikTok",
-      "Telegram",
-      "Editorial and product storytelling",
+      "Sharper presence",
+      "Higher perceived value",
+      "Cleaner visual consistency",
+      "Work that feels premium at first glance",
     ],
   },
 ];
@@ -64,11 +65,12 @@ export default function AboutMarquee() {
 
         gsap.fromTo(
           revealTargets,
-          { y: 36, opacity: 0 },
+          { y: 44, opacity: 0, filter: "blur(10px)" },
           {
             y: 0,
             opacity: 1,
-            duration: 0.85,
+            filter: "blur(0px)",
+            duration: 0.92,
             stagger: 0.12,
             ease: "power3.out",
             scrollTrigger: {
@@ -82,7 +84,7 @@ export default function AboutMarquee() {
       cleanup = () => context.revert();
     };
 
-    runReveal();
+    void runReveal();
 
     return () => {
       active = false;
@@ -93,39 +95,45 @@ export default function AboutMarquee() {
   return (
     <section ref={sectionRef} id="about" className="section-shell">
       <div className="content-shell space-y-14">
-        <div data-about-reveal className="section-label-row">
-          <span className="accent-square accent-square--tiny" aria-hidden />
-          <span className="section-label">About</span>
-        </div>
+        <div
+          data-about-reveal
+          className="grid gap-8 border-b border-white/10 pb-12 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,0.5fr)] lg:items-end"
+        >
+          <div className="space-y-5">
+            <div className="section-label-row">
+              <span className="accent-square accent-square--tiny" aria-hidden />
+              <span className="section-label">About</span>
+            </div>
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,0.34fr)_minmax(0,1fr)]">
-          <div />
+            <h2 className="display-title max-w-[8ch]">
+              I build visual systems that make brands feel sharper, cleaner,
+              and harder to ignore.
+            </h2>
+          </div>
 
-          <p data-about-reveal className="statement-copy max-w-[15ch] md:max-w-none">
-            Based in Addis Ababa, Mikiyas Daniel crafts digital identities for
-            brands seeking visual distinction. From social media systems to full
-            brand architectures, every pixel serves a purpose.
+          <p className="body-copy max-w-[34ch] lg:justify-self-end">
+            I work from Addis Ababa with a systems-first approach to content,
+            campaigns, and identity. The goal is always the same: make the
+            brand feel more intentional the moment someone lands on it.
           </p>
         </div>
 
-        <div className="grid gap-12 border-t border-white/10 pt-16 md:grid-cols-3 md:gap-x-10 lg:gap-x-16 lg:pt-20">
+        <div className="grid gap-8 lg:grid-cols-3">
           {columns.map((column) => (
             <div
               key={column.title}
               data-about-reveal
-              className="flex max-w-[26rem] flex-col gap-6"
+              className="rounded-[18px] border border-white/8 bg-white/[0.02] p-7"
             >
-              <p className="text-[clamp(0.82rem,0.95vw,0.98rem)] font-medium uppercase tracking-[0.22em] text-white/42">
-                {column.label}
-              </p>
-              <h3 className="text-[clamp(2.2rem,3vw,3.85rem)] font-black leading-[0.94] tracking-[-0.055em] text-white">
+              <p className="section-label text-white/40">{column.label}</p>
+              <h3 className="mt-5 text-[clamp(2rem,3vw,3.6rem)] font-black leading-[0.92] tracking-[-0.06em] text-white">
                 {column.title}
               </h3>
-              <ul className="space-y-3.5 pt-1">
+              <ul className="mt-8 space-y-3.5">
                 {column.items.map((item) => (
                   <li
                     key={item}
-                    className="text-[clamp(1.35rem,1.72vw,2.05rem)] font-medium leading-[1.08] tracking-[-0.045em] text-white"
+                    className="text-[clamp(1.1rem,1.45vw,1.55rem)] font-medium leading-[1.08] tracking-[-0.045em] text-white"
                   >
                     {item}
                   </li>

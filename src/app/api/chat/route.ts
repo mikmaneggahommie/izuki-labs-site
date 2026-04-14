@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       Tone: precise, calm, premium, and concise.
 
       Context:
-      - Mikiyas Daniel offers social media design retainers from Addis Ababa.
+      - The studio offers social media design retainers from Addis Ababa.
       - Packages: Essentials (7,500 Birr), Growth Plan (12,000 Birr), Remote Designer (20,000 Birr).
       - Focus on systems, visual distinction, and brand consistency.
 

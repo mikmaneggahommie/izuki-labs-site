@@ -10,40 +10,18 @@ type HeroCard = {
 
 const heroUnits: HeroCard[][] = [
   [
-    {
-      src: "/images/1.JPG",
-      alt: "Portrait campaign artwork",
-    },
-    {
-      src: "/images/2.jpg",
-      alt: "Editorial campaign detail",
-    },
-    {
-      src: "/images/3.jpg",
-      alt: "Interface concept artwork",
-    },
-    {
-      src: "/images/4.jpg",
-      alt: "Blue composition artwork",
-    },
+    { src: "/images/1.JPG", alt: "Editorial surface artwork" },
+    { src: "/images/2.jpg", alt: "Campaign detail artwork" },
+    { src: "/images/6.jpg", alt: "Launch artwork" },
+    { src: "/images/4.jpg", alt: "Brand composition artwork" },
+    { src: "/images/5.jpg", alt: "Poster layout artwork" },
   ],
   [
-    {
-      src: "/images/5.jpg",
-      alt: "Glass stack concept artwork",
-    },
-    {
-      src: "/images/6.jpg",
-      alt: "AI launch artwork",
-    },
-    {
-      src: "/images/7.jpg",
-      alt: "Luminous abstract artwork",
-    },
-    {
-      src: "/images/2.jpg",
-      alt: "Mobile concept artwork",
-    },
+    { src: "/images/3.jpg", alt: "Mobile system artwork" },
+    { src: "/images/5.jpg", alt: "Print layout artwork" },
+    { src: "/images/7.jpg", alt: "Luminous motion artwork" },
+    { src: "/images/2.jpg", alt: "Feed design artwork" },
+    { src: "/images/4.jpg", alt: "Graphic composition artwork" },
   ],
 ];
 
@@ -57,6 +35,7 @@ type CardState = {
 };
 
 type LoopMetrics = {
+  centerOffset: number;
   diagonalX: number;
   diagonalY: number;
   travelY: number;
@@ -65,20 +44,24 @@ type LoopMetrics = {
 const getStackState = (index: number): CardState => ({
   x: 0,
   y: 0,
-  z: -index * 12,
+  z: -index * 8,
   rotationX: 0,
   rotationY: 0,
   rotationZ: 0,
 });
 
-const getFanState = (index: number, metrics: LoopMetrics): CardState => ({
-  x: index * metrics.diagonalX,
-  y: index * metrics.diagonalY,
-  z: -index * 18,
-  rotationX: index === 0 ? 0 : 1.5,
-  rotationY: index === 0 ? 0 : -8,
-  rotationZ: index === 0 ? 0 : 4,
-});
+const getFanState = (index: number, metrics: LoopMetrics): CardState => {
+  const delta = index - metrics.centerOffset;
+
+  return {
+    x: delta * metrics.diagonalX,
+    y: delta * metrics.diagonalY,
+    z: -Math.abs(delta) * 22,
+    rotationX: delta === 0 ? 0 : 1.25,
+    rotationY: delta === 0 ? 0 : -8,
+    rotationZ: delta === 0 ? 0 : 4,
+  };
+};
 
 export default function HeroSection() {
   const stageRef = useRef<HTMLDivElement>(null);
@@ -95,7 +78,7 @@ export default function HeroSection() {
       }
 
       const gsap = (await import("gsap")).default;
-      if (!active || !stageRef.current) {
+      if (!active) {
         return;
       }
 
@@ -125,6 +108,7 @@ export default function HeroSection() {
       ) => {
         cards.forEach((card, index) => {
           const values = state(index, metrics);
+
           gsap.set(card, {
             x: values.x,
             y: values.y,
@@ -148,9 +132,10 @@ export default function HeroSection() {
         }
 
         const metrics: LoopMetrics = {
-          diagonalX: Math.round(width * 0.34),
-          diagonalY: Math.round(height * 0.235),
-          travelY: Math.round(height + height * 0.235 * (firstCards.length - 1) - 18),
+          centerOffset: (firstCards.length - 1) / 2,
+          diagonalX: Math.round(width * 0.27),
+          diagonalY: Math.round(height * 0.19),
+          travelY: Math.round(height + height * 0.19 * (firstCards.length - 1) - 20),
         };
 
         setCards(firstCards, (index) => getStackState(index), metrics);
@@ -162,28 +147,28 @@ export default function HeroSection() {
         timeline = gsap.timeline({ repeat: -1 });
 
         timeline
-          .to({}, { duration: 0.95 })
+          .to({}, { duration: 1.08 })
           .to(
-            firstCards.slice(1),
+            firstCards,
             {
-              x: (index) => getFanState(index + 1, metrics).x,
-              y: (index) => getFanState(index + 1, metrics).y,
-              z: (index) => getFanState(index + 1, metrics).z,
-              rotationX: (index) => getFanState(index + 1, metrics).rotationX,
-              rotationY: (index) => getFanState(index + 1, metrics).rotationY,
-              rotationZ: (index) => getFanState(index + 1, metrics).rotationZ,
-              duration: 0.88,
+              x: (index) => getFanState(index, metrics).x,
+              y: (index) => getFanState(index, metrics).y,
+              z: (index) => getFanState(index, metrics).z,
+              rotationX: (index) => getFanState(index, metrics).rotationX,
+              rotationY: (index) => getFanState(index, metrics).rotationY,
+              rotationZ: (index) => getFanState(index, metrics).rotationZ,
+              duration: 0.98,
               ease: "expo.out",
-              stagger: 0.08,
+              stagger: { each: 0.06, from: "center" },
             },
-            "unstack-a"
+            "fan-a"
           )
-          .to({}, { duration: 0.28 })
+          .to({}, { duration: 0.18 })
           .to(
             firstUnit,
             {
               y: -metrics.travelY,
-              duration: 1.55,
+              duration: 1.65,
               ease: "none",
             },
             "push-a"
@@ -192,27 +177,27 @@ export default function HeroSection() {
             secondUnit,
             {
               y: 0,
-              duration: 1.55,
+              duration: 1.65,
               ease: "none",
             },
             "push-a"
           )
           .to(
-            secondCards.slice(1),
+            secondCards,
             {
-              x: 0,
-              y: 0,
-              z: (index) => getStackState(index + 1).z,
+              x: (index) => getStackState(index).x,
+              y: (index) => getStackState(index).y,
+              z: (index) => getStackState(index).z,
               rotationX: 0,
               rotationY: 0,
               rotationZ: 0,
-              duration: 0.74,
+              duration: 0.8,
               ease: "expo.out",
-              stagger: 0.07,
+              stagger: { each: 0.05, from: "edges" },
             },
-            "push-a+=0.88"
+            "push-a+=0.9"
           )
-          .to({}, { duration: 0.78 })
+          .to({}, { duration: 0.72 })
           .set(
             firstCards,
             {
@@ -227,26 +212,26 @@ export default function HeroSection() {
           )
           .set(firstUnit, { x: 0, y: metrics.travelY }, "reset-a")
           .to(
-            secondCards.slice(1),
+            secondCards,
             {
-              x: (index) => getFanState(index + 1, metrics).x,
-              y: (index) => getFanState(index + 1, metrics).y,
-              z: (index) => getFanState(index + 1, metrics).z,
-              rotationX: (index) => getFanState(index + 1, metrics).rotationX,
-              rotationY: (index) => getFanState(index + 1, metrics).rotationY,
-              rotationZ: (index) => getFanState(index + 1, metrics).rotationZ,
-              duration: 0.88,
+              x: (index) => getFanState(index, metrics).x,
+              y: (index) => getFanState(index, metrics).y,
+              z: (index) => getFanState(index, metrics).z,
+              rotationX: (index) => getFanState(index, metrics).rotationX,
+              rotationY: (index) => getFanState(index, metrics).rotationY,
+              rotationZ: (index) => getFanState(index, metrics).rotationZ,
+              duration: 0.98,
               ease: "expo.out",
-              stagger: 0.08,
+              stagger: { each: 0.06, from: "center" },
             },
-            "unstack-b"
+            "fan-b"
           )
-          .to({}, { duration: 0.28 })
+          .to({}, { duration: 0.18 })
           .to(
             secondUnit,
             {
               y: -metrics.travelY,
-              duration: 1.55,
+              duration: 1.65,
               ease: "none",
             },
             "push-b"
@@ -255,27 +240,27 @@ export default function HeroSection() {
             firstUnit,
             {
               y: 0,
-              duration: 1.55,
+              duration: 1.65,
               ease: "none",
             },
             "push-b"
           )
           .to(
-            firstCards.slice(1),
+            firstCards,
             {
-              x: 0,
-              y: 0,
-              z: (index) => getStackState(index + 1).z,
+              x: (index) => getStackState(index).x,
+              y: (index) => getStackState(index).y,
+              z: (index) => getStackState(index).z,
               rotationX: 0,
               rotationY: 0,
               rotationZ: 0,
-              duration: 0.74,
+              duration: 0.8,
               ease: "expo.out",
-              stagger: 0.07,
+              stagger: { each: 0.05, from: "edges" },
             },
-            "push-b+=0.88"
+            "push-b+=0.9"
           )
-          .to({}, { duration: 0.78 })
+          .to({}, { duration: 0.72 })
           .set(
             secondCards,
             {
@@ -319,15 +304,13 @@ export default function HeroSection() {
     <section id="top" className="section-shell hero-shell">
       <div className="content-shell hero-viewport">
         <div className="hero-copy">
-          <p className="hero-eyebrow">Social media direction, campaigns, and systems</p>
           <h1 className="hero-wordmark" aria-label="Izuki Labs">
-            <span>IZUKI</span>
-            <span>LABS</span>
+            <span className="hero-wordmark-line">
+              <span>IZUKI</span>
+              <span className="hero-wordmark-dot" aria-hidden />
+            </span>
+            <span className="hero-wordmark-line">LABS</span>
           </h1>
-          <p className="hero-description">
-            Motion-first visual packages for brands that need a sharper presence
-            across launches, content systems, and ongoing campaigns.
-          </p>
         </div>
 
         <div
@@ -335,33 +318,39 @@ export default function HeroSection() {
           className="hero-stage"
           aria-label="Automated portfolio animation"
         >
-          {heroUnits.map((unit, unitIndex) => (
-            <div
-              key={`hero-unit-${unitIndex}`}
-              ref={(node) => {
-                unitRefs.current[unitIndex] = node;
-              }}
-              className="hero-unit"
-            >
-              {unit.map((card, cardIndex) => (
-                <article
-                  key={`${card.src}-${cardIndex}`}
-                  className="hero-card"
-                  data-card-index={cardIndex}
-                  style={{ zIndex: unit.length - cardIndex }}
-                >
-                  <Image
-                    src={card.src}
-                    alt={card.alt}
-                    fill
-                    priority={unitIndex === 0 && cardIndex === 0}
-                    sizes="(max-width: 767px) 42vw, (max-width: 1023px) 28vw, 340px"
-                    className="hero-card-image"
-                  />
-                </article>
-              ))}
-            </div>
-          ))}
+          {heroUnits.map((unit, unitIndex) => {
+            const centerIndex = Math.floor(unit.length / 2);
+
+            return (
+              <div
+                key={`hero-unit-${unitIndex}`}
+                ref={(node) => {
+                  unitRefs.current[unitIndex] = node;
+                }}
+                className="hero-unit"
+              >
+                {unit.map((card, cardIndex) => (
+                  <article
+                    key={`${card.src}-${cardIndex}`}
+                    className="hero-card"
+                    data-card-index={cardIndex}
+                    style={{
+                      zIndex: unit.length - Math.abs(cardIndex - centerIndex),
+                    }}
+                  >
+                    <Image
+                      src={card.src}
+                      alt={card.alt}
+                      fill
+                      priority={unitIndex === 0}
+                      sizes="(max-width: 767px) 44vw, (max-width: 1023px) 26vw, 360px"
+                      className="hero-card-image"
+                    />
+                  </article>
+                ))}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

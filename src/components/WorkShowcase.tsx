@@ -57,10 +57,11 @@ export default function WorkShowcase() {
 
         gsap.fromTo(
           revealTargets,
-          { y: 40, opacity: 0 },
+          { y: 48, opacity: 0, filter: "blur(10px)" },
           {
             y: 0,
             opacity: 1,
+            filter: "blur(0px)",
             duration: 0.9,
             stagger: 0.12,
             ease: "power3.out",
@@ -116,7 +117,7 @@ export default function WorkShowcase() {
               href={account.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex h-full flex-col gap-8 rounded-[12px] border border-white/8 bg-[#111111] p-8 transition-all duration-300 hover:-translate-y-1 hover:border-white/20"
+              className="group flex h-full flex-col gap-8 rounded-[18px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-8 transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)]"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
