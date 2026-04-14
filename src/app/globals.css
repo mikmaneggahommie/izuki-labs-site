@@ -220,12 +220,13 @@ button {
   line-height: 0.95;
 }
 
-.hero-title {
-  font-size: clamp(64px, 10vw, 160px);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 0.9;
-}
+  .hero-wordmark {
+    font-size: clamp(86px, 16vw, 240px);
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+    font-family: inherit;
+    font-weight: 800;
+  }
 
 .statement-copy {
   font-size: clamp(32px, 5vw, 72px);
@@ -351,7 +352,7 @@ button {
 .hero-stage {
   position: absolute;
   inset: 0;
-  overflow: visible;
+  overflow: hidden;
   pointer-events: none;
   perspective: 1800px;
   z-index: 2;
@@ -359,14 +360,10 @@ button {
 
 .hero-unit {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 56%;
-  margin-top: calc(50vh - 200px);
+  transform: translate(-50%, -50%); /* Locks exactly center-right */
   opacity: 0;
-}
-
-.hero-unit:first-child {
-  opacity: 1;
 }
 
 .hero-card {
@@ -502,10 +499,7 @@ button {
     font-size: clamp(72px, 13vw, 138px);
   }
 
-  .hero-unit {
-    left: 50%;
-    margin-top: calc(50vh - 180px);
-  }
+
 
   .hero-card {
     width: clamp(190px, 30vw, 290px);
@@ -542,10 +536,7 @@ button {
     line-height: 0.88;
   }
 
-  .hero-unit {
-    left: 42%;
-    margin-top: calc(50vh - 140px);
-  }
+
 
   .hero-card {
     width: clamp(160px, 42vw, 220px);

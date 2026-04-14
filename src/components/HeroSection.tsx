@@ -5,7 +5,6 @@ import { useEffect, useRef } from "react";
 
 import { assetPath } from "@/lib/asset-path";
 
-/* ─── Card groups ─── */
 type HeroCard = { src: string; alt: string };
 
 const GROUP_A: HeroCard[] = [
@@ -28,11 +27,17 @@ const GROUP_B: HeroCard[] = [
 
 const GROUPS = [GROUP_A, GROUP_B];
 
-/* ─── Timing ─── */
-const T_HOLD    = 0.7;   // pause on stacked state
-const T_UNSTACK = 1.0;   // fan out duration
-const T_PUSH    = 2.8;   // conveyor push duration (cards stay fanned)
-const T_SNAP    = 0.6;   // consolidation snap-back
+/*
+ * STRICT TIMING — DIAGONAL CONVEYOR BELT LOOP
+ * Phase 1: Diagonal Unstack  → 0.8s (expo.out)
+ * Phase 2: Hold (stationary) → 1.5s
+ * Phase 3: Conveyor Push     → 1.5s (power2.inOut)
+ * Phase 4: Center Snap       → 0.6s (expo.in)
+ */
+const T_UNSTACK = 0.8;
+const T_HOLD    = 1.5;
+const T_PUSH    = 1.5;
+const T_SNAP    = 0.6;
 
 export default function HeroSection() {
   const stageRef = useRef<HTMLDivElement>(null);
@@ -59,200 +64,154 @@ export default function HeroSection() {
       let tl: ReturnType<typeof gsap.timeline> | undefined;
       let resizeId: number | undefined;
 
-      /* ── Compute responsive metrics ── */
       const measure = () => {
         const stage = stageRef.current!.getBoundingClientRect();
-        const card  = cardsA[0].getBoundingClientRect();
-        const n     = cardsA.length;
+        const n = cardsA.length;
 
-        // Diagonal step between fanned cards
-        // Reference: cards fan from top-left to bottom-right
-        // Each card offsets to the top-left from the anchor
-        const stepX = card.width * 0.55;
-        const stepY = card.height * 0.22;
+        // Fan stretches 85% of screen to hit corners perfectly without overflowing too much
+        const stepX = (stage.width * 0.85) / (n - 1);
+        const stepY = (stage.height * 0.85) / (n - 1);
 
-        // The full diagonal span of a fanned group
-        const fanSpanX = stepX * (n - 1);
-        const fanSpanY = stepY * (n - 1);
+        // Mathematical push distance for perfect edge-to-edge tracking
+        // This guarantees Group B seamlessly follows Group A with identical spacing
+        const pushX = n * stepX;
+        const pushY = n * stepY;
 
-        // The total vertical distance to push a fanned group completely off screen
-        // and bring the next one into view. We push by the full viewport height
-        // plus padding so no gap is visible.
-        const pushDist = stage.height + fanSpanY + card.height;
-
-        return { stepX, stepY, fanSpanX, fanSpanY, pushDist, n, stageH: stage.height, cardH: card.height };
+        return { stepX, stepY, pushX, pushY };
       };
 
-      /* ── Fan position for card i (0=back, n-1=front/anchor) ── */
-      const fanXY = (i: number, count: number, m: ReturnType<typeof measure>) => {
-        const dist = count - 1 - i; // 0 for anchor, higher for further cards
-        return {
-          x: -dist * m.stepX,
-          y: -dist * m.stepY,
-          z: -dist * 18,
-          rotX: dist === 0 ? 0 : 1.5,
-          rotY: dist === 0 ? 0 : -8,
-          rotZ: dist === 0 ? 0 : 3.5,
-        };
+      // Distribute symmetrically from -half to +half so the array centers at (0,0)
+      const getT = (i: number, n: number) => {
+        return i - (n - 1) / 2;
       };
 
-      /* ── Apply stacked state (all behind anchor) ── */
-      const setStack = (cards: HTMLElement[]) => {
-        cards.forEach((el, i) => {
-          gsap.set(el, {
-            x: 0, y: 0, z: -i * 6,
-            rotationX: 0, rotationY: 0, rotationZ: 0,
-            transformPerspective: 1800,
-            transformOrigin: "50% 50%",
-            force3D: true,
-          });
-        });
-      };
-
-      /* ── Apply fanned state ── */
-      const setFan = (cards: HTMLElement[], m: ReturnType<typeof measure>) => {
-        cards.forEach((el, i) => {
-          const f = fanXY(i, cards.length, m);
-          gsap.set(el, {
-            x: f.x, y: f.y, z: f.z,
-            rotationX: f.rotX, rotationY: f.rotY, rotationZ: f.rotZ,
-            transformPerspective: 1800,
-            transformOrigin: "50% 50%",
-            force3D: true,
-          });
-        });
-      };
-
-      /* ── Animate cards to fanned state ── */
-      const tweenToFan = (
-        cards: HTMLElement[],
-        m: ReturnType<typeof measure>,
-        label: string,
-        timeline: ReturnType<typeof gsap.timeline>
-      ) => {
-        timeline.to(cards, {
-          x: (i: number) => fanXY(i, cards.length, m).x,
-          y: (i: number) => fanXY(i, cards.length, m).y,
-          z: (i: number) => fanXY(i, cards.length, m).z,
-          rotationX: (i: number) => fanXY(i, cards.length, m).rotX,
-          rotationY: (i: number) => fanXY(i, cards.length, m).rotY,
-          rotationZ: (i: number) => fanXY(i, cards.length, m).rotZ,
-          duration: T_UNSTACK,
-          ease: "power4.out",
-          stagger: { each: 0.07, from: "start" },
-        }, label);
-      };
-
-      /* ── Animate cards to stacked state ── */
-      const tweenToStack = (
-        cards: HTMLElement[],
-        label: string,
-        timeline: ReturnType<typeof gsap.timeline>
-      ) => {
-        timeline.to(cards, {
-          x: 0, y: 0,
-          z: (i: number) => -i * 6,
-          rotationX: 0, rotationY: 0, rotationZ: 0,
-          duration: T_SNAP,
-          ease: "back.in(1.7)",
-          stagger: { each: 0.03, from: "end" },
-        }, label);
-      };
-
-      /* ═══════════════════════════════════════
-         BUILD THE MASTER TIMELINE
-         ═══════════════════════════════════════ */
       const buildTimeline = () => {
         tl?.kill();
         const m = measure();
 
-        /*
-         * COORDINATE SYSTEM:
-         * The .hero-unit elements are positioned via CSS at the ANCHOR point
-         * (center-right of viewport). All card x/y offsets are RELATIVE to
-         * this anchor. The wrapper y-translate moves the entire group up/down.
-         *
-         * Anchor = (0, 0) in wrapper-local space
-         * Fan extends to the TOP-LEFT (negative x, negative y)
-         * Push direction = UPWARD (negative wrapper y)
-         */
+        // ─── INITIALIZATION ───
+        
+        // Group A: Start CLEANLY STACKED in dead center. Z-Index 10 because it is the current visible group.
+        gsap.set(cardsA, { x: 0, y: 0, scale: 1, xPercent: -50, yPercent: -50 });
+        gsap.set(wrapA, { x: 0, y: 0, zIndex: 10, autoAlpha: 1 });
 
-        // Initial state:
-        // Group A = STACKED at anchor, visible
-        // Group B = FANNED, positioned BELOW viewport (ready to push up)
-        setStack(cardsA);
-        setFan(cardsB, m);
-
-        gsap.set(wrapA, { y: 0, autoAlpha: 1 });
-        gsap.set(wrapB, { y: m.pushDist, autoAlpha: 1 });
+        // Group B: Prepared offscreen (Top-Left), already FANNED to act as incoming conveyor.
+        // Lower z-index because it is physically further top-left (further away from camera).
+        gsap.set(cardsB, { 
+          x: (i) => getT(i, cardsB.length) * m.stepX, 
+          y: (i) => getT(i, cardsB.length) * m.stepY,
+          scale: 1, xPercent: -50, yPercent: -50
+        });
+        gsap.set(wrapB, { x: -m.pushX, y: -m.pushY, zIndex: 5, autoAlpha: 1 });
 
         tl = gsap.timeline({ repeat: -1 });
 
-        /* ════ CYCLE 1: A unstacks → push → B consolidates ════ */
+        tl.to({}, { duration: 0.3 }); // Breathing room at start
 
-        // HOLD: show clean stack
+        /* ═══════════════════════════════════
+           CYCLE A → B
+           ═══════════════════════════════════ */
+
+        // 1. DIAGONAL BURST
+        tl.addLabel("unstack-a")
+          .to(cardsA, {
+            x: (i) => getT(i, cardsA.length) * m.stepX,
+            y: (i) => getT(i, cardsA.length) * m.stepY,
+            duration: T_UNSTACK,
+            ease: "expo.out",
+            stagger: { each: 0.05, from: "center" }
+          }, "unstack-a");
+
+        // 2. HOLD IT
         tl.to({}, { duration: T_HOLD });
 
-        // PHASE 1 — UNSTACK A: fan out from stack
-        tl.addLabel("fan-a");
-        tweenToFan(cardsA, m, "fan-a", tl);
-
-        // Small breath after fan completes
-        tl.to({}, { duration: 0.2 });
-
-        // PHASE 2 — HEAVY PUSH: conveyor belt
-        // Group A moves UP (fanned). Group B moves UP from below (also fanned).
-        // Cards STAY FANNED during entire push.
+        // 3. DIAGONAL CONVEYOR BELT (The Seamless Push)
         tl.addLabel("push-a")
           .to(wrapA, {
-            y: -m.pushDist,
+            x: m.pushX, // Slides out Bottom-Right
+            y: m.pushY,
             duration: T_PUSH,
-            ease: "power1.inOut",
+            ease: "power2.inOut"
           }, "push-a")
           .to(wrapB, {
+            x: 0,        // Slides into Center from Top-Left
             y: 0,
             duration: T_PUSH,
-            ease: "power1.inOut",
+            ease: "power2.inOut"
           }, "push-a");
 
-        // PHASE 3 — SNAP B: consolidate Group B into stack at anchor
-        // Starts near the END of the push so it overlaps slightly
-        tl.addLabel("snap-b", `push-a+=${T_PUSH * 0.85}`);
-        tweenToStack(cardsB, "snap-b", tl);
+        // 4. CONSOLIDATE IN CENTER
+        tl.addLabel("snap-b")
+          .to(cardsB, {
+            x: 0,
+            y: 0,
+            duration: T_SNAP,
+            ease: "expo.in",
+            stagger: { each: 0.03, from: "edges" }
+          }, "snap-b");
 
-        // RESET A: teleport below, re-fan, for next cycle
+        // 5. HIDDEN RESET & Z-INDEX SWAP
         tl.call(() => {
-          setFan(cardsA, m);
-          gsap.set(wrapA, { y: m.pushDist });
+          gsap.set(wrapB, { zIndex: 10 }); // Now in center, becomes leader
+          gsap.set(wrapA, { zIndex: 5, x: -m.pushX, y: -m.pushY }); // Prepare A offscreen Top-Left
+          gsap.set(cardsA, { 
+            x: (i) => getT(i, cardsA.length) * m.stepX, 
+            y: (i) => getT(i, cardsA.length) * m.stepY 
+          }); // Fan A to be ready
         });
 
-        /* ════ CYCLE 2: B unstacks → push → A consolidates ════ */
+        tl.to({}, { duration: 0.4 }); // Breathing room
 
+        /* ═══════════════════════════════════
+           CYCLE B → A
+           ═══════════════════════════════════ */
+
+        // 1. DIAGONAL BURST
+        tl.addLabel("unstack-b")
+          .to(cardsB, {
+            x: (i) => getT(i, cardsB.length) * m.stepX,
+            y: (i) => getT(i, cardsB.length) * m.stepY,
+            duration: T_UNSTACK,
+            ease: "expo.out",
+            stagger: { each: 0.05, from: "center" }
+          }, "unstack-b");
+
+        // 2. HOLD IT
         tl.to({}, { duration: T_HOLD });
 
-        tl.addLabel("fan-b");
-        tweenToFan(cardsB, m, "fan-b", tl);
-
-        tl.to({}, { duration: 0.2 });
-
+        // 3. DIAGONAL CONVEYOR BELT
         tl.addLabel("push-b")
           .to(wrapB, {
-            y: -m.pushDist,
+            x: m.pushX, // Slides out Bottom-Right
+            y: m.pushY,
             duration: T_PUSH,
-            ease: "power1.inOut",
+            ease: "power2.inOut"
           }, "push-b")
           .to(wrapA, {
+            x: 0,        // Slides into Center from Top-Left
             y: 0,
             duration: T_PUSH,
-            ease: "power1.inOut",
+            ease: "power2.inOut"
           }, "push-b");
 
-        tl.addLabel("snap-a", `push-b+=${T_PUSH * 0.85}`);
-        tweenToStack(cardsA, "snap-a", tl);
+        // 4. CONSOLIDATE IN CENTER
+        tl.addLabel("snap-a")
+          .to(cardsA, {
+            x: 0,
+            y: 0,
+            duration: T_SNAP,
+            ease: "expo.in",
+            stagger: { each: 0.03, from: "edges" }
+          }, "snap-a");
 
+        // 5. HIDDEN RESET & Z-INDEX SWAP
         tl.call(() => {
-          setFan(cardsB, m);
-          gsap.set(wrapB, { y: m.pushDist });
+          gsap.set(wrapA, { zIndex: 10 });
+          gsap.set(wrapB, { zIndex: 5, x: -m.pushX, y: -m.pushY });
+          gsap.set(cardsB, { 
+            x: (i) => getT(i, cardsB.length) * m.stepX, 
+            y: (i) => getT(i, cardsB.length) * m.stepY 
+          });
         });
       };
 
@@ -276,9 +235,10 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section id="top" className="section-shell hero-shell">
-      <div className="content-shell hero-viewport">
-        <div className="hero-copy">
+    <section id="top" className="section-shell hero-shell z-0">
+      <div className="content-shell hero-viewport relative min-h-screen">
+        {/* Bottom-left wordmark — explicitly z-index 10 behind images */}
+        <div className="hero-copy absolute left-8 bottom-8 z-10 w-full max-w-lg">
           <h1 className="hero-wordmark" aria-label="Izuki Labs">
             <span className="hero-wordmark-line">
               <span>IZUKI</span>
@@ -288,9 +248,10 @@ export default function HeroSection() {
           </h1>
         </div>
 
+        {/* Animation stage — explicitly z-index 30 ON TOP of text */}
         <div
           ref={stageRef}
-          className="hero-stage"
+          className="hero-stage absolute inset-0 z-30 pointer-events-none"
           aria-label="Automated portfolio animation"
         >
           {GROUPS.map((group, gi) => (
@@ -304,6 +265,7 @@ export default function HeroSection() {
                   key={`${card.src}-${ci}`}
                   className="hero-card"
                   data-ci={ci}
+                  // Lowest index renders at back (Top-Left); Highest renders at front (Bottom-Right)
                   style={{ zIndex: ci + 1 }}
                 >
                   <Image

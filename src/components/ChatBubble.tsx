@@ -72,6 +72,16 @@ export default function ChatBubble() {
     }
 
     if (flowState === "COLLECTING_PHONE") {
+      // Basic phone validation: strips non-digits and checks length
+      const digitCount = userContent.replace(/\\D/g, "").length;
+      if (digitCount < 9 || digitCount > 15) {
+        appendAssistantMessage(
+          "That doesn't look like a valid phone number. Please provide a valid number with country code if needed."
+        );
+        setIsLoading(false);
+        return;
+      }
+
       setFormData((current) => ({ ...current, phone: userContent }));
       appendAssistantMessage(
         "Great. Drop your email too and I’ll keep the thread organized."
@@ -82,6 +92,16 @@ export default function ChatBubble() {
     }
 
     if (flowState === "COLLECTING_EMAIL") {
+      // Basic email validation regex
+      const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+      if (!emailRegex.test(userContent)) {
+        appendAssistantMessage(
+          "That doesn't look like a valid email. Please provide a valid email address."
+        );
+        setIsLoading(false);
+        return;
+      }
+
       const nextUserInfo = { ...formData, email: userContent };
       setFormData(nextUserInfo);
       appendAssistantMessage(
@@ -91,6 +111,18 @@ export default function ChatBubble() {
       );
       setFlowState("CHATTING");
       setIsLoading(false);
+
+      // Silently save the lead to the backend
+      try {
+        await fetch("/api/lead", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(nextUserInfo),
+        });
+      } catch (err) {
+        console.error("Failed to save lead:", err);
+      }
+
       return;
     }
 

@@ -30,6 +30,12 @@ Known visitor details:
 - Email: ${userInfo?.email || "Unknown"}
 `;
 
+    // Format the conversation history for Gemini (excluding the final message which is sent below)
+    const conversationHistory = messages.slice(0, -1).map((msg) => ({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }],
+    }));
+
     const chat = model.startChat({
       history: [
         { role: "user", parts: [{ text: systemPrompt }] },
@@ -41,6 +47,7 @@ Known visitor details:
             },
           ],
         },
+        ...conversationHistory,
       ],
     });
 
