@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash",
+      model: "gemini-1.5-flash-latest", // Use stable alias to avoid 404 on some regions
       systemInstruction: `${studioSystemPrompt}
 
 IDENTIFIED VISITOR:
