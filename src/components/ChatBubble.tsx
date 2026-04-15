@@ -357,7 +357,7 @@ export default function ChatBubble() {
                   Email Me
                 </a>
                 <a
-                  href="https://t.me/izukilabsbot"
+                  href="https://t.me/snowplugwalk"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex h-11 items-center justify-center rounded-[8px] border border-white/10 bg-[#1A1A1A] px-4 text-[13px] font-medium text-white transition-colors hover:border-white/20"
