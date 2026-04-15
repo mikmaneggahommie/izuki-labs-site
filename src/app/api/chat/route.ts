@@ -46,11 +46,15 @@ export async function POST(req: Request) {
 
         const systemPrompt = `${studioSystemPrompt}
 
-Known visitor details:
-- Name: ${userInfo?.name || "Unknown"}
-- Telegram: ${userInfo?.telegram || "Unknown"}
-- Phone: ${userInfo?.phone || "Unknown"}
-- Email: ${userInfo?.email || "Unknown"}
+VITAL INSTRUCTIONS FOR THIS MESSAGE:
+1. You already know the following details about the visitor. DO NOT ask for them again:
+   - Name: ${userInfo?.name || "Unknown"}
+   - Telegram: ${userInfo?.telegram || "Unknown"}
+   - Phone: ${userInfo?.phone || "Unknown"}
+   - Email: ${userInfo?.email || "Unknown"}
+
+2. 🚫 STRICT PROHIBITION: You are FORBIDDEN from mentioning "10,000 Birr" or the "Mini Identity" package. These do not exist.
+3. If they ask for a logo, provide the tiered add-on rates (2500, 3500, 4000) only.
 `.trim();
 
         const conversationHistory = messages.slice(0, -1).map((msg) => ({

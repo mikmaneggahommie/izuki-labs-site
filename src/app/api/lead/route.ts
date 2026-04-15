@@ -31,6 +31,7 @@ export async function POST(req: Request) {
             "Content-Type": "application/json" 
           },
           body: JSON.stringify({
+            user_id: "default",
             arguments: {
               spreadsheetId: SPREADSHEET_ID,
               range: "Sheet1!A:E",
