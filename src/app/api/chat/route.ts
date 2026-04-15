@@ -1,18 +1,18 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 import { studioSystemPrompt } from "@/lib/studio-concierge";
 
 // Vercel Production Shield
 export const dynamic = "force-dynamic";
-export const maxDuration = 30; // 30s Lambda Timeout
+export const maxDuration = 30;
 
 export async function POST(req: Request) {
   try {
     const { messages, userInfo } = await req.json();
     const apiKey = process.env.GEMINI_API_KEY;
 
-    console.log("[IZUKI-API] Received request. Messages count:", messages.length);
-    console.log("[IZUKI-API] API Key Status:", apiKey ? "Loaded" : "MISSING");
+    console.log("[IZUKI-API] Request received. Messages:", messages.length);
+    console.log("[IZUKI-API] API Key:", apiKey ? "Loaded" : "MISSING");
 
     if (!apiKey) {
       return NextResponse.json({ 
@@ -21,64 +21,71 @@ export async function POST(req: Request) {
       }, { status: 500 });
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    
-    // Direct model — no discovery, no fallback to deprecated models
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash",
-      systemInstruction: `${studioSystemPrompt}
+    const ai = new GoogleGenAI({ apiKey });
+
+    // Build the full system instruction with visitor context
+    const systemInstruction = `${studioSystemPrompt}
 
 IDENTIFIED VISITOR:
 - Name: ${userInfo?.name || "Unknown"}
 - Contact: ${userInfo?.email || userInfo?.telegram || userInfo?.phone || "Unknown"}
-`.trim(),
-    });
+`.trim();
 
-    // History Sanitizer
-    let history: any[] = [];
+    // Build conversation history for context
+    // Filter and clean messages
+    const chatHistory: Array<{ role: "user" | "model"; parts: Array<{ text: string }> }> = [];
     
     for (const m of messages) {
-       if (!m.content || m.role === 'system') continue;
-       const role = m.role === "assistant" ? "model" : "user";
-       
-       if (history.length > 0 && history[history.length - 1].role === role) {
-          history[history.length - 1].parts[0].text += "\n" + m.content;
-       } else {
-          history.push({ role, parts: [{ text: m.content }] });
-       }
+      if (!m.content || m.role === "system") continue;
+      const role = m.role === "assistant" ? "model" as const : "user" as const;
+      
+      if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === role) {
+        chatHistory[chatHistory.length - 1].parts[0].text += "\n" + m.content;
+      } else {
+        chatHistory.push({ role, parts: [{ text: m.content }] });
+      }
     }
 
     // Google AI Protocol: first message MUST be 'user'
-    while (history.length > 0 && history[0].role !== "user") {
-      history.shift();
+    while (chatHistory.length > 0 && chatHistory[0].role !== "user") {
+      chatHistory.shift();
     }
 
-    if (history.length === 0) {
-      history.push({ role: "user", parts: [{ text: "Hello" }] });
+    if (chatHistory.length === 0) {
+      chatHistory.push({ role: "user", parts: [{ text: "Hello" }] });
     }
 
     // Last message must be user (the prompt)
-    if (history[history.length - 1].role === "model") {
-       history.pop();
+    if (chatHistory[chatHistory.length - 1].role === "model") {
+      chatHistory.pop();
     }
 
-    const lastMessage = history.length > 0 ? history.pop().parts[0].text : "What can you do?";
-    const chat = model.startChat({ history });
+    const lastMessage = chatHistory.length > 0 ? chatHistory.pop()!.parts[0].text : "What can you do?";
 
-    console.log("[IZUKI-API] Starting stream with gemini-2.0-flash...");
-    const result = await chat.sendMessageStream(lastMessage);
+    console.log("[IZUKI-API] Starting stream with gemini-3-flash-preview...");
+
+    // Use the new SDK's chat with streaming
+    const chat = ai.chats.create({
+      model: "gemini-3-flash-preview",
+      config: {
+        systemInstruction,
+      },
+      history: chatHistory,
+    });
+
+    const response = await chat.sendMessageStream({ message: lastMessage });
 
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const chunk of result.stream) {
-            const text = chunk.text();
+          for await (const chunk of response) {
+            const text = chunk.text;
             if (text) controller.enqueue(encoder.encode(text));
           }
           controller.close();
         } catch (err) {
-          console.error("[IZUKI-API] Stream runtime error:", err);
+          console.error("[IZUKI-API] Stream error:", err);
           controller.error(err);
         }
       },
@@ -89,7 +96,7 @@ IDENTIFIED VISITOR:
     });
 
   } catch (error: any) {
-    console.error("[IZUKI-API] Fatal Failure:", error);
+    console.error("[IZUKI-API] Fatal:", error);
     return NextResponse.json({ 
       error: "Engine Failure", 
       message: error.message 
