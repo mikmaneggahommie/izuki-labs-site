@@ -273,8 +273,8 @@ export default function ChatBubble() {
             </div>
 
             {/* LOWER SECTION - INPUT & ACTIONS */}
-            <div className="border-t-[2.5px] border-[#00FF00] bg-[#000000]">
-              <form onSubmit={submitMessage} className="border-b-[2.5px] border-[#00FF00]">
+            <div className="border-t-[2.5px] border-[#FF0000] bg-[#000000]">
+              <form onSubmit={submitMessage} className="border-b-[2.5px] border-[#FF0000]">
                 <div className="flex items-center">
                   <input
                     autoFocus
@@ -282,9 +282,9 @@ export default function ChatBubble() {
                     disabled={isLoading}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder={getPlaceholder()}
-                    className="h-16 flex-1 bg-transparent px-6 text-lg font-bold text-[#00FF00] outline-none placeholder:text-[#00FF00]/30"
+                    className="h-16 flex-1 bg-transparent px-6 text-lg font-bold text-[#FF0000] outline-none placeholder:text-[#FF0000]/30"
                   />
-                  <button type="submit" className="flex h-16 w-16 items-center justify-center bg-[#00FF00] text-black transition-colors hover:bg-white">
+                  <button type="submit" className="flex h-16 w-16 items-center justify-center bg-[#FF0000] text-black transition-colors hover:bg-white">
                     <Send className="h-6 w-6" />
                   </button>
                 </div>
