@@ -306,13 +306,11 @@ button {
   min-height: 100svh;
   padding-top: clamp(5rem, 7vw, 6rem);
   padding-bottom: 0;
-  overflow: hidden;
 }
 
 .hero-viewport {
   position: relative;
   min-height: calc(100svh - clamp(5rem, 7vw, 6rem));
-  overflow: hidden;
 }
 
 .hero-copy {
@@ -350,8 +348,11 @@ button {
 
 .hero-stage {
   position: absolute;
-  inset: 0;
-  overflow: hidden;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: visible !important;
   pointer-events: none;
   perspective: 1800px;
   z-index: 2;
@@ -360,7 +361,7 @@ button {
 .hero-unit {
   position: absolute;
   top: 50%;
-  left: 56%;
+  left: 70%;
   transform: translate(-50%, -50%); /* Locks exactly center-right */
   opacity: 0;
 }
