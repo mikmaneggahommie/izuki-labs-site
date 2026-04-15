@@ -17,11 +17,19 @@ type UserInfo = {
   email?: string;
 };
 
-// Simple Markdown-to-HTML formatter for basic styling
+// Improved Markdown-to-HTML formatter for enterprise styling
 const formatMarkdown = (text: string) => {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n/g, '<br />');
+  if (!text) return "";
+  
+  // Strip extraction signals
+  const cleanText = text.split("@@@INFO_EXTRACTED@@@")[0].trim();
+
+  return cleanText
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+    .replace(/^\s*[\-\*]\s+(.*)$/gm, '<li class="ml-4 list-disc">$1</li>') // Bullet points
+    .replace(/^\s*(\d+)\.\s+(.*)$/gm, '<li class="ml-4 list-decimal">$1</li>') // Numbered lists
+    .replace(/\n/g, '<br />')
+    .replace(/(<li.*<\/li>)/gs, '<ul class="my-2">$1</ul>'); // Wrap lists
 };
 
 export default function ChatBubble() {
@@ -35,8 +43,9 @@ export default function ChatBubble() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isNearBottom, setIsNearBottom] = useState(false);
-  const [flowState, setFlowState] = useState<"COLLECTING_NAME" | "COLLECTING_TELEGRAM" | "COLLECTING_PHONE" | "COLLECTING_EMAIL" | "CHATTING">("CHATTING");
+  const [flowState, setFlowState] = useState<"COLLECTING_NAME" | "COLLECTING_CONTACT" | "COLLECTING_EMAIL" | "CHATTING">("COLLECTING_NAME");
   const [formData, setFormData] = useState<UserInfo>({});
+  const [leadStepInput, setLeadStepInput] = useState("");
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -65,8 +74,44 @@ export default function ChatBubble() {
   };
 
   const handleSkip = () => {
-    appendAssistantMessage("No worries. Let's keep talking about your project. What else do you need to know?");
+    setMessages((prev) => [...prev, 
+      { role: "user", content: "I'll skip the details for now." },
+      { role: "assistant", content: "No worries! I'm here to help. What can I tell you about my design systems or pricing?" }
+    ]);
     setFlowState("CHATTING");
+  };
+
+  const handleLeadStep = (e: React.FormEvent) => {
+    e.preventDefault();
+    const val = leadStepInput.trim();
+    if (!val) return;
+
+    if (flowState === "COLLECTING_NAME") {
+      setFormData({ ...formData, name: val });
+      setMessages(prev => [...prev, { role: "user", content: val }]);
+      appendAssistantMessage(`Nice to meet you, ${val}. What's the best way to reach you? (Telegram @username or Phone)`);
+      setFlowState("COLLECTING_CONTACT");
+    } else if (flowState === "COLLECTING_CONTACT") {
+      const isTelegram = val.startsWith("@");
+      setFormData({ ...formData, [isTelegram ? "telegram" : "phone"]: val });
+      setMessages(prev => [...prev, { role: "user", content: val }]);
+      appendAssistantMessage("Perfect. Lastly, your email for the custom proposal?");
+      setFlowState("COLLECTING_EMAIL");
+    } else if (flowState === "COLLECTING_EMAIL") {
+      setFormData({ ...formData, email: val });
+      setMessages(prev => [...prev, { role: "user", content: val }]);
+      appendAssistantMessage("Got it! I'm logging your request now. How can I help with your design projects today?");
+      
+      // Submit lead to backend
+      fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, email: val }),
+      });
+      
+      setFlowState("CHATTING");
+    }
+    setLeadStepInput("");
   };
 
   const submitMessage = async (e: React.FormEvent) => {
@@ -218,39 +263,88 @@ export default function ChatBubble() {
 
             {/* Input & Footer */}
             <div className="border-t border-white/5 bg-[#111111] p-5 space-y-4">
-              <form onSubmit={submitMessage} className="relative">
-                <input
-                  autoFocus
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask about design systems..."
-                  className="w-full rounded-none border border-white/10 bg-[#1A1A1A] py-3.5 pl-5 pr-14 text-[14px] text-white placeholder:text-white/20 focus:border-[#FF0000]/50 focus:outline-none transition-all"
-                />
-                <button
-                  type="submit"
-                  disabled={!input.trim() || isLoading}
-                  className="absolute right-2 top-1.5 flex h-10 w-10 items-center justify-center rounded-none bg-[#FF0000] text-white shadow-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
-                >
-                  <Send className="h-4 w-4" />
-                </button>
-              </form>
+              {flowState !== "CHATTING" ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">
+                      Step {flowState === "COLLECTING_NAME" ? "1" : flowState === "COLLECTING_CONTACT" ? "2" : "3"} of 3
+                    </span>
+                    <button 
+                      onClick={handleSkip}
+                      className="text-[10px] font-bold uppercase tracking-widest text-[#FF0000] hover:underline"
+                    >
+                      Skip to Chat
+                    </button>
+                  </div>
+                  
+                  <form onSubmit={handleLeadStep} className="relative">
+                    <input
+                      autoFocus
+                      value={leadStepInput}
+                      onChange={(e) => setLeadStepInput(e.target.value)}
+                      placeholder={
+                        flowState === "COLLECTING_NAME" ? "Enter your name..." : 
+                        flowState === "COLLECTING_CONTACT" ? "@telegram or phone..." : 
+                        "Enter your email..."
+                      }
+                      className="w-full rounded-none border border-white/10 bg-[#1A1A1A] py-3.5 pl-5 pr-14 text-[14px] text-white placeholder:text-white/20 focus:border-[#FF0000]/50 focus:outline-none transition-all"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!leadStepInput.trim()}
+                      className="absolute right-2 top-1.5 flex h-10 w-10 items-center justify-center rounded-none bg-[#FF0000] text-white shadow-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                    >
+                      <Send className="h-4 w-4" />
+                    </button>
+                  </form>
+                  <div className="h-1 w-full bg-white/5">
+                    <motion.div 
+                      className="h-full bg-[#FF0000]"
+                      initial={{ width: "33.33%" }}
+                      animate={{ 
+                        width: flowState === "COLLECTING_NAME" ? "33.33%" : 
+                               flowState === "COLLECTING_CONTACT" ? "66.66%" : "100%" 
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <form onSubmit={submitMessage} className="relative">
+                    <input
+                      autoFocus
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="Ask about design systems..."
+                      className="w-full rounded-none border border-white/10 bg-[#1A1A1A] py-3.5 pl-5 pr-14 text-[14px] text-white placeholder:text-white/20 focus:border-[#FF0000]/50 focus:outline-none transition-all"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!input.trim() || isLoading}
+                      className="absolute right-2 top-1.5 flex h-10 w-10 items-center justify-center rounded-none bg-[#FF0000] text-white shadow-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                    >
+                      <Send className="h-4 w-4" />
+                    </button>
+                  </form>
 
-              <div className="grid grid-cols-2 gap-3">
-                <a
-                  href="mailto:it.mikiyas.daniel@gmail.com"
-                  className="flex h-12 items-center justify-center gap-2 rounded-none bg-[#FF0000] text-[13px] font-bold uppercase tracking-tight text-white transition-all hover:brightness-110 active:scale-[0.98]"
-                >
-                  Email Me
-                </a>
-                <a
-                  href="https://t.me/snowplugwalk"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-12 items-center justify-center gap-2 rounded-none border border-white/10 bg-white/5 text-[13px] font-bold uppercase tracking-tight text-white transition-all hover:bg-white/10 active:scale-[0.98]"
-                >
-                  Message Telegram
-                </a>
-              </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <a
+                      href="mailto:it.mikiyas.daniel@gmail.com"
+                      className="flex h-12 items-center justify-center gap-2 rounded-none bg-[#FF0000] text-[13px] font-bold uppercase tracking-tight text-white transition-all hover:brightness-110 active:scale-[0.98]"
+                    >
+                      Email Me
+                    </a>
+                    <a
+                      href="https://t.me/snowplugwalk"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex h-12 items-center justify-center gap-2 rounded-none border border-white/10 bg-white/5 text-[13px] font-bold uppercase tracking-tight text-white transition-all hover:bg-white/10 active:scale-[0.98]"
+                    >
+                      Message Telegram
+                    </a>
+                  </div>
+                </>
+              )}
             </div>
           </motion.div>
         ) : null}
