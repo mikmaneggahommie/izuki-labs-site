@@ -70,13 +70,7 @@ export default function ChatBubble() {
       if (nearBottom) {
         setIsOpen(true);
         setHasAutoOpened(true);
-        setMessages((current) => [
-          ...current,
-          {
-            role: "assistant",
-            content: "What would you like to know?",
-          },
-        ]);
+        // Removed redundant "What would you like to know?" append here to fix doubling.
       }
     };
 
@@ -222,7 +216,7 @@ export default function ChatBubble() {
         <motion.button
           type="button"
           onClick={() => setIsOpen(true)}
-          className={`fixed bottom-8 right-8 z-[100] flex h-14 w-14 items-center justify-center rounded-full border border-white/15 bg-[#111111] text-white shadow-[0_20px_60px_rgba(0,0,0,0.5)] transition-colors hover:border-[#FF0000] md:bottom-8 md:right-8 ${
+          className={`fixed bottom-8 right-8 z-[100] flex h-14 w-14 items-center justify-center rounded-full border border-white/15 bg-[#111111] text-white shadow-[0_20px_60px_rgba(0,0,0,0.5)] transition-colors hover:border-[#00FF00] md:bottom-8 md:right-8 ${
             isNearBottom ? "animate-dot-pulse" : ""
           }`}
           whileHover={{ scale: 1.03 }}
@@ -260,7 +254,7 @@ export default function ChatBubble() {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-white/72 transition-colors hover:text-[#E8503A]"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-white/72 transition-colors hover:text-[#00FF00]"
                 aria-label="Close chat"
               >
                 <X className="h-4 w-4" />
@@ -276,8 +270,8 @@ export default function ChatBubble() {
                     transition={{ duration: 0.22 }}
                     className={`max-w-[88%] px-4 py-3 text-[14px] leading-[1.55] ${
                       message.role === "assistant"
-                        ? "rounded-[12px_12px_12px_4px] border border-white/6 bg-[#1A1A1A] text-white"
-                        : "ml-auto rounded-[12px_12px_4px_12px] bg-[#E8503A] text-white"
+                        ? "rounded-[12px_12px_12px_4px] border border-white/12 bg-[#1A1A1A] text-white"
+                        : "ml-auto rounded-[12px_12px_4px_12px] bg-[#00FF00] text-black font-medium"
                     }`}
                     dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content) }}
                   />
@@ -341,7 +335,7 @@ export default function ChatBubble() {
                   <button
                     type="submit"
                     disabled={isLoading || !input.trim()}
-                    className="flex h-11 w-11 items-center justify-center rounded-[8px] bg-[#E8503A] text-white transition-opacity disabled:opacity-40"
+                    className="flex h-11 w-11 items-center justify-center rounded-[8px] bg-[#00FF00] text-black transition-opacity disabled:opacity-40"
                     aria-label="Send message"
                   >
                     <Send className="h-4 w-4" />
@@ -352,7 +346,7 @@ export default function ChatBubble() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <a
                   href="mailto:it.mikiyas.daniel@gmail.com"
-                  className="flex h-11 items-center justify-center rounded-[8px] bg-[#E8503A] px-4 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+                  className="flex h-11 items-center justify-center rounded-[8px] bg-[#00FF00] px-4 text-[13px] font-bold text-black transition-opacity hover:opacity-90 mt-1"
                 >
                   Email Me
                 </a>
@@ -360,7 +354,7 @@ export default function ChatBubble() {
                   href="https://t.me/snowplugwalk"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-11 items-center justify-center rounded-[8px] border border-white/10 bg-[#1A1A1A] px-4 text-[13px] font-medium text-white transition-colors hover:border-white/20"
+                  className="flex h-11 items-center justify-center rounded-[8px] border border-[#00FF00]/40 bg-[#111111] px-4 text-[13px] font-bold text-[#00FF00] transition-colors hover:bg-[#00FF00]/10 mt-1"
                 >
                   Message On Telegram
                 </a>
