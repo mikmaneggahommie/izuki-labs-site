@@ -15,6 +15,17 @@ type FlowState =
 type Message = {
   role: "assistant" | "user";
   content: string;
+  isInfoRequest?: boolean; // New flag for messages that request contact info
+};
+
+type ChatApiResponse = {
+  role: "assistant";
+  content: string;
+  extractedInfo?: {
+    name?: string | null;
+    phone?: string | null;
+    email?: string | null;
+  };
 };
 
 const backendChatEnabled = process.env.NEXT_PUBLIC_CHAT_MODE !== "disabled";
@@ -80,24 +91,32 @@ export default function ChatBubble() {
   };
 
   const handleSkip = () => {
-    if (flowState === "COLLECTING_PHONE") {
-      appendAssistantMessage("No worries. Drop your email too and I’ll keep the thread organized.");
-      setFlowState("COLLECTING_EMAIL");
-    } else if (flowState === "COLLECTING_EMAIL") {
-      appendAssistantMessage(
-        backendChatEnabled
-          ? "Locked in. Ask about pricing, timelines, retainers, or the best package for your brand."
-          : "Locked in. I’ve got your details in this chat, and I can still guide you through pricing, timelines, and the best package right here."
-      );
+    if (flowState === "COLLECTING_NAME") {
       setFlowState("CHATTING");
+      appendAssistantMessage("No problem. We can keep it casual. How can I help with your design systems today?");
+    } else if (flowState === "COLLECTING_PHONE") {
+      setFlowState("COLLECTING_EMAIL");
+      appendAssistantMessage("Understood. Drop your email if you'd like me to follow up there instead.", true);
+    } else if (flowState === "COLLECTING_EMAIL") {
+      setFlowState("CHATTING");
+      appendAssistantMessage("Locked in. Ask about pricing, timelines, or my Remote Designer plan.");
       
-      // Save partial lead
-      fetch("/api/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      }).catch(err => console.error("Failed to save partial lead:", err));
+      // Save partial lead if any
+      if (formData.name || formData.phone) {
+        fetch("/api/lead", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }).catch(err => console.error("Failed to save partial lead:", err));
+      }
     }
+  };
+
+  const appendAssistantMessage = (content: string, isInfoRequest = false) => {
+    setMessages((current) => [
+      ...current,
+      { role: "assistant", content, isInfoRequest },
+    ]);
   };
 
   const submitMessage = async (event: React.FormEvent) => {
@@ -115,16 +134,63 @@ export default function ChatBubble() {
 
     await new Promise((resolve) => setTimeout(resolve, 420));
 
+    // If backend chat is enabled, we let Gemini handle the reasoning
+    if (backendChatEnabled) {
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [...messages, userMessage],
+            userInfo: formData,
+          }),
+        });
+
+        const data = (await response.json()) as ChatApiResponse;
+
+        if (data.content && data.role === "assistant") {
+          // Update local info if Gemini extracted anything
+          if (data.extractedInfo) {
+            const { name, phone, email } = data.extractedInfo;
+            setFormData(prev => ({
+              name: name || prev.name,
+              phone: phone || prev.phone,
+              email: email || prev.email,
+            }));
+
+            // Auto-advance states if we got the info we were looking for
+            if (name && flowState === "COLLECTING_NAME") setFlowState("COLLECTING_PHONE");
+            if (phone && flowState === "COLLECTING_PHONE") setFlowState("COLLECTING_EMAIL");
+            if (email && flowState === "COLLECTING_EMAIL") {
+              setFlowState("CHATTING");
+              // Final lead save
+              fetch("/api/lead", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ...formData, email }),
+              }).catch(err => console.error("Failed to save lead:", err));
+            }
+          }
+
+          appendAssistantMessage(data.content, data.content.includes("?") && (flowState !== "CHATTING"));
+        } else {
+          appendAssistantMessage(getStudioConciergeReply(userContent, formData));
+        }
+      } catch {
+        appendAssistantMessage(getStudioConciergeReply(userContent, formData));
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+
+    // Fallback/Legacy heuristic logic (only if backend is disabled)
     if (flowState === "COLLECTING_NAME") {
-      // Pivot check: if it looks like a question, skip to chatting
       if (isLikelyQuestion(userContent)) {
         setFlowState("CHATTING");
-        // Proceed to chat logic below
       } else {
         setFormData((current) => ({ ...current, name: userContent }));
-        appendAssistantMessage(
-          `Perfect, ${userContent}. What phone number should I use for project follow-up?`
-        );
+        appendAssistantMessage(`Perfect, ${userContent}. What phone number should I use for project follow-up?`, true);
         setFlowState("COLLECTING_PHONE");
         setIsLoading(false);
         return;
@@ -132,25 +198,17 @@ export default function ChatBubble() {
     }
 
     if (flowState === "COLLECTING_PHONE") {
-      // Pivot check: if it looks like a question, skip to chatting
       if (isLikelyQuestion(userContent)) {
         setFlowState("CHATTING");
-        // Proceed to chat logic below
       } else {
-        // Basic phone validation: strips non-digits and checks length
         const digitCount = userContent.replace(/\D/g, "").length;
         if (digitCount < 9 || digitCount > 15) {
-          appendAssistantMessage(
-            "That doesn't look like a valid phone number. Please provide a valid number with country code if needed."
-          );
+          appendAssistantMessage("That doesn't look like a valid phone number. Please provide a valid number with country code.");
           setIsLoading(false);
           return;
         }
-
         setFormData((current) => ({ ...current, phone: userContent }));
-        appendAssistantMessage(
-          "Great. Drop your email too and I’ll keep the thread organized."
-        );
+        appendAssistantMessage("Great. Drop your email too and I’ll keep the thread organized.", true);
         setFlowState("COLLECTING_EMAIL");
         setIsLoading(false);
         return;
@@ -158,76 +216,27 @@ export default function ChatBubble() {
     }
 
     if (flowState === "COLLECTING_EMAIL") {
-      // Pivot check
       if (isLikelyQuestion(userContent)) {
         setFlowState("CHATTING");
-        // Proceed to chat logic below
       } else {
-        // Basic email validation regex
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(userContent)) {
-          appendAssistantMessage(
-            "That doesn't look like a valid email. Please provide a valid email address."
-          );
+          appendAssistantMessage("Please provide a valid email address.");
           setIsLoading(false);
           return;
         }
-
         const nextUserInfo = { ...formData, email: userContent };
         setFormData(nextUserInfo);
-        appendAssistantMessage(
-          backendChatEnabled
-            ? "Locked in. Ask about pricing, timelines, retainers, or the best package for your brand."
-            : "Locked in. I’ve got your details in this chat, and I can still guide you through pricing, timelines, and the best package right here."
-        );
+        appendAssistantMessage("Locked in. Ask about pricing, timelines, or my Remote Designer plan.");
         setFlowState("CHATTING");
         setIsLoading(false);
-
-        // Silently save the lead to the backend
-        try {
-          await fetch("/api/lead", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(nextUserInfo),
-          });
-        } catch (err) {
-          console.error("Failed to save lead:", err);
-        }
-
+        fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(nextUserInfo) });
         return;
       }
     }
 
-    const nextMessages = [...messages, userMessage];
-
-    if (!backendChatEnabled) {
-      appendAssistantMessage(getStudioConciergeReply(userContent, formData));
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: nextMessages,
-          userInfo: formData,
-        }),
-      });
-
-      const data = (await response.json()) as Partial<Message>;
-
-      if (data.content && data.role === "assistant") {
-        appendAssistantMessage(data.content);
-      } else {
-        appendAssistantMessage(getStudioConciergeReply(userContent, formData));
-      }
-    } catch {
-      appendAssistantMessage(getStudioConciergeReply(userContent, formData));
-    } finally {
-      setIsLoading(false);
-    }
+    appendAssistantMessage(getStudioConciergeReply(userContent, formData));
+    setIsLoading(false);
   };
 
   return (
@@ -283,19 +292,35 @@ export default function ChatBubble() {
 
             <div className="chat-scroll flex-1 space-y-4 overflow-y-auto px-6 py-6">
               {messages.map((message, index) => (
-                <motion.div
-                  key={`${message.role}-${index}`}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.22 }}
-                  className={`max-w-[88%] px-4 py-3 text-[14px] leading-[1.55] ${
-                    message.role === "assistant"
-                      ? "rounded-[12px_12px_12px_4px] border border-white/6 bg-[#1A1A1A] text-white"
-                      : "ml-auto rounded-[12px_12px_4px_12px] bg-[#E8503A] text-white"
-                  }`}
-                >
-                  {message.content}
-                </motion.div>
+                <div key={`${message.role}-${index}`} className="group flex flex-col gap-2">
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.22 }}
+                    className={`max-w-[88%] px-4 py-3 text-[14px] leading-[1.55] ${
+                      message.role === "assistant"
+                        ? "rounded-[12px_12px_12px_4px] border border-white/6 bg-[#1A1A1A] text-white"
+                        : "ml-auto rounded-[12px_12px_4px_12px] bg-[#E8503A] text-white"
+                    }`}
+                  >
+                    {message.content}
+                  </motion.div>
+                  
+                  {message.role === "assistant" && message.isInfoRequest && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="mt-1"
+                    >
+                      <button
+                        onClick={handleSkip}
+                        className="flex h-8 items-center rounded-full border border-white/10 px-4 text-[11px] font-bold uppercase tracking-wider text-white/40 transition-all hover:border-white/20 hover:bg-white/5 hover:text-white"
+                      >
+                        Skip for now
+                      </button>
+                    </motion.div>
+                  )}
+                </div>
               ))}
 
               {isLoading ? (
@@ -347,17 +372,6 @@ export default function ChatBubble() {
                   </button>
                 </div>
               </form>
-
-              {flowState === "COLLECTING_PHONE" || flowState === "COLLECTING_EMAIL" ? (
-                <div className="flex justify-start">
-                  <button
-                    onClick={handleSkip}
-                    className="text-[12px] font-medium text-white/45 transition-colors hover:text-white"
-                  >
-                    Skip for now
-                  </button>
-                </div>
-              ) : null}
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <a
