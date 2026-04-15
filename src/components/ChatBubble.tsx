@@ -74,7 +74,7 @@ export default function ChatBubble() {
           ...current,
           {
             role: "assistant",
-            content: "Got a question about a plan or timeline? Ask me anything right here.",
+            content: "What would you like to know?",
           },
         ]);
       }
