@@ -248,11 +248,11 @@ export default function ChatBubble() {
                   <p className="text-base font-bold tracking-[-0.03em] text-white">
                     izuki.labs
                   </p>
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#E8503A]" />
+                  <span className="h-2 w-2 rounded-full bg-[#22C55E] animate-online-pulse" />
                 </div>
                 <p className="text-[12px] font-medium text-white/45">
                   {backendChatEnabled
-                    ? "Interactive Assistant"
+                    ? "Ask anything"
                     : "Design Assistant"}
                 </p>
               </div>
