@@ -63,7 +63,7 @@ export default function ChatBubble() {
     const savedMsg = sessionStorage.getItem("izuki_chat_msgs");
     const savedInfo = sessionStorage.getItem("izuki_chat_info");
     if (savedMsg) setMessages(JSON.parse(savedMsg));
-    else setMessages([{ role: "assistant", content: "Hey, I'm the design partner for the lab. What's on your mind?" }]);
+    else setMessages([{ role: "assistant", content: "Hey! What's your name?" }]);
     
     if (savedInfo) {
       const info = JSON.parse(savedInfo);
@@ -125,7 +125,7 @@ export default function ChatBubble() {
     tryLeadSubmit(formData);
     setMessages((prev) => [...prev, 
       { role: "user", content: "I'll skip the details for now." },
-      { role: "assistant", content: "No worries! I'm here to help. What can I tell you about my design systems or pricing?" }
+      { role: "assistant", content: "No worries! Ask me anything about design, pricing, or how I work." }
     ]);
     setFlowState("CHATTING");
   };
@@ -144,7 +144,7 @@ export default function ChatBubble() {
       const newData = { ...formData, name: val };
       setFormData(newData);
       setMessages(prev => [...prev, { role: "user", content: val }]);
-      appendAssistantMessage(`Nice to meet you, ${val}. What's the best way to reach you? (Telegram, Phone, or Link)`);
+      appendAssistantMessage(`Nice to meet you, ${val}. What's the best way to reach you? (Telegram @username or Phone)`);
       setFlowState("COLLECTING_CONTACT");
     } else if (flowState === "COLLECTING_CONTACT") {
       const isEmail = validateEmail(val);
@@ -170,7 +170,7 @@ export default function ChatBubble() {
       const newData = { ...formData, email: val };
       setFormData(newData);
       setMessages(prev => [...prev, { role: "user", content: val }]);
-      appendAssistantMessage("Got it! I'm logging your request now. How can I help with your design projects today?");
+      appendAssistantMessage("Got it! How can I help you today? Ask me anything about design, pricing, or my process.");
       tryLeadSubmit(newData);
       setFlowState("CHATTING");
     }
@@ -190,7 +190,6 @@ export default function ChatBubble() {
     let assistantContent = "";
 
     try {
-      // 1. First Attempt: Standard API Route (High-IQ Vercel Path)
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -220,22 +219,20 @@ export default function ChatBubble() {
           });
         }
       } else {
-        // DETAILED DIAGNOSTICS FOR VERCEL
         const errorBody = await response.json().catch(() => ({}));
         console.error(`[IZUKI-FRONTEND] API Failed (${response.status}):`, errorBody);
         
         if (response.status === 404) {
-           throw new Error("API Route Missing (Check Vercel Deployment).");
+           throw new Error("API Route Missing. Check Vercel Deployment.");
         } else if (response.status === 500) {
-           throw new Error(`Server Error: ${errorBody.message || 'Check Vercel Logs'}`);
+           throw new Error(errorBody.message || 'Something went wrong. Try again.');
         } else {
            throw new Error(`Connection failed (${response.status})`);
         }
       }
     } catch (err: any) {
       console.error("Critical Connection Failure:", err);
-      // Show the actual error to the user for one turn to debug
-      appendAssistantMessage(`Connection Refused: ${err.message}. Please verify your Gemini API Key is set in Vercel.`);
+      appendAssistantMessage("I'm having trouble connecting right now. Try again in a moment, or reach me directly below.");
     } finally {
       setIsLoading(false);
     }
@@ -248,7 +245,7 @@ export default function ChatBubble() {
           type="button"
           onClick={() => setIsOpen(true)}
           className={`fixed bottom-8 right-8 z-[100] flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-[#0A0A0A] text-white shadow-2xl transition-all hover:scale-110 active:scale-95 md:bottom-10 md:right-10 ${
-            isNearBottom ? "ring-2 ring-red-500/50" : ""
+            isNearBottom ? "ring-2 ring-[#00FF00]/50" : ""
           }`}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -265,16 +262,16 @@ export default function ChatBubble() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 32, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-4 right-4 z-[110] flex h-[500px] w-[calc(100vw-32px)] max-w-[400px] flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#0A0A0A] shadow-[0_32px_128px_rgba(0,0,0,0.8)] backdrop-blur-xl md:bottom-10 md:right-10"
+            className="fixed bottom-4 right-4 z-[110] flex h-[520px] w-[calc(100vw-32px)] max-w-[400px] flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#0A0A0A] shadow-[0_32px_128px_rgba(0,0,0,0.8)] backdrop-blur-xl md:bottom-10 md:right-10"
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-white/5 bg-[#111111] px-6 py-5">
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-black tracking-tight text-white">izuki.labs</span>
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-[#FF0000]" />
-                </div>
-                <span className="text-[11px] font-medium uppercase tracking-widest text-white/40">Studio Concierge</span>
+            <div className="flex items-center justify-between border-b border-white/5 bg-[#111111] px-6 py-4">
+              <div className="flex items-center gap-2.5">
+                <span className="text-lg font-black tracking-tight text-white uppercase">IZUKI LABS</span>
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00FF00] opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#00FF00]" />
+                </span>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
@@ -285,49 +282,51 @@ export default function ChatBubble() {
             </div>
 
             {/* Messages */}
-            <div className="chat-scroll flex-1 p-6 space-y-6 overflow-y-auto">
-              {messages.map((message, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[85%] px-5 py-3.5 text-[14.5px] leading-relaxed ${
-                      message.role === "user"
-                        ? "rounded-[1.25rem] rounded-br-[4px] bg-[#FF0000] text-white font-medium shadow-[0_4px_12px_rgba(255,0,0,0.2)]"
-                        : "rounded-[1.25rem] rounded-bl-[4px] bg-[#1A1A1A] text-white/90 border border-white/5"
-                    }`}
-                    dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content) }}
-                  />
-                </motion.div>
-              ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="rounded-[1.25rem] rounded-bl-[4px] bg-[#1A1A1A] px-5 py-4 border border-white/5">
-                    <div className="flex gap-1.5">
-                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/30" style={{ animationDelay: "0ms" }} />
-                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/30" style={{ animationDelay: "150ms" }} />
-                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/30" style={{ animationDelay: "300ms" }} />
+            <div className="chat-scroll flex-1 overflow-y-auto px-5 py-4">
+              <div className="flex flex-col gap-4">
+                {messages.map((message, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-[85%] px-4 py-3 text-[14px] leading-relaxed ${
+                        message.role === "user"
+                          ? "rounded-[1.25rem] rounded-br-[4px] bg-[#FF0000] text-white font-medium shadow-[0_4px_12px_rgba(255,0,0,0.2)]"
+                          : "rounded-[1.25rem] rounded-bl-[4px] bg-[#1A1A1A] text-white/90 border border-white/5"
+                      }`}
+                      dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content) }}
+                    />
+                  </motion.div>
+                ))}
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="rounded-[1.25rem] rounded-bl-[4px] bg-[#1A1A1A] px-5 py-4 border border-white/5">
+                      <div className="flex gap-1.5">
+                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/30" style={{ animationDelay: "0ms" }} />
+                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/30" style={{ animationDelay: "150ms" }} />
+                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/30" style={{ animationDelay: "300ms" }} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
+                )}
+                <div ref={messagesEndRef} />
+              </div>
             </div>
 
             {/* Input & Footer */}
-            <div className="border-t border-white/5 bg-[#111111] p-5 space-y-4">
+            <div className="border-t border-white/5 bg-[#111111] p-4">
               {flowState !== "CHATTING" ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">
                       Step {flowState === "COLLECTING_NAME" ? "1" : flowState === "COLLECTING_CONTACT" ? "2" : "3"} of 3
                     </span>
                     <button 
                       onClick={handleSkip}
-                      className="text-[10px] font-bold uppercase tracking-widest text-[#FF0000] hover:underline"
+                      className="text-[10px] font-bold uppercase tracking-widest text-white/50 hover:text-white transition-colors"
                     >
                       Skip to Chat
                     </button>
@@ -348,26 +347,33 @@ export default function ChatBubble() {
                         flowState === "COLLECTING_CONTACT" ? "@telegram, phone, or link..." : 
                         "Enter your email..."
                       }
-                      className={`w-full rounded-none border py-3.5 pl-5 pr-14 text-[14px] text-white placeholder:text-white/20 focus:outline-none transition-all ${
-                        error ? "border-red-500 bg-red-500/10" : "border-white/10 bg-[#1A1A1A] focus:border-[#FF0000]/50"
+                      className={`w-full rounded-xl border py-3 pl-4 pr-14 text-[14px] text-white placeholder:text-white/20 focus:outline-none transition-all ${
+                        error ? "border-red-500/60 bg-red-500/5" : "border-white/10 bg-[#1A1A1A] focus:border-white/20"
                       }`}
                     />
-                    {error && (
-                      <span className="absolute left-0 top-full mt-1 text-[11px] font-bold text-red-500">
-                        {error}
-                      </span>
-                    )}
                     <button
                       type="submit"
                       disabled={!leadStepInput.trim()}
-                      className="absolute right-2 top-1.5 flex h-10 w-10 items-center justify-center rounded-none bg-[#FF0000] text-white shadow-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF0000] text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-30"
                     >
-                      <Send className="h-4 w-4" />
+                      <Send className="h-3.5 w-3.5" />
                     </button>
                   </form>
-                  <div className="h-1 w-full bg-white/5">
+                  {/* Error space — always reserved to prevent layout shift */}
+                  <div className="h-4">
+                    {error && (
+                      <motion.span
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="block text-[11px] font-medium text-red-400"
+                      >
+                        {error}
+                      </motion.span>
+                    )}
+                  </div>
+                  <div className="h-1 w-full rounded-full bg-white/5 overflow-hidden">
                     <motion.div 
-                      className="h-full bg-[#FF0000]"
+                      className="h-full bg-[#FF0000] rounded-full"
                       initial={{ width: "33.33%" }}
                       animate={{ 
                         width: flowState === "COLLECTING_NAME" ? "33.33%" : 
@@ -377,28 +383,28 @@ export default function ChatBubble() {
                   </div>
                 </div>
               ) : (
-                <>
+                <div className="space-y-3">
                   <form onSubmit={submitMessage} className="relative">
                     <input
                       autoFocus
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      placeholder="Ask about design systems..."
-                      className="w-full rounded-none border border-white/10 bg-[#1A1A1A] py-3.5 pl-5 pr-14 text-[14px] text-white placeholder:text-white/20 focus:border-[#FF0000]/50 focus:outline-none transition-all"
+                      placeholder="Ask anything..."
+                      className="w-full rounded-xl border border-white/10 bg-[#1A1A1A] py-3 pl-4 pr-14 text-[14px] text-white placeholder:text-white/20 focus:border-white/20 focus:outline-none transition-all"
                     />
                     <button
                       type="submit"
                       disabled={!input.trim() || isLoading}
-                      className="absolute right-2 top-1.5 flex h-10 w-10 items-center justify-center rounded-none bg-[#FF0000] text-white shadow-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF0000] text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-30"
                     >
-                      <Send className="h-4 w-4" />
+                      <Send className="h-3.5 w-3.5" />
                     </button>
                   </form>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-2.5">
                     <a
                       href="mailto:it.mikiyas.daniel@gmail.com"
-                      className="flex h-12 items-center justify-center gap-2 rounded-none bg-[#FF0000] text-[13px] font-bold uppercase tracking-tight text-white transition-all hover:brightness-110 active:scale-[0.98]"
+                      className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[#FF0000] text-[12px] font-bold uppercase tracking-tight text-white transition-all hover:brightness-110 active:scale-[0.98]"
                     >
                       Email Me
                     </a>
@@ -406,12 +412,12 @@ export default function ChatBubble() {
                       href="https://t.me/snowplugwalk"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex h-12 items-center justify-center gap-2 rounded-none border border-white/10 bg-white/5 text-[13px] font-bold uppercase tracking-tight text-white transition-all hover:bg-white/10 active:scale-[0.98]"
+                      className="flex h-11 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 text-[12px] font-bold uppercase tracking-tight text-white transition-all hover:bg-white/10 active:scale-[0.98]"
                     >
                       Message Telegram
                     </a>
                   </div>
-                </>
+                </div>
               )}
             </div>
           </motion.div>

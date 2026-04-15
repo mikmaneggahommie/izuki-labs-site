@@ -11,7 +11,6 @@ export async function POST(req: Request) {
     const { messages, userInfo } = await req.json();
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // 1. Diagnostic Logging (Visible in Vercel Logs)
     console.log("[IZUKI-API] Received request. Messages count:", messages.length);
     console.log("[IZUKI-API] API Key Status:", apiKey ? "Loaded" : "MISSING");
 
@@ -24,27 +23,9 @@ export async function POST(req: Request) {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     
-    // ARMOR V20: AUTO-ENLIGHTENMENT (Model Discovery)
-    let targetModel = "gemini-1.5-flash"; 
-    try {
-      // Cast to any to bypass strict Next 16/TS build checks for this legacy SDK method
-      const availableModels = await (genAI as any).listModels();
-      console.log("[IZUKI-API] Available Models:", availableModels?.models?.map((m: any) => m.name));
-      
-      const modelNames = availableModels?.models?.map((m: any) => m.name) || [];
-      if (modelNames.some((n: string) => n.includes("gemini-2.0-flash"))) {
-        targetModel = "gemini-2.0-flash";
-      } else if (modelNames.some((n: string) => n.includes("gemini-1.5-pro"))) {
-        targetModel = "gemini-1.5-pro";
-      }
-      console.log("[IZUKI-API] Auto-Selected Engine:", targetModel);
-    } catch (discoveryErr: any) {
-      console.warn("[IZUKI-API] Discovery Failed. Falling back to 1.5-flash-latest.", discoveryErr.message);
-      targetModel = "gemini-1.5-flash-latest";
-    }
-
+    // Direct model — no discovery, no fallback to deprecated models
     const model = genAI.getGenerativeModel({ 
-      model: targetModel,
+      model: "gemini-2.0-flash",
       systemInstruction: `${studioSystemPrompt}
 
 IDENTIFIED VISITOR:
@@ -53,7 +34,7 @@ IDENTIFIED VISITOR:
 `.trim(),
     });
 
-    // 2. High-Resilience History Sanitizer (Armor V17)
+    // History Sanitizer
     let history: any[] = [];
     
     for (const m of messages) {
@@ -67,18 +48,16 @@ IDENTIFIED VISITOR:
        }
     }
 
-    // CRITICAL: Google AI Protocol Enforcement
-    // The very first message in history MUST be from the 'user'.
+    // Google AI Protocol: first message MUST be 'user'
     while (history.length > 0 && history[0].role !== "user") {
       history.shift();
     }
 
-    // Ensure we have something left
     if (history.length === 0) {
       history.push({ role: "user", parts: [{ text: "Hello" }] });
     }
 
-    // Ensure the last message is from User to be used as final prompt
+    // Last message must be user (the prompt)
     if (history[history.length - 1].role === "model") {
        history.pop();
     }
@@ -86,7 +65,7 @@ IDENTIFIED VISITOR:
     const lastMessage = history.length > 0 ? history.pop().parts[0].text : "What can you do?";
     const chat = model.startChat({ history });
 
-    console.log("[IZUKI-API] Starting stream with Pro Engine...");
+    console.log("[IZUKI-API] Starting stream with gemini-2.0-flash...");
     const result = await chat.sendMessageStream(lastMessage);
 
     const encoder = new TextEncoder();
@@ -112,7 +91,7 @@ IDENTIFIED VISITOR:
   } catch (error: any) {
     console.error("[IZUKI-API] Fatal Failure:", error);
     return NextResponse.json({ 
-      error: "High-IQ Engine Failure", 
+      error: "Engine Failure", 
       message: error.message 
     }, { status: 500 });
   }
