@@ -19,6 +19,14 @@ export async function POST(req: Request) {
     }
 
     // Insert lead into Supabase
+    if (!supabase) {
+      console.error("Supabase client not initialized. Check your environment variables.");
+      return NextResponse.json(
+        { error: "Service temporarily unavailable — database connection error" },
+        { status: 503 }
+      );
+    }
+
     const { error } = await supabase.from("leads").insert([
       { name, phone, email },
     ]);
