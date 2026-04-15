@@ -147,6 +147,7 @@ export default function ChatBubble() {
       setFormData(prev => ({ ...prev, email: userContent }));
       setFlowState("CHATTING");
     }
+    if (backendChatEnabled) {
       try {
         const response = await fetch("/api/chat", {
           method: "POST",
