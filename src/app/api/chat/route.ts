@@ -18,7 +18,19 @@ export async function POST(req: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+
+    const safetySettings = [
+      { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+      { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+      { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+      { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+    ];
+
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash-latest",
+      safetySettings 
+    });
+
     const lastMessage = messages[messages.length - 1]?.content ?? "";
 
     const systemPrompt = `${studioSystemPrompt}
@@ -29,7 +41,7 @@ Known visitor details:
 - Email: ${userInfo?.email || "Unknown"}
 `.trim();
 
-    console.log("Initing chat with model: gemini-1.5-flash-latest");
+    console.log("Initing chat with model: gemini-1.5-flash-latest (safety: BLOCK_NONE)");
 
     const conversationHistory = messages.slice(0, -1).map((msg) => ({
       role: msg.role === "assistant" ? "model" : "user",
@@ -54,8 +66,11 @@ Known visitor details:
       async start(controller) {
         try {
           for await (const chunk of result.stream) {
-            const text = chunk.text();
-            controller.enqueue(encoder.encode(text));
+            // Safe chunk verification
+            if (chunk.candidates?.[0]?.content?.parts?.[0]?.text) {
+              const text = chunk.text();
+              controller.enqueue(encoder.encode(text));
+            }
           }
           controller.close();
         } catch (streamErr: any) {
@@ -77,7 +92,8 @@ Known visitor details:
     console.error("Gemini API Route Error:", error);
     return NextResponse.json({ 
       error: "Failed to process stream", 
-      details: error.message || String(error) 
+      details: error.message || String(error),
+      stack: error.stack
     }, { status: 500 });
   }
 }
