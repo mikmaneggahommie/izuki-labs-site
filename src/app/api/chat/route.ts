@@ -61,11 +61,26 @@ IMPORTANT:
 
     const result = await chat.sendMessage(lastMessage);
     const response = await result.response;
+    const text = response.text();
 
-    return NextResponse.json({
-      role: "assistant",
-      content: response.text(),
-    });
+    try {
+      // Attempt to parse JSON from Gemini's response
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const data = jsonMatch ? JSON.parse(jsonMatch[0]) : { reply: text, extractedInfo: null };
+
+      return NextResponse.json({
+        role: "assistant",
+        content: data.reply || text,
+        extractedInfo: data.extractedInfo || null,
+      });
+    } catch (e) {
+      console.error("Failed to parse Gemini JSON:", e);
+      return NextResponse.json({
+        role: "assistant",
+        content: text,
+      });
+    }
+
   } catch (error: unknown) {
     console.error("Gemini API Error:", error);
     return NextResponse.json(
