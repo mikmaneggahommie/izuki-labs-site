@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     
     if (COMPOSIO_API_KEY) {
       try {
-        await fetch(`https://backend.composio.dev/api/v3.1/tools/execute/GOOGLESHEETS_SPREADSHEETS_VALUES_APPEND`, {
+        const sheetResponse = await fetch(`https://backend.composio.dev/api/v3.1/tools/execute/GOOGLESHEETS_SPREADSHEETS_VALUES_APPEND`, {
           method: "POST",
           headers: { 
             "x-api-key": COMPOSIO_API_KEY,
@@ -39,6 +39,12 @@ export async function POST(req: Request) {
             }
           }),
         });
+
+        if (!sheetResponse.ok) {
+          const errorData = await sheetResponse.text();
+          console.error("Composio API Error Payload:", errorData);
+          throw new Error(`Composio Error: ${sheetResponse.status}`);
+        }
       } catch (sheetErr) {
         console.error("Composio Google Sheets Logging Failed:", sheetErr);
       }

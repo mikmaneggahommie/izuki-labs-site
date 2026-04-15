@@ -48,9 +48,13 @@ export default function ChatBubble() {
   const [isNearBottom, setIsNearBottom] = useState(false);
   const [flowState, setFlowState] = useState<"COLLECTING_NAME" | "COLLECTING_CONTACT" | "COLLECTING_EMAIL" | "CHATTING">("COLLECTING_NAME");
   const [formData, setFormData] = useState<UserInfo>({});
-  const [leadStepInput, setLeadStepInput] = useState("");
+  const [error, setError] = useState<string | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePhone = (phone: string) => /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/.test(phone);
+  const validateTelegram = (tg: string) => /^@?[a-zA-Z0-9_]{5,32}$/.test(tg);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -102,21 +106,39 @@ export default function ChatBubble() {
 
   const handleLeadStep = (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     const val = leadStepInput.trim();
     if (!val) return;
 
     if (flowState === "COLLECTING_NAME") {
+      if (val.length < 2) {
+        setError("Please enter your real name.");
+        return;
+      }
       setFormData({ ...formData, name: val });
       setMessages(prev => [...prev, { role: "user", content: val }]);
       appendAssistantMessage(`Nice to meet you, ${val}. What's the best way to reach you? (Telegram @username or Phone)`);
       setFlowState("COLLECTING_CONTACT");
     } else if (flowState === "COLLECTING_CONTACT") {
-      const isTelegram = val.startsWith("@");
+      const isTelegram = val.startsWith("@") || !/^\d/.test(val);
+      if (isTelegram && !validateTelegram(val)) {
+        setError("Invalid Telegram handle. Use @username.");
+        return;
+      }
+      if (!isTelegram && !validatePhone(val)) {
+        setError("Please enter a valid phone number.");
+        return;
+      }
+      
       setFormData({ ...formData, [isTelegram ? "telegram" : "phone"]: val });
       setMessages(prev => [...prev, { role: "user", content: val }]);
       appendAssistantMessage("Perfect. Lastly, your email for the custom proposal?");
       setFlowState("COLLECTING_EMAIL");
     } else if (flowState === "COLLECTING_EMAIL") {
+      if (!validateEmail(val)) {
+        setError("Please enter a valid email address.");
+        return;
+      }
       setFormData({ ...formData, email: val });
       setMessages(prev => [...prev, { role: "user", content: val }]);
       appendAssistantMessage("Got it! I'm logging your request now. How can I help with your design projects today?");
@@ -306,17 +328,29 @@ export default function ChatBubble() {
                   </div>
                   
                   <form onSubmit={handleLeadStep} className="relative">
-                    <input
+                    <motion.input
                       autoFocus
+                      animate={error ? { x: [-4, 4, -4, 4, 0] } : {}}
+                      transition={{ duration: 0.4 }}
                       value={leadStepInput}
-                      onChange={(e) => setLeadStepInput(e.target.value)}
+                      onChange={(e) => {
+                        setLeadStepInput(e.target.value);
+                        if (error) setError(null);
+                      }}
                       placeholder={
                         flowState === "COLLECTING_NAME" ? "Enter your name..." : 
                         flowState === "COLLECTING_CONTACT" ? "@telegram or phone..." : 
                         "Enter your email..."
                       }
-                      className="w-full rounded-none border border-white/10 bg-[#1A1A1A] py-3.5 pl-5 pr-14 text-[14px] text-white placeholder:text-white/20 focus:border-[#FF0000]/50 focus:outline-none transition-all"
+                      className={`w-full rounded-none border py-3.5 pl-5 pr-14 text-[14px] text-white placeholder:text-white/20 focus:outline-none transition-all ${
+                        error ? "border-red-500 bg-red-500/10" : "border-white/10 bg-[#1A1A1A] focus:border-[#FF0000]/50"
+                      }`}
                     />
+                    {error && (
+                      <span className="absolute left-0 -top-6 text-[11px] font-bold text-red-500">
+                        {error}
+                      </span>
+                    )}
                     <button
                       type="submit"
                       disabled={!leadStepInput.trim()}
