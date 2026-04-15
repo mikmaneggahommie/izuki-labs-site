@@ -39,6 +39,7 @@ interface InfiniteGalleryProps {
 	blurSettings?: BlurSettings;
 	className?: string;
 	style?: React.CSSProperties;
+	isLocked?: boolean; // Prop to control if we should preventDefault or not
 }
 
 interface PlaneData {
@@ -192,6 +193,7 @@ function GalleryScene({
 	images,
 	speed = 1,
 	visibleCount = 8,
+	isLocked = true,
 	fadeSettings = {
 		fadeIn: { start: 0.05, end: 0.15 },
 		fadeOut: { start: 0.85, end: 0.95 },
@@ -277,11 +279,14 @@ function GalleryScene({
 	// Handle scroll input
 	const handleWheel = useCallback(
 		(event: WheelEvent) => {
+			if (isLocked) {
+				event.preventDefault();
+			}
 			setScrollVelocity((prev) => prev + event.deltaY * 0.01 * speed);
 			setAutoPlay(false);
 			lastInteraction.current = Date.now();
 		},
-		[speed]
+		[speed, isLocked]
 	);
 
 	// Handle keyboard input
@@ -303,7 +308,7 @@ function GalleryScene({
 	useEffect(() => {
 		const canvas = document.querySelector('canvas');
 		if (canvas) {
-			canvas.addEventListener('wheel', handleWheel, { passive: true });
+			canvas.addEventListener('wheel', handleWheel, { passive: !isLocked });
 			document.addEventListener('keydown', handleKeyDown);
 
 			return () => {
@@ -311,7 +316,7 @@ function GalleryScene({
 				document.removeEventListener('keydown', handleKeyDown);
 			};
 		}
-	}, [handleWheel, handleKeyDown]);
+	}, [handleWheel, handleKeyDown, isLocked]);
 
 	// Auto-play logic
 	useEffect(() => {
@@ -463,10 +468,8 @@ function GalleryScene({
 				const worldZ = plane.z - depthRange / 2;
 
 				// Calculate scale to maintain aspect ratio
-				const img = texture?.image as any;
-				const aspect = (img && typeof img === 'object' && 'width' in img && img.width) 
-					? img.width / img.height 
-					: 1;
+				const img = texture.image as any;
+				const aspect = img ? img.width / img.height : 1;
 				const scale: [number, number, number] =
 					aspect > 1 ? [2 * aspect, 2, 1] : [2, 2 / aspect, 1];
 
@@ -517,6 +520,7 @@ export default function InfiniteGallery({
 	images,
 	className = 'h-96 w-full',
 	style,
+	isLocked = true,
 	fadeSettings = {
 		fadeIn: { start: 0.05, end: 0.25 },
 		fadeOut: { start: 0.4, end: 0.43 },
@@ -559,6 +563,7 @@ export default function InfiniteGallery({
 			>
 				<GalleryScene
 					images={images}
+					isLocked={isLocked}
 					fadeSettings={fadeSettings}
 					blurSettings={blurSettings}
 				/>

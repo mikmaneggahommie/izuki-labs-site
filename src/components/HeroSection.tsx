@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import { assetPath } from "@/lib/asset-path";
 import InfiniteGallery from "@/components/ui/3d-gallery-photography";
 
@@ -14,13 +15,50 @@ const HERO_IMAGES = [
 ];
 
 export default function HeroSection() {
+  const [isLocked, setIsLocked] = useState(true);
+  const [virtualScroll, setVirtualScroll] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Threshold: How many scroll "ticks" before we unlock the page
+  const LOCK_THRESHOLD = 2000; 
+
+  useEffect(() => {
+    const handleGlobalWheel = (e: WheelEvent) => {
+      if (!isLocked) return;
+
+      // Only capture if we are at the top of the page
+      if (window.scrollY > 10) {
+        setIsLocked(false);
+        return;
+      }
+
+      // Accumulate virtual scroll
+      setVirtualScroll(prev => {
+        const next = prev + Math.abs(e.deltaY);
+        if (next > LOCK_THRESHOLD) {
+          setIsLocked(false);
+          return next;
+        }
+        return next;
+      });
+    };
+
+    window.addEventListener("wheel", handleGlobalWheel, { passive: false });
+    return () => window.removeEventListener("wheel", handleGlobalWheel);
+  }, [isLocked]);
+
   return (
-    <section id="top" className="relative h-screen w-full bg-black overflow-hidden z-0">
+    <section 
+      ref={containerRef}
+      id="top" 
+      className="relative h-screen w-full bg-black overflow-hidden z-0"
+    >
       <InfiniteGallery
         images={HERO_IMAGES.map(img => ({ ...img, src: assetPath(img.src) }))}
-        speed={1.0}
+        speed={1.2}
         zSpacing={3.5}
         visibleCount={7}
+        isLocked={isLocked}
         className="h-full w-full"
       />
       
@@ -31,10 +69,16 @@ export default function HeroSection() {
         </h1>
       </div>
 
-      <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none z-50">
+      <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none z-50 transition-opacity duration-500" style={{ opacity: isLocked ? 1 : 0 }}>
         <p className="font-mono uppercase text-[10px] tracking-widest text-white/40">
-          Orbiting the perimeter — Scroll results in motion
+          Capture Initiated — Scroll to reveal depth
         </p>
+        <div className="mt-2 h-1 w-24 mx-auto bg-white/5 overflow-hidden">
+          <div 
+            className="h-full bg-[#00FF00] transition-all duration-300" 
+            style={{ width: `${Math.min(100, (virtualScroll / LOCK_THRESHOLD) * 100)}%` }} 
+          />
+        </div>
       </div>
     </section>
   );
