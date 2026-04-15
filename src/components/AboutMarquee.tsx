@@ -2,13 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { ScrollReveal, ParallaxWrap } from "@/components/FancyText";
-
-const headingLines = [
-  "I build visual systems",
-  "that make brands feel",
-  "sharper, cleaner,",
-  "and harder to ignore.",
-];
+import { MagicText } from "@/components/ui/magic-text";
 
 const columns = [
   {
@@ -52,57 +46,24 @@ export default function AboutMarquee() {
 
     const runReveal = async () => {
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-      if (reducedMotion.matches || !sectionRef.current) {
-        return;
-      }
+      if (reducedMotion.matches || !sectionRef.current) return;
 
       const gsap = (await import("gsap")).default;
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      if (!active) {
-        return;
-      }
+      if (!active) return;
 
       gsap.registerPlugin(ScrollTrigger);
 
       const context = gsap.context(() => {
-        const headingLinesTargets =
-          sectionRef.current?.querySelectorAll("[data-about-line]");
-        const revealTargets =
-          sectionRef.current?.querySelectorAll("[data-about-reveal]");
-
-        if (headingLinesTargets?.length) {
-          gsap.fromTo(
-            headingLinesTargets,
-            { yPercent: 110, opacity: 0 },
-            {
-              yPercent: 0,
-              opacity: 1,
-              duration: 1,
-              stagger: 0.08,
-              ease: "expo.out",
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: "top 78%",
-              },
-            }
-          );
-        }
-
+        const revealTargets = sectionRef.current?.querySelectorAll("[data-about-reveal]");
         if (revealTargets?.length) {
           gsap.fromTo(
             revealTargets,
             { y: 52, opacity: 0, filter: "blur(12px)" },
             {
-              y: 0,
-              opacity: 1,
-              filter: "blur(0px)",
-              duration: 0.94,
-              stagger: 0.12,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: "top 74%",
-              },
+              y: 0, opacity: 1, filter: "blur(0px)",
+              duration: 0.94, stagger: 0.12, ease: "power3.out",
+              scrollTrigger: { trigger: sectionRef.current, start: "top 74%" },
             }
           );
         }
@@ -112,11 +73,7 @@ export default function AboutMarquee() {
     };
 
     void runReveal();
-
-    return () => {
-      active = false;
-      cleanup?.();
-    };
+    return () => { active = false; cleanup?.(); };
   }, []);
 
   return (
@@ -131,15 +88,11 @@ export default function AboutMarquee() {
               </div>
             </ScrollReveal>
 
-            <h2 className="max-w-[18ch] text-[clamp(36px,6vw,96px)] font-black leading-[1.05] tracking-[-0.04em] text-white">
-              {headingLines.map((line) => (
-                <span key={line} className="block overflow-hidden">
-                  <span className="block" data-about-line>
-                    {line}
-                  </span>
-                </span>
-              ))}
-            </h2>
+            {/* MagicText — scroll-based word reveal */}
+            <MagicText
+              text="I build visual systems that make brands feel sharper, cleaner, and harder to ignore."
+              className="text-[clamp(32px,5.5vw,80px)] font-black leading-[1.05] tracking-[-0.04em] text-white"
+            />
           </div>
 
           <ScrollReveal delay={0.3}>

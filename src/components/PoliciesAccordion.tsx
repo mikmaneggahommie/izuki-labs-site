@@ -42,7 +42,6 @@ export default function PoliciesAccordion() {
             </div>
 
             <h2 className="display-title">How It Works</h2>
-            <span className="accent-square mt-4" aria-hidden />
           </div>
         </ScrollReveal>
 

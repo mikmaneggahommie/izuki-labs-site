@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useRef } from "react";
 import { assetPath } from "@/lib/asset-path";
 import InfiniteGallery from "@/components/ui/3d-gallery-photography";
+import { VelocityRow } from "@/components/ui/scroll-velocity";
 
 const HERO_IMAGES = [
   { src: "/images/7.jpg", alt: "Izuki Portfolio 7" },
@@ -15,43 +16,12 @@ const HERO_IMAGES = [
 ];
 
 export default function HeroSection() {
-  const [isLocked, setIsLocked] = useState(true);
-  const [virtualScroll, setVirtualScroll] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Threshold: How many scroll "ticks" before we unlock the page
-  const LOCK_THRESHOLD = 2000; 
-
-  useEffect(() => {
-    // Once unlocked, never re-lock (prevents infinite scroll trap from menu)
-    if (!isLocked) return;
-
-    const handleGlobalWheel = (e: WheelEvent) => {
-      // Only capture if we are at the top of the page
-      if (window.scrollY > 10) {
-        setIsLocked(false);
-        return;
-      }
-
-      // Accumulate virtual scroll
-      setVirtualScroll(prev => {
-        const next = prev + Math.abs(e.deltaY);
-        if (next > LOCK_THRESHOLD) {
-          setIsLocked(false);
-          return next;
-        }
-        return next;
-      });
-    };
-
-    window.addEventListener("wheel", handleGlobalWheel, { passive: false });
-    return () => window.removeEventListener("wheel", handleGlobalWheel);
-  }, [isLocked]);
-
   return (
-    <section 
+    <section
       ref={containerRef}
-      id="top" 
+      id="top"
       className="relative h-screen w-full bg-black overflow-hidden z-0"
     >
       <InfiniteGallery
@@ -59,19 +29,21 @@ export default function HeroSection() {
         speed={1.2}
         zSpacing={3.5}
         visibleCount={7}
-        isLocked={isLocked}
+        isLocked={false}
         className="h-full w-full"
       />
-      
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center text-center px-4 mix-blend-exclusion text-white z-50">
-        <h1 className="font-serif text-6xl md:text-9xl tracking-tighter uppercase font-black">
-          <span className="block opacity-90 italic">IZUKI</span>
-          <span className="block -mt-4 md:-mt-8">LABS</span>
-        </h1>
+
+      {/* IZUKI.LABS — edge-to-edge velocity scroll */}
+      <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-50 mix-blend-exclusion">
+        <VelocityRow baseVelocity={-3} className="pointer-events-none">
+          <span className="text-[20vw] font-black tracking-[-0.04em] text-white whitespace-nowrap px-[0.15em] leading-[0.85]">
+            IZUKI<span className="text-[#E50000]">.</span>LABS
+          </span>
+        </VelocityRow>
       </div>
 
       {/* Subtle scroll hint */}
-      <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none z-50 transition-opacity duration-500" style={{ opacity: isLocked ? 1 : 0 }}>
+      <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none z-50">
         <p className="font-mono uppercase text-[10px] tracking-widest text-white/30">
           Scroll to explore
         </p>

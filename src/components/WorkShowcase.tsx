@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { ScrollReveal } from "@/components/FancyText";
+import { VelocityRow } from "@/components/ui/scroll-velocity";
 
 import { assetPath } from "@/lib/asset-path";
 
@@ -53,39 +53,25 @@ export default function WorkShowcase() {
 
     const runReveal = async () => {
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-      if (reducedMotion.matches || !sectionRef.current) {
-        return;
-      }
+      if (reducedMotion.matches || !sectionRef.current) return;
 
       const gsap = (await import("gsap")).default;
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      if (!active) {
-        return;
-      }
+      if (!active) return;
 
       gsap.registerPlugin(ScrollTrigger);
 
       const context = gsap.context(() => {
-        const revealTargets =
-          sectionRef.current?.querySelectorAll("[data-work-reveal]");
-        if (!revealTargets?.length) {
-          return;
-        }
+        const revealTargets = sectionRef.current?.querySelectorAll("[data-work-reveal]");
+        if (!revealTargets?.length) return;
 
         gsap.fromTo(
           revealTargets,
           { y: 48, opacity: 0, filter: "blur(10px)" },
           {
-            y: 0,
-            opacity: 1,
-            filter: "blur(0px)",
-            duration: 0.9,
-            stagger: 0.12,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 78%",
-            },
+            y: 0, opacity: 1, filter: "blur(0px)",
+            duration: 0.9, stagger: 0.12, ease: "power3.out",
+            scrollTrigger: { trigger: sectionRef.current, start: "top 78%" },
           }
         );
       }, sectionRef);
@@ -94,25 +80,26 @@ export default function WorkShowcase() {
     };
 
     runReveal();
-
-    return () => {
-      active = false;
-      cleanup?.();
-    };
+    return () => { active = false; cleanup?.(); };
   }, []);
 
   return (
     <section ref={sectionRef} id="work" className="section-shell">
+      {/* Edge-to-edge velocity title */}
+      <div className="overflow-hidden mb-12 md:mb-16">
+        <VelocityRow baseVelocity={-2}>
+          <span className="text-[clamp(64px,12vw,180px)] font-black tracking-[-0.05em] text-white uppercase whitespace-nowrap px-[0.2em] leading-[0.85]">
+            Works
+          </span>
+        </VelocityRow>
+      </div>
+
       <div className="content-shell">
         <div
           data-work-reveal
           className="grid gap-10 border-b border-white/10 pb-12 md:grid-cols-[minmax(0,1fr)_minmax(280px,400px)] md:items-end"
         >
-          <div className="space-y-5">
-            <h2 className="display-title">Featured Brands</h2>
-            <span className="accent-square mt-3" aria-hidden />
-          </div>
-
+          <div />
           <p className="body-copy max-w-[36ch] md:justify-self-end">
             Social media accounts I designed, managed, and grew from the ground up.
           </p>
@@ -139,37 +126,27 @@ export default function WorkShowcase() {
                       className="object-cover"
                     />
                   </div>
-
                   <div className="space-y-1">
-                    <p className="text-[22px] font-bold tracking-[-0.03em] text-white">
-                      {account.name}
-                    </p>
-                    <p className="text-sm font-medium text-white/50">
-                      {account.handle}
-                    </p>
+                    <p className="text-[22px] font-bold tracking-[-0.03em] text-white">{account.name}</p>
+                    <p className="text-sm font-medium text-white/50">{account.handle}</p>
                   </div>
                 </div>
-
                 <ArrowUpRight className="h-5 w-5 text-white/40 transition-colors group-hover:text-[var(--accent)]" />
               </div>
 
               <div className="flex items-center justify-between gap-4 border-y border-white/8 py-4 text-sm">
-                <span className="font-medium uppercase tracking-[0.15em] text-white/35">
-                  Instagram
-                </span>
-                <span className="font-medium text-white/75">
-                  {account.followers}
-                </span>
+                <span className="font-medium uppercase tracking-[0.15em] text-white/35">Instagram</span>
+                <span className="font-medium text-white/75">{account.followers}</span>
               </div>
 
               <p className="body-copy">{account.summary}</p>
 
               <div className="grid grid-cols-3 gap-4">
-                {account.previews.map((preview, previewIndex) => (
-                  <div key={`${account.handle}-${previewIndex}`} className="work-preview">
+                {account.previews.map((preview, idx) => (
+                  <div key={`${account.handle}-${idx}`} className="work-preview">
                     <Image
                       src={assetPath(preview)}
-                      alt={`${account.name} preview ${previewIndex + 1}`}
+                      alt={`${account.name} preview ${idx + 1}`}
                       fill
                       sizes="(max-width: 1023px) 30vw, 150px"
                       className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"

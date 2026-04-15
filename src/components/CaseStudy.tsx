@@ -21,39 +21,25 @@ export default function CaseStudy() {
 
     const runReveal = async () => {
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-      if (reducedMotion.matches || !sectionRef.current) {
-        return;
-      }
+      if (reducedMotion.matches || !sectionRef.current) return;
 
       const gsap = (await import("gsap")).default;
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      if (!active) {
-        return;
-      }
+      if (!active) return;
 
       gsap.registerPlugin(ScrollTrigger);
 
       const context = gsap.context(() => {
-        const revealTargets =
-          sectionRef.current?.querySelectorAll("[data-case-reveal]");
-        if (!revealTargets?.length) {
-          return;
-        }
+        const revealTargets = sectionRef.current?.querySelectorAll("[data-case-reveal]");
+        if (!revealTargets?.length) return;
 
         gsap.fromTo(
           revealTargets,
           { y: 48, opacity: 0, filter: "blur(12px)" },
           {
-            y: 0,
-            opacity: 1,
-            filter: "blur(0px)",
-            duration: 0.94,
-            stagger: 0.12,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 78%",
-            },
+            y: 0, opacity: 1, filter: "blur(0px)",
+            duration: 0.94, stagger: 0.12, ease: "power3.out",
+            scrollTrigger: { trigger: sectionRef.current, start: "top 78%" },
           }
         );
       }, sectionRef);
@@ -62,18 +48,11 @@ export default function CaseStudy() {
     };
 
     void runReveal();
-
-    return () => {
-      active = false;
-      cleanup?.();
-    };
+    return () => { active = false; cleanup?.(); };
   }, []);
 
   const updateSlider = (clientX: number) => {
-    if (!containerRef.current) {
-      return;
-    }
-
+    if (!containerRef.current) return;
     const bounds = containerRef.current.getBoundingClientRect();
     const clamped = Math.max(0, Math.min(clientX - bounds.left, bounds.width));
     sliderX.set((clamped / bounds.width) * 100);
@@ -89,11 +68,10 @@ export default function CaseStudy() {
           <div className="space-y-6">
             <div className="section-label-row">
               <span className="accent-square accent-square--tiny" aria-hidden />
-              <span className="section-label">Design Spotlight</span>
+              <span className="section-label">Before &amp; After</span>
             </div>
 
-            <h2 className="display-title">This Month&apos;s Highlight</h2>
-            <span className="accent-square mt-3" aria-hidden />
+            <h2 className="display-title">Recent Transformation</h2>
           </div>
 
           <ScrollReveal delay={0.2}>
@@ -108,41 +86,41 @@ export default function CaseStudy() {
           <div className="flex justify-center">
             <div
               ref={containerRef}
-              className="relative w-full max-w-[430px] overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_28px_90px_rgba(0,0,0,0.42)]"
+              className="relative w-full max-w-[480px] overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_28px_90px_rgba(0,0,0,0.42)]"
               onPointerDown={(event) => {
                 setDragging(true);
                 updateSlider(event.clientX);
               }}
               onPointerMove={(event) => {
-                if (dragging) {
-                  updateSlider(event.clientX);
-                }
+                if (dragging) updateSlider(event.clientX);
               }}
               onPointerUp={() => setDragging(false)}
               onPointerLeave={() => setDragging(false)}
               style={{ touchAction: "none" }}
             >
-              {/* Before image — natural aspect ratio, no crop */}
+              {/* Before image — full resolution, no crop */}
               <div className="relative w-full">
                 <Image
                   src={assetPath("/images/case-study/before.jpg")}
                   alt="Before design"
-                  width={430}
-                  height={764}
+                  width={480}
+                  height={854}
                   className="block w-full h-auto grayscale"
-                  sizes="(max-width: 767px) 84vw, 430px"
+                  sizes="(max-width: 767px) 90vw, 480px"
+                  priority
                 />
               </div>
 
-              {/* After image — absolute overlay with clip */}
+              {/* After image — absolute overlay clipped */}
               <motion.div className="absolute inset-0" style={{ clipPath }}>
                 <Image
                   src={assetPath("/images/case-study/after.jpg")}
                   alt="After design"
-                  width={430}
-                  height={764}
+                  width={480}
+                  height={854}
                   className="block w-full h-auto"
-                  sizes="(max-width: 767px) 84vw, 430px"
+                  sizes="(max-width: 767px) 90vw, 480px"
+                  priority
                 />
               </motion.div>
 
@@ -188,13 +166,11 @@ export default function CaseStudy() {
                 The original campaign needed stronger hierarchy, sharper
                 messaging, and a more immediate sense of urgency for the launch.
               </p>
-
               <p className="body-copy">
                 I rebuilt the visual system for a vertical-first format, tightened
                 the spacing, lifted contrast, and reorganized the information so
                 it could stop the scroll faster.
               </p>
-
               <p className="text-[18px] font-semibold leading-[1.7] text-white">
                 The result is a cleaner campaign with better focus, stronger
                 momentum, and a more premium registration push.

@@ -74,7 +74,7 @@ export default function ContactFooter() {
                 <span className="section-label">Start A Project</span>
               </div>
 
-              <h2 className="display-title max-w-[10ch]">
+              <h2 className="display-title">
                 <TypewriterText text="Write to me." speed={80} />
               </h2>
             </div>

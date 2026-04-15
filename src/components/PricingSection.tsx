@@ -174,11 +174,10 @@ export default function PricingSection() {
           <div className="space-y-6">
             <div className="section-label-row">
               <span className="accent-square accent-square--tiny" aria-hidden />
-              <span className="section-label">Retainer Packages</span>
+              <span className="section-label">Pricing</span>
             </div>
 
             <h2 className="display-title">Pricing</h2>
-            <span className="accent-square mt-3" aria-hidden />
           </div>
 
           <p className="body-copy max-w-[34ch] lg:justify-self-end">
