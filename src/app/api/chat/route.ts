@@ -26,14 +26,24 @@ export async function POST(req: Request) {
       { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
     ];
 
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      safetySettings 
-    });
+    const modelIds = [
+      "gemini-1.5-flash",
+      "gemini-1.5-flash-001",
+      "gemini-1.5-flash-002",
+      "gemini-1.5-pro",
+      "gemini-1.0-pro"
+    ];
 
-    const lastMessage = messages[messages.length - 1]?.content ?? "";
+    let result;
+    let successModel = "";
 
-    const systemPrompt = `${studioSystemPrompt}
+    for (const modelId of modelIds) {
+      try {
+        console.log(`Trying model: ${modelId}`);
+        const model = genAI.getGenerativeModel({ model: modelId, safetySettings });
+        const lastMessage = messages[messages.length - 1]?.content ?? "";
+
+        const systemPrompt = `${studioSystemPrompt}
 
 Known visitor details:
 - Name: ${userInfo?.name || "Unknown"}
@@ -41,25 +51,37 @@ Known visitor details:
 - Email: ${userInfo?.email || "Unknown"}
 `.trim();
 
-    console.log("Initing chat with model: gemini-1.5-flash-latest (safety: BLOCK_NONE)");
+        const conversationHistory = messages.slice(0, -1).map((msg) => ({
+          role: msg.role === "assistant" ? "model" : "user",
+          parts: [{ text: msg.content }],
+        }));
 
-    const conversationHistory = messages.slice(0, -1).map((msg) => ({
-      role: msg.role === "assistant" ? "model" : "user",
-      parts: [{ text: msg.content }],
-    }));
+        const chat = model.startChat({
+          history: [
+            { role: "user", parts: [{ text: systemPrompt }] },
+            {
+              role: "model",
+              parts: [{ text: "Understood. I am now acting as the interactive assistant for the izuki.labs website." }],
+            },
+            ...conversationHistory,
+          ],
+        });
 
-    const chat = model.startChat({
-      history: [
-        { role: "user", parts: [{ text: systemPrompt }] },
-        {
-          role: "model",
-          parts: [{ text: "Understood. I am now acting as the interactive assistant for the izuki.labs website." }],
-        },
-        ...conversationHistory,
-      ],
-    });
+        result = await chat.sendMessageStream(lastMessage);
+        successModel = modelId;
+        break; // Success!
+      } catch (err) {
+        console.error(`Model ${modelId} failed:`, err);
+        continue; // Try next move
+      }
+    }
 
-    const result = await chat.sendMessageStream(lastMessage);
+    if (!result) {
+      throw new Error("All model IDs failed to initialize. Check API key permissions.");
+    }
+
+    console.log(`Successfully connected using model: ${successModel}`);
+
 
     const encoder = new TextEncoder();
     const stream = new ReadableStream({

@@ -39,11 +39,11 @@ export default function HeroSection() {
         tl?.kill();
 
         // 1. INITIAL SETUP
-        // Anchor point is top: 50%, left: 70% as requested by User
+        // Fixed Anchor point: Absolute dead center (top: 50%, left: 50%)
         gsap.set(cards, {
           position: "absolute",
           top: "50%",
-          left: "70%",
+          left: "50%",
           xPercent: -50,
           yPercent: -50,
           x: 0,
