@@ -12,8 +12,8 @@
   --line-strong: rgba(255, 255, 255, 0.16);
   --radius: 12px;
   --accent: #FF0000;
+  --accent: #FF0000;
   --accent-foreground: #FFFFFF;
-  --accent-soft: rgba(255, 0, 0, 0.1);
   --container: 1400px;
   --section-padding-y: clamp(8.5rem, 12vw, 12rem);
   --section-padding-x: max(5vw, 1.25rem);
