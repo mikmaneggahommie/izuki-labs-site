@@ -68,28 +68,23 @@ export default function HeroSection() {
         
         const n = cardsA.length;
 
-        // Fanning distance (spreads to corners safely)
-        const stepX = (stageW * 0.85) / (n - 1);
-        const stepY = (stageH * 0.85) / (n - 1);
-
-        // Mathematical offset to push exactly out of frame seamlessly
-        const pushX = n * stepX;
-        const pushY = n * stepY;
-
-        return { stepX, stepY, pushX, pushY };
-      };
-
       // Math Helpers
-      // Isometric tight stack logic: The front card (i=5) is exactly at 0,0. 
-      // The cards behind it shift Top-Left slightly to create depth visually!
-      const stackStepX = 14; 
-      const stackStepY = 14;
-      const getStackX = (i: number) => (i - (cardsA.length - 1)) * -stackStepX;
-      const getStackY = (i: number) => (i - (cardsA.length - 1)) * -stackStepY;
+      // Perfect zero-offset stack logic: The cards perfectly overlap during consolidation
+      // so it looks like a single card.
+      const getStackX = (i: number) => 0;
+      const getStackY = (i: number) => 0;
 
       // Fanned state logic: Perfectly spread across the screen
-      const getFanX = (i: number, stepX: number) => (i - (cardsA.length - 1) / 2) * stepX;
-      const getFanY = (i: number, stepY: number) => (i - (cardsA.length - 1) / 2) * stepY;
+      // Reduced spread to 70% so they do NOT push off the screen edge
+      const stepSpreadX = (stageW * 0.70) / (cardsA.length - 1);
+      const stepSpreadY = (stageH * 0.70) / (cardsA.length - 1);
+      
+      const getFanX = (i: number) => (i - (cardsA.length - 1) / 2) * stepSpreadX;
+      const getFanY = (i: number) => (i - (cardsA.length - 1) / 2) * stepSpreadY;
+
+      // Mathematical offset to push exactly out of frame seamlessly
+      const pushX = cardsA.length * stepSpreadX;
+      const pushY = cardsA.length * stepSpreadY;
 
       const buildTimeline = () => {
         tl?.kill();
@@ -114,21 +109,21 @@ export default function HeroSection() {
 
         // ─── INITIAL STATE ───
         
-        // Group A: Start ISOMETRICALLY STACKED. Z-Index 10.
+        // Group A: Start PERFECTLY STACKED. Z-Index 10.
         gsap.set(cardsA, { x: getStackX, y: getStackY });
         gsap.set(wrapA, { x: 0, y: 0, zIndex: 10, autoAlpha: 1 });
 
         // Group B: Prepared offscreen (Top-Left), already FANNED!
         gsap.set(cardsB, { 
-          x: (i) => getFanX(i, m.stepX), 
-          y: (i) => getFanY(i, m.stepY)
+          x: getFanX, 
+          y: getFanY
         });
-        gsap.set(wrapB, { x: -m.pushX, y: -m.pushY, zIndex: 5, autoAlpha: 1 });
+        gsap.set(wrapB, { x: -pushX, y: -pushY, zIndex: 5, autoAlpha: 1 });
 
         tl = gsap.timeline({ repeat: -1 });
 
         // Admire the starting stack
-        tl.to({}, { duration: T_STACK_HOLD }); 
+        tl.to({}, { duration: 1.5 }); 
 
         /* ═══════════════════════════════════
            CYCLE A → B
@@ -137,51 +132,51 @@ export default function HeroSection() {
         // 1. FAN OUT BURST (Explode from the pack)
         tl.addLabel("unstack-a")
           .to(cardsA, {
-            x: (i) => getFanX(i, m.stepX),
-            y: (i) => getFanY(i, m.stepY),
-            duration: T_UNSTACK,
+            x: getFanX,
+            y: getFanY,
+            duration: 1.2,
             ease: "expo.out",
             stagger: { each: 0.04, from: "end" } // Front cards fly out first
           }, "unstack-a");
 
-        tl.to({}, { duration: T_PRE_HOLD });
+        tl.to({}, { duration: 0.8 }); // Pause before first step
 
-        // 2. CONVEYOR BELT FLOAT (The smooth continuous river)
-        // Group A continuously pushes to Bottom-Right while B beautifully trails it from Top-Left
-        tl.addLabel("push-a")
-          .to(wrapA, {
-            x: m.pushX, 
-            y: m.pushY,
-            duration: T_PUSH,
-            ease: "none" // Linear perfectly matches "conveying one by one"
-          }, "push-a")
-          .to(wrapB, {
-            x: 0,       
-            y: 0,
-            duration: T_PUSH,
-            ease: "none"
-          }, "push-a");
+        // 2. CONVEYOR BELT (Step-by-step sequential shifting)
+        for(let step = 1; step <= cardsA.length; step++) {
+           const curX = step * stepSpreadX;
+           const curY = step * stepSpreadY;
+           const label = `push-a-${step}`;
+           
+           tl.addLabel(label)
+             .to(wrapA, { x: curX, y: curY, duration: 0.6, ease: "power2.inOut" }, label)
+             .to(wrapB, { x: curX - pushX, y: curY - pushY, duration: 0.6, ease: "power2.inOut" }, label);
+           
+           tl.to({}, { duration: 0.8 }); // The decisive pause you requested between EACH card
+        }
+
+        // HIDE Group A immediately before snap, killing any ghost edge cards!
+        tl.set(wrapA, { autoAlpha: 0 });
 
         // 3. CONSOLIDATE B (Snap perfectly back to center stack)
         tl.addLabel("snap-b")
           .to(cardsB, {
             x: getStackX,
             y: getStackY,
-            duration: T_SNAP,
+            duration: 1.2,
             ease: "expo.inOut",
             stagger: { each: 0.04, from: "start" } // Snaps from the back into the stack
           }, "snap-b");
 
-        // Admire the finished B stack
-        tl.to({}, { duration: T_STACK_HOLD });
+        // Admire the finished B stack cleanly centered
+        tl.to({}, { duration: 1.5 });
 
         // 5. HIDDEN RESET & Z-INDEX SWAP
         tl.call(() => {
           gsap.set(wrapB, { zIndex: 10 }); // Center becomes leader
-          gsap.set(wrapA, { zIndex: 5, x: -m.pushX, y: -m.pushY }); // Prepare A top-left
+          gsap.set(wrapA, { zIndex: 5, x: -pushX, y: -pushY, autoAlpha: 1 }); // Prepare A top-left cleanly
           gsap.set(cardsA, { 
-            x: (i) => getFanX(i, m.stepX), 
-            y: (i) => getFanY(i, m.stepY)
+            x: getFanX, 
+            y: getFanY
           });
         });
 
@@ -191,46 +186,48 @@ export default function HeroSection() {
 
         tl.addLabel("unstack-b")
           .to(cardsB, {
-            x: (i) => getFanX(i, m.stepX),
-            y: (i) => getFanY(i, m.stepY),
-            duration: T_UNSTACK,
+            x: getFanX,
+            y: getFanY,
+            duration: 1.2,
             ease: "expo.out",
             stagger: { each: 0.04, from: "end" }
           }, "unstack-b");
 
-        tl.to({}, { duration: T_PRE_HOLD });
+        tl.to({}, { duration: 0.8 }); // Pause before first step
 
-        tl.addLabel("push-b")
-          .to(wrapB, {
-            x: m.pushX,
-            y: m.pushY,
-            duration: T_PUSH,
-            ease: "none"
-          }, "push-b")
-          .to(wrapA, {
-            x: 0,
-            y: 0,
-            duration: T_PUSH,
-            ease: "none"
-          }, "push-b");
+        // CONVEYOR BELT B (Step-by-step)
+        for(let step = 1; step <= cardsB.length; step++) {
+           const curX = step * stepSpreadX;
+           const curY = step * stepSpreadY;
+           const label = `push-b-${step}`;
+           
+           tl.addLabel(label)
+             .to(wrapB, { x: curX, y: curY, duration: 0.6, ease: "power2.inOut" }, label)
+             .to(wrapA, { x: curX - pushX, y: curY - pushY, duration: 0.6, ease: "power2.inOut" }, label);
+           
+           tl.to({}, { duration: 0.8 }); // The decisive pause
+        }
+
+        // HIDE Group B immediately before snap
+        tl.set(wrapB, { autoAlpha: 0 });
 
         tl.addLabel("snap-a")
           .to(cardsA, {
             x: getStackX,
             y: getStackY,
-            duration: T_SNAP,
+            duration: 1.2,
             ease: "expo.inOut",
             stagger: { each: 0.04, from: "start" }
           }, "snap-a");
 
-        tl.to({}, { duration: T_STACK_HOLD });
+        tl.to({}, { duration: 1.5 });
 
         tl.call(() => {
           gsap.set(wrapA, { zIndex: 10 });
-          gsap.set(wrapB, { zIndex: 5, x: -m.pushX, y: -m.pushY });
+          gsap.set(wrapB, { zIndex: 5, x: -pushX, y: -pushY, autoAlpha: 1 });
           gsap.set(cardsB, { 
-            x: (i) => getFanX(i, m.stepX), 
-            y: (i) => getFanY(i, m.stepY)
+            x: getFanX, 
+            y: getFanY
           });
         });
       };
