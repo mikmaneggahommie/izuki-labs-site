@@ -1,8 +1,7 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useRef } from "react";
 import { assetPath } from "@/lib/asset-path";
+import InfiniteGallery from "@/components/ui/3d-gallery-photography";
 
 const HERO_IMAGES = [
   { src: "/images/7.jpg", alt: "Izuki Portfolio 7" },
@@ -15,147 +14,27 @@ const HERO_IMAGES = [
 ];
 
 export default function HeroSection() {
-  const stageRef = useRef<HTMLDivElement>(null);
-  const unitRef = useRef<HTMLDivElement>(null);
-  const projectIdxRef = useRef(0);
-
-  useEffect(() => {
-    let alive = true;
-    let tl: gsap.core.Timeline | undefined;
-
-    const boot = async () => {
-      const gsap = (await import("gsap")).default;
-      if (!alive || !unitRef.current) return;
-
-      const cards = Array.from(unitRef.current.querySelectorAll<HTMLElement>(".hero-card"));
-      if (cards.length === 0) return;
-
-      const totalImages = HERO_IMAGES.length;
-
-      const buildLoop = () => {
-        tl?.kill();
-        
-        // Initial Reset
-        gsap.set(cards, {
-          x: 0,
-          y: 0,
-          scale: 1,
-          autoAlpha: 0,
-          zIndex: 10,
-          rotation: 0
-        });
-
-        tl = gsap.timeline({ repeat: -1 });
-
-        // THE PIVOT LOOP
-        const runCycle = () => {
-          const leadIdx = projectIdxRef.current % cards.length;
-          const leadCard = cards[leadIdx];
-          const otherCards = cards.filter((item, i) => i !== leadIdx);
-          
-          const cycleTl = gsap.timeline();
-
-          // PHASE A: The Resting Spotlight (2.5s Hold)
-          cycleTl.set(cards, { zIndex: 10, autoAlpha: 0 });
-          cycleTl.set(leadCard, { zIndex: 100, autoAlpha: 1, x: 0, y: 0 });
-          
-          cycleTl.to({}, { duration: 2.5 }); 
-
-          // PHASE B: The Diagonal Burst (1.0s Duration)
-          cycleTl.addLabel("burst");
-          
-          const tlGroup = otherCards.slice(0, Math.ceil(otherCards.length / 2));
-          const brGroup = otherCards.slice(Math.ceil(otherCards.length / 2));
-
-          cycleTl.set(otherCards, { autoAlpha: 1 }, "burst");
-          
-          cycleTl.to(tlGroup, {
-            x: (i) => -(i + 1) * 280,
-            y: (i) => -(i + 1) * 220,
-            rotation: (i) => -(i + 1) * 5,
-            duration: 1.0,
-            ease: "expo.out",
-            stagger: { amount: 0.1, from: "start" }
-          }, "burst");
-
-          cycleTl.to(brGroup, {
-            x: (i) => (i + 1) * 280,
-            y: (i) => (i + 1) * 220,
-            rotation: (i) => (i + 1) * 5,
-            duration: 1.0,
-            ease: "expo.out",
-            stagger: { amount: 0.1, from: "start" }
-          }, "burst");
-
-          cycleTl.to({}, { duration: 0.4 });
-
-          // PHASE C: The High-Velocity Snap (0.5s Duration)
-          cycleTl.addLabel("snap");
-          cycleTl.to(otherCards, {
-            x: 0,
-            y: 0,
-            rotation: 0,
-            duration: 0.5,
-            ease: "expo.in",
-            onComplete: () => {
-              projectIdxRef.current = (projectIdxRef.current + 1) % totalImages;
-            }
-          }, "snap");
-
-          return cycleTl;
-        };
-
-        for (let i = 0; i < cards.length; i++) {
-          tl.add(runCycle());
-        }
-      };
-
-      buildLoop();
-    };
-
-    boot();
-    return () => { 
-      alive = false; 
-      tl?.kill();
-    };
-  }, []);
-
   return (
-    <section id="top" className="section-shell hero-shell z-0 relative h-screen w-full overflow-hidden bg-black">
-      <div className="content-shell hero-viewport relative min-h-screen">
-        <div className="hero-copy absolute left-8 bottom-8 z-10 w-full max-w-lg">
-          <h1 className="hero-wordmark" aria-label="Izuki Labs">
-            <span className="hero-wordmark-line flex items-center">
-              <span className="font-[family-name:var(--font-neue-haas-display)] text-6xl md:text-9xl tracking-tighter uppercase font-black text-white">IZUKI</span>
-              <span className="ml-[0.05em] h-[0.12em] w-[0.12em] bg-[#FF0000] mt-[0.3em]" aria-hidden />
-            </span>
-            <span className="hero-wordmark-line block font-[family-name:var(--font-neue-haas-display)] text-6xl md:text-9xl tracking-tighter uppercase font-black text-white">LABS</span>
-          </h1>
-        </div>
+    <section id="top" className="relative h-screen w-full bg-black overflow-hidden z-0">
+      <InfiniteGallery
+        images={HERO_IMAGES.map(img => ({ ...img, src: assetPath(img.src) }))}
+        speed={1.0}
+        zSpacing={3.5}
+        visibleCount={7}
+        className="h-full w-full"
+      />
+      
+      <div className="absolute inset-0 pointer-events-none flex items-center justify-center text-center px-4 mix-blend-exclusion text-white z-50">
+        <h1 className="font-serif text-6xl md:text-9xl tracking-tighter uppercase font-black">
+          <span className="block opacity-90 italic">IZUKI</span>
+          <span className="block -mt-4 md:-mt-8">LABS</span>
+        </h1>
+      </div>
 
-        <div
-          ref={stageRef}
-          className="hero-stage absolute inset-0 flex items-center justify-center pointer-events-none"
-        >
-          <div ref={unitRef} className="hero-unit relative w-[320px] h-[450px] md:w-[420px] md:h-[600px] flex items-center justify-center">
-            {HERO_IMAGES.map((item, i) => (
-              <article
-                key={i}
-                className="hero-card absolute inset-0"
-                style={{ zIndex: 10 - i }}
-              >
-                <Image
-                  src={assetPath(item.src)}
-                  alt={item.alt}
-                  fill
-                  priority={i < 2}
-                  className="hero-card-image object-cover border-[1px] border-white/10"
-                  sizes="(max-width: 768px) 100vw, 420px"
-                />
-              </article>
-            ))}
-          </div>
-        </div>
+      <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none z-50">
+        <p className="font-mono uppercase text-[10px] tracking-widest text-white/40">
+          Orbiting the perimeter — Scroll results in motion
+        </p>
       </div>
     </section>
   );
