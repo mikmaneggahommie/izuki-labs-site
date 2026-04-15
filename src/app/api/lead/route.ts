@@ -18,21 +18,20 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1. Log to Google Sheets via Composio API (v3.1)
+    // 1. Log to Google Sheets via Stable Composio v1 API
     const COMPOSIO_API_KEY = process.env.COMPOSIO_API_KEY;
     const SPREADSHEET_ID = "1DgP1WdGULNf2RMJ1QZPpv9M3yKD_BhLSIct5F_JQHvw";
     
     if (COMPOSIO_API_KEY) {
       try {
-        const sheetResponse = await fetch(`https://backend.composio.dev/api/v3.1/tools/execute/GOOGLESHEETS_SPREADSHEETS_VALUES_APPEND`, {
+        const sheetResponse = await fetch(`https://api.composio.dev/v1/actions/execute/googlesheets_spreadsheets_values_append`, {
           method: "POST",
           headers: { 
             "x-api-key": COMPOSIO_API_KEY,
             "Content-Type": "application/json" 
           },
           body: JSON.stringify({
-            user_id: "default",
-            arguments: {
+            data: {
               spreadsheetId: SPREADSHEET_ID,
               range: "Sheet1!A:E",
               valueInputOption: "USER_ENTERED",
@@ -43,7 +42,7 @@ export async function POST(req: Request) {
 
         if (!sheetResponse.ok) {
           const errorData = await sheetResponse.text();
-          console.error("Composio API Error Payload:", errorData);
+          console.error("Composio Stable V1 Error:", errorData);
           throw new Error(`Composio Error: ${sheetResponse.status}`);
         }
       } catch (sheetErr) {

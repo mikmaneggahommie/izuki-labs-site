@@ -50,8 +50,13 @@ export default function ChatBubble() {
 
   // Validation Patterns
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const validatePhone = (phone: string) => /^(\+251|0)?[97]\d{8}$/.test(phone.replace(/\s/g, ""));
+  const validatePhone = (phone: string) => {
+    const clean = phone.replace(/[\s\-\(\)]/g, "");
+    return /^\+?\d{7,15}$/.test(clean);
+  };
   const validateTelegram = (tg: string) => /^@?[a-zA-Z0-9_]{5,32}$/.test(tg);
+
+  const normalizeTelegram = (tg: string) => tg.startsWith("@") ? tg : "@" + tg;
 
   // Persistence: Load
   useEffect(() => {
@@ -128,7 +133,7 @@ export default function ChatBubble() {
   const handleLeadStep = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    const val = leadStepInput.trim();
+    let val = leadStepInput.trim();
     if (!val) return;
 
     if (flowState === "COLLECTING_NAME") {
@@ -144,15 +149,16 @@ export default function ChatBubble() {
     } else if (flowState === "COLLECTING_CONTACT") {
       const isTelegram = val.startsWith("@") || !/^\d/.test(val);
       if (isTelegram && !validateTelegram(val)) {
-        setError("Invalid Telegram handle. Use @username.");
+        setError("Invalid Telegram format.");
         return;
       }
       if (!isTelegram && !validatePhone(val)) {
-        setError("Valid formats: 09... or +251...");
+        setError("Invalid phone number.");
         return;
       }
       
-      const newData = { ...formData, [isTelegram ? "telegram" : "phone"]: val };
+      const normalizedValue = isTelegram ? normalizeTelegram(val) : val.replace(/[\s\-\(\)]/g, "");
+      const newData = { ...formData, [isTelegram ? "telegram" : "phone"]: normalizedValue };
       setFormData(newData);
       setMessages(prev => [...prev, { role: "user", content: val }]);
       appendAssistantMessage("Perfect. Lastly, your email for the custom proposal?");
@@ -215,7 +221,7 @@ export default function ChatBubble() {
           return newMessages;
         });
 
-        // AI Extraction Armor V2
+        // AI Extraction Armor V3
         if (assistantContent.includes("@@@INFO_EXTRACTED@@@")) {
           const parts = assistantContent.split("@@@INFO_EXTRACTED@@@");
           const jsonStr = parts[1]?.trim();
@@ -225,11 +231,10 @@ export default function ChatBubble() {
               const rawData = JSON.parse(jsonStr);
               const cleanData: UserInfo = {};
               
-              // Only keep valid data from AI extraction
               if (rawData.name && rawData.name.length > 2) cleanData.name = rawData.name;
               if (rawData.email && validateEmail(rawData.email)) cleanData.email = rawData.email;
-              if (rawData.phone && validatePhone(rawData.phone)) cleanData.phone = rawData.phone;
-              if (rawData.telegram && validateTelegram(rawData.telegram)) cleanData.telegram = rawData.telegram;
+              if (rawData.phone && validatePhone(rawData.phone)) cleanData.phone = rawData.phone.replace(/[\s\-\(\)]/g, "");
+              if (rawData.telegram && validateTelegram(rawData.telegram)) cleanData.telegram = normalizeTelegram(rawData.telegram);
 
               if (Object.keys(cleanData).length > 0) {
                 const hasUpdates = Object.entries(cleanData).some(
@@ -250,7 +255,7 @@ export default function ChatBubble() {
       }
     } catch (err: any) {
       console.error("Chat Error:", err);
-      appendAssistantMessage("I'm having a bit of trouble connecting. You can reach me directly on Telegram @snowplugwalk.");
+      appendAssistantMessage("I'm having a bit of trouble connecting.");
     } finally {
       setIsLoading(false);
     }
