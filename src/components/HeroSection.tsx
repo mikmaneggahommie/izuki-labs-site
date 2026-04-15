@@ -75,7 +75,7 @@ export default function HeroSection() {
         </p>
         <div className="mt-2 h-1 w-24 mx-auto bg-white/5 overflow-hidden">
           <div 
-            className="h-full bg-[#00FF00] transition-all duration-300" 
+            className="h-full bg-[#FF0000] transition-all duration-300" 
             style={{ width: `${Math.min(100, (virtualScroll / LOCK_THRESHOLD) * 100)}%` }} 
           />
         </div>
