@@ -8,22 +8,22 @@ const policies = [
   {
     title: "Revision Policy",
     content:
-      "Minor text edits, color shifts, and layout refinements count as revisions. New concepts, major direction changes, or a completely different visual route are treated as new requests.",
+      "What counts as a revision: Minor text changes, color adjustments, and layout tweaks. IMPORTANT: New concepts, major direction changes, or a completely different visual route are treated as 'New Requests' or 'Major Redesigns'.",
   },
   {
     title: "Workflow Policy",
     content:
-      "Requests are handled sequentially for quality control. Turnaround times apply per request, not per batch, and large post-approval changes are added back into the request queue.",
+      "I work sequentially using a queue-based system to ensure quality. New requests enter the queue and are handled one-by-one. Max 2 active tasks at a time. Turnaround time applies per task, not per batch.",
   },
   {
     title: "Fair Use Policy",
     content:
-      "Unlimited support is structured around sustainable, high-quality output. It covers ongoing volume over time, not unlimited simultaneous work or instant bulk delivery.",
+      "'Unlimited' support is defined as total volume over time. It does NOT mean unlimited simultaneous work or instant bulk delivery. This ensures a sustainable workload and consistent high quality across all clients.",
   },
   {
     title: "Turnaround Times",
     content:
-      "Remote Designer requests are typically delivered in 24 to 48 hours, Growth Plan requests in 48 hours, and Essentials requests in 72 hours. Rush delivery is available as an add-on.",
+      "Standard turnaround: Remote Designer (24–48h per task), Growth Plan (48h per task), Essentials Plan (72h per task). Rush options (under 12 or 24 hours) are available as add-ons.",
   },
 ];
 

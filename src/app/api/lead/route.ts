@@ -18,21 +18,20 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1. Log to Google Sheets via Composio API
+    // 1. Log to Google Sheets via Composio API (v3.1)
     const COMPOSIO_API_KEY = process.env.COMPOSIO_API_KEY;
     const SPREADSHEET_ID = "1DgP1WdGULNf2RMJ1QZPpv9M3yKD_BhLSIct5F_JQHvw";
     
     if (COMPOSIO_API_KEY) {
       try {
-        await fetch("https://api.composio.dev/v1/actions/execute", {
+        await fetch(`https://backend.composio.dev/api/v3.1/tools/execute/GOOGLESHEETS_SPREADSHEETS_VALUES_APPEND`, {
           method: "POST",
           headers: { 
             "x-api-key": COMPOSIO_API_KEY,
             "Content-Type": "application/json" 
           },
           body: JSON.stringify({
-            action_slug: "googlesheets_spreadsheets_values_append",
-            parameters: {
+            arguments: {
               spreadsheetId: SPREADSHEET_ID,
               range: "Sheet1!A:E",
               valueInputOption: "USER_ENTERED",
