@@ -1,8 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { MessageSquare, Send, X } from "lucide-react";
+import { MessageSquare, Send, X, User, Phone, Mail, SendHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils"; // Assuming cn is available, or I'll define it locally
 
 type FlowState =
   | "COLLECTING_NAME"
@@ -25,6 +26,11 @@ export default function ChatBubble() {
   const [formData, setFormData] = useState({ name: "", telegram: "", phone: "", email: "" });
   const [messages, setMessages] = useState<Message[]>([]);
   const hasInitialized = useRef(false);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasAutoOpened, setHasAutoOpened] = useState(false);
+  const [isNearBottom, setIsNearBottom] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen && !hasInitialized.current) {
@@ -32,12 +38,6 @@ export default function ChatBubble() {
       hasInitialized.current = true;
     }
   }, [isOpen]);
-
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasAutoOpened, setHasAutoOpened] = useState(false);
-  const [isNearBottom, setIsNearBottom] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const formatMarkdown = (text: string) => {
     return text
@@ -135,7 +135,6 @@ export default function ChatBubble() {
     } else if (flowState === "COLLECTING_EMAIL") {
       setFormData(prev => ({ ...prev, email: userContent }));
       setFlowState("CHATTING");
-      // Initial Chat prompt
       const currentData = { ...formData, email: userContent };
       fetch("/api/lead", {
         method: "POST",
@@ -195,131 +194,145 @@ export default function ChatBubble() {
       case "COLLECTING_TELEGRAM": return "Telegram handle...";
       case "COLLECTING_PHONE": return "Enter phone number...";
       case "COLLECTING_EMAIL": return "Enter your email...";
-      default: return "What would you like to know?";
+      default: return "Ask about pricing, services...";
     }
-  };
-
-  const getCurrentPrompt = () => {
-    if (messages.length === 0) return "What would you like to know?";
-    // For collection states, show the last assistant message content
-    const lastAssistant = [...messages].reverse().find(m => m.role === "assistant");
-    return lastAssistant?.content || "What would you like to know?";
   };
 
   return (
     <>
-      {!isOpen ? (
-        <motion.button
-          type="button"
-          onClick={() => setIsOpen(true)}
-          className={`fixed bottom-8 right-8 z-[100] flex h-14 w-14 items-center justify-center rounded-full border border-[#FF0000]/40 bg-[#000000] text-[#FF0000] shadow-[0_0_20px_rgba(255,0,0,0.2)] md:bottom-8 md:right-8 transition-all hover:scale-110 hover:border-[#FF0000] ${
-            isNearBottom ? "animate-pulse" : ""
-          }`}
-          aria-label="Open chat"
-        >
-          <MessageSquare className="h-6 w-6" />
-        </motion.button>
-      ) : null}
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={() => setIsOpen(true)}
+            className={cn(
+              "fixed bottom-8 right-8 z-[100] flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-[#0A0A0A] text-white shadow-liquid transition-all hover:scale-105 hover:border-white/20",
+              isNearBottom && "animate-pulse border-[#FF0000]/40"
+            )}
+            aria-label="Open chat"
+          >
+            <MessageSquare className="h-6 w-6 stroke-[1.5]" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
-        {isOpen ? (
+        {isOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed bottom-6 right-6 z-[200] flex h-[580px] w-full max-w-[420px] flex-col overflow-hidden border-[2.5px] border-[#FF0000] bg-[#000000] shadow-[12px_12px_0px_#000000]"
+            initial={{ opacity: 0, y: 30, scale: 0.95, transformOrigin: "bottom right" }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.95 }}
+            className="fixed bottom-8 right-8 z-[200] flex h-[600px] w-[calc(100vw-64px)] max-w-[400px] flex-col overflow-hidden rounded-[2.5rem] liquid-glass shadow-liquid"
           >
             {/* HEADER */}
-            <div className="flex items-center justify-between border-b-[2.5px] border-[#FF0000] px-6 py-5 bg-[#000000]">
-              <div className="flex items-center gap-3">
-                <span className="font-[family-name:var(--font-neue-haas-display)] text-xl font-black uppercase tracking-tighter text-white">izuki.labs</span>
-                <div className="relative h-2.5 w-2.5">
-                  <span className="absolute inset-0 animate-ping rounded-full bg-[#FF0000] opacity-75" />
-                  <span className="relative block h-2.5 w-2.5 rounded-full bg-[#FF0000]" />
+            <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-7 py-6">
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-black tracking-tighter text-white uppercase">izuki.labs</span>
+                  <div className="flex h-2 w-2 items-center justify-center">
+                    <span className="absolute h-2 w-2 animate-ping rounded-full bg-[#FF0000] opacity-75" />
+                    <span className="relative h-2 w-2 rounded-full bg-[#FF0000]" />
+                  </div>
                 </div>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Studio Concierge</span>
               </div>
-              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#FF0000]/60">Ask anything</p>
-              <button onClick={() => setIsOpen(false)} className="text-white hover:text-[#FF0000] transition-colors">
-                <X className="h-5 w-5" />
+              <button 
+                onClick={() => setIsOpen(false)}
+                className="group flex h-10 w-10 items-center justify-center rounded-full bg-white/5 transition-all hover:bg-white/10"
+              >
+                <X className="h-5 w-5 text-white/60 group-hover:text-white" />
               </button>
             </div>
 
-            {/* MIDDLE SECTION - DYNAMIC HUB */}
-            <div className="flex-1 overflow-hidden p-6">
-              {flowState === "CHATTING" ? (
-                <div className="chat-scroll h-full space-y-4 overflow-y-auto pr-2">
-                  {messages.map((m, i) => (
-                    <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                      <div className={`max-w-[85%] border-[1.5px] px-4 py-3 text-[14px] leading-relaxed ${
-                        m.role === "user" 
-                        ? "border-[#FF0000] bg-[#FF0000] font-black text-black" 
-                        : "border-[#FF0000] bg-[#111111] text-[#FF0000]"
-                      }`}
-                      dangerouslySetInnerHTML={{ __html: formatMarkdown(m.content) }}
+            {/* CHAT AREA */}
+            <div className="chat-scroll flex-1 space-y-5 overflow-y-auto px-7 py-6">
+              {messages.map((m, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}
+                >
+                  <div
+                    className={cn(
+                      "max-w-[85%] rounded-[1.25rem] px-5 py-3.5 text-[14px] leading-relaxed",
+                      m.role === "user"
+                        ? "bg-[#FF0000] font-bold text-black shadow-[0_4px_15px_rgba(255,0,0,0.2)]"
+                        : "border border-white/5 bg-white/[0.03] text-white/90"
+                    )}
+                    dangerouslySetInnerHTML={{ __html: formatMarkdown(m.content) }}
+                  />
+                </motion.div>
+              ))}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="flex gap-1.5 rounded-full border border-white/5 bg-white/[0.03] px-4 py-2.5">
+                    {[0, 1, 2].map((d) => (
+                      <motion.span
+                        key={d}
+                        animate={{ opacity: [0.3, 1, 0.3] }}
+                        transition={{ duration: 1, repeat: Infinity, delay: d * 0.2 }}
+                        className="h-1.5 w-1.5 rounded-full bg-[#FF0000]"
                       />
-                    </div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
-              ) : (
-                <div className="flex h-full items-center justify-center">
-                  <div className="w-full border-[2.5px] border-[#FF0000] bg-[#111111] p-8 text-center shadow-[6px_6px_0px_#FF0000]">
-                    <p className="text-xl font-black leading-tight text-[#FF0000] uppercase tracking-tighter">
-                      {getCurrentPrompt()}
-                    </p>
+                    ))}
                   </div>
                 </div>
               )}
+              <div ref={messagesEndRef} />
             </div>
 
-            {/* LOWER SECTION - INPUT & ACTIONS */}
-            <div className="border-t-[2.5px] border-[#FF0000] bg-[#000000]">
-              <form onSubmit={submitMessage} className="border-b-[2.5px] border-[#FF0000]">
-                <div className="flex items-center">
-                  <input
-                    autoFocus
-                    value={input}
-                    disabled={isLoading}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder={getPlaceholder()}
-                    className="h-16 flex-1 bg-transparent px-6 text-lg font-bold text-[#FF0000] outline-none placeholder:text-[#FF0000]/30"
-                  />
-                  <button type="submit" className="flex h-16 w-16 items-center justify-center bg-[#FF0000] text-black transition-colors hover:bg-white">
-                    <Send className="h-6 w-6" />
-                  </button>
-                </div>
+            {/* FOOTER AREA */}
+            <div className="border-t border-white/5 bg-white/[0.01] p-6 space-y-5">
+              <form onSubmit={submitMessage} className="relative group">
+                <input
+                  autoFocus
+                  value={input}
+                  disabled={isLoading}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={getPlaceholder()}
+                  className="h-14 w-full rounded-2xl border border-white/10 bg-white/[0.02] pl-6 pr-14 text-sm font-medium text-white outline-none transition-all placeholder:text-white/30 focus:border-white/20 focus:bg-white/[0.04]"
+                />
+                <button
+                  type="submit"
+                  disabled={isLoading || !input.trim()}
+                  className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF0000] text-black transition-all hover:scale-105 disabled:opacity-30"
+                >
+                  <SendHorizontal className="h-5 w-5" />
+                </button>
               </form>
 
-              <div className="p-5 space-y-4">
-                {flowState !== "CHATTING" && (
+              <div className="flex gap-3">
+                {flowState !== "CHATTING" ? (
                   <button
                     onClick={handleSkip}
-                    className="h-12 w-full border-[2.5px] border-[#FF0000] bg-[#111111] text-[13px] font-black uppercase tracking-[0.4em] text-[#FF0000] transition-all hover:bg-[#FF0000] hover:text-black"
+                    className="h-12 flex-1 rounded-2xl border border-white/10 bg-white/[0.02] text-[11px] font-black uppercase tracking-[0.2em] text-white/60 transition-all hover:bg-white/5 hover:text-white"
                   >
-                    SKIP PROTOCOL
+                    Skip to Services
                   </button>
+                ) : (
+                  <div className="grid w-full grid-cols-2 gap-3">
+                    <a
+                      href="mailto:it.mikiyas.daniel@gmail.com"
+                      className="flex h-12 items-center justify-center rounded-2xl bg-[#FF0000] text-[11px] font-black uppercase tracking-[0.2em] text-black transition-all hover:opacity-90"
+                    >
+                      Email Me
+                    </a>
+                    <a
+                      href="https://t.me/snowplugwalk"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02] text-[11px] font-black uppercase tracking-[0.2em] text-white/60 transition-all hover:border-white/20 hover:text-white"
+                    >
+                      Telegram
+                    </a>
+                  </div>
                 )}
-
-                <div className="grid grid-cols-2 gap-4">
-                  <a
-                    href="mailto:it.mikiyas.daniel@gmail.com"
-                    className="flex h-12 items-center justify-center bg-[#FF0000] text-[13px] font-black uppercase tracking-[0.2em] text-black transition-all hover:bg-white"
-                  >
-                    EMAIL
-                  </a>
-                  <a
-                    href="https://t.me/snowplugwalk"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-12 items-center justify-center border-[2px] border-[#FF0000] bg-black text-[13px] font-black uppercase tracking-[0.2em] text-[#FF0000] transition-all hover:bg-[#FF0000] hover:text-black"
-                  >
-                    TELEGRAM
-                  </a>
-                </div>
               </div>
             </div>
           </motion.div>
-        ) : null}
+        )}
       </AnimatePresence>
     </>
   );
