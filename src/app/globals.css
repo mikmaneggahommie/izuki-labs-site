@@ -306,11 +306,13 @@ button {
   min-height: 100svh;
   padding-top: clamp(5rem, 7vw, 6rem);
   padding-bottom: 0;
+  overflow: visible !important;
 }
 
 .hero-viewport {
   position: relative;
   min-height: calc(100svh - clamp(5rem, 7vw, 6rem));
+  overflow: visible !important;
 }
 
 .hero-copy {

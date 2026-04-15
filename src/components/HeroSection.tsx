@@ -18,99 +18,120 @@ const ALL_PROJECTS: HeroCardData[] = [
 
 export default function HeroSection() {
   const stageRef = useRef<HTMLDivElement>(null);
-  const unitRef = useRef<HTMLDivElement>(null);
-  const [projectSet, setProjectSet] = useState(ALL_PROJECTS);
+  const wrapARef = useRef<HTMLDivElement>(null);
+  const wrapBRef = useRef<HTMLDivElement>(null);
+  
+  const [groupA, setGroupA] = useState<HeroCardData[]>([]);
+  const [groupB, setGroupB] = useState<HeroCardData[]>([]);
+  const projectIdx = useRef(0);
+
+  const getSet = (offset: number) => {
+    const set = [];
+    for (let i = 0; i < 7; i++) {
+      set.push(ALL_PROJECTS[(offset + i) % ALL_PROJECTS.length]);
+    }
+    return set;
+  };
+
+  useEffect(() => {
+    // Initial Setup
+    setGroupA(getSet(0));
+    setGroupB(getSet(1));
+  }, []);
 
   useEffect(() => {
     let alive = true;
-    let tl: any;
+    let tl: gsap.core.Timeline | undefined;
 
     const boot = async () => {
       const gsap = (await import("gsap")).default;
-      if (!alive || !unitRef.current) return;
+      if (!alive || !wrapARef.current || !wrapBRef.current) return;
 
-      const cards = Array.from(unitRef.current.querySelectorAll<HTMLElement>(".hero-card"));
-      if (cards.length === 0) return;
+      const cardsA = Array.from(wrapARef.current.querySelectorAll<HTMLElement>(".hero-card"));
+      const cardsB = Array.from(wrapBRef.current.querySelectorAll<HTMLElement>(".hero-card"));
 
-      // Reset positions
-      gsap.set(cards, { x: 0, y: 0, xPercent: -50, yPercent: -50, autoAlpha: 1 });
-      gsap.set(unitRef.current, { autoAlpha: 1 });
+      // Setup styles
+      gsap.set([wrapARef.current, wrapBRef.current], { 
+        position: "absolute", 
+        top: "50%", 
+        left: "70%", 
+        xPercent: -50, 
+        yPercent: -50 
+      });
+      gsap.set([cardsA, cardsB], { x: 0, y: 0, xPercent: -50, yPercent: -50, autoAlpha: 1 });
+      
+      // Hide back-cards initially
+      gsap.set(cardsA.slice(0, -1), { autoAlpha: 0 });
+      gsap.set(cardsB.slice(0, -1), { autoAlpha: 0 });
 
-      // Identify groups
-      // Indices 0, 1, 2 -> Top Left
-      // Indices 3, 4, 5 -> Bottom Right
-      // Index 6 -> Anchor (Pivot)
-      const topLeftCards = cards.slice(0, 3);
-      const bottomRightCards = cards.slice(3, 6);
-      const anchorCard = cards[6];
+      tl = gsap.timeline({ repeat: -1 });
 
-      // Exclude anchor from being hidden in stack phase
-      gsap.set(cards.slice(0, -1), { autoAlpha: 0 });
+      const addSequence = (activeCards: HTMLElement[], inactiveWrap: HTMLElement, isFirst: boolean) => {
+        const tlGroup = activeCards.slice(0, 3);
+        const brGroup = activeCards.slice(3, 6);
+        const anchor = activeCards[6];
 
-      const buildTimeline = () => {
-        tl?.kill();
-        tl = gsap.timeline({ repeat: -1 });
+        // 1. Hold
+        tl!.to({}, { duration: 1.5 });
 
-        // Phase 1: Hold Stack
-        tl.to({}, { duration: 1.5 });
+        // 2. Unstack
+        tl!.addLabel(isFirst ? "fan-a" : "fan-b")
+           .set(activeCards, { autoAlpha: 1 })
+           .to(tlGroup, {
+             x: (i) => -((3 - i) * 200),
+             y: (i) => -((3 - i) * 180),
+             duration: 1.2,
+             ease: "expo.out",
+             stagger: 0.05
+           }, isFirst ? "fan-a" : "fan-b")
+           .to(brGroup, {
+             x: (i) => (i + 1) * 200,
+             y: (i) => (i + 1) * 180,
+             duration: 1.2,
+             ease: "expo.out",
+             stagger: 0.05
+           }, isFirst ? "fan-a" : "fan-b");
 
-        // Phase 2: Unstack (Fan Out)
-        tl.addLabel("fan")
-          .set(cards, { autoAlpha: 1 }, "fan")
-          .to(topLeftCards, {
-            x: (i) => -((3 - i) * 160),
-            y: (i) => -((3 - i) * 160),
-            duration: 1.2,
-            ease: "expo.out",
-            stagger: 0.05
-          }, "fan")
-          .to(bottomRightCards, {
-            x: (i) => (i + 1) * 160,
-            y: (i) => (i + 1) * 160,
-            duration: 1.2,
-            ease: "expo.out",
-            stagger: 0.05
-          }, "fan");
+        // 3. Hold Fan
+        tl!.to({}, { duration: 1.5 });
 
-        // Phase 3: Hold Fan
-        tl.to({}, { duration: 1.5 });
+        // 4. Snap back to local (0,0) - The Anchor
+        tl!.addLabel(isFirst ? "snap-a" : "snap-b")
+           .to(activeCards, {
+             x: 0,
+             y: 0,
+             duration: 1.2,
+             ease: "expo.inOut",
+             stagger: { each: 0.04, from: "start" }
+           }, isFirst ? "snap-a" : "snap-b");
 
-        // Phase 4: Snap Back to Anchor (Reset coordinates to 0,0)
-        tl.addLabel("snap")
-          .to(cards, {
-            x: 0,
-            y: 0,
-            duration: 1.0,
-            ease: "expo.inOut",
-            stagger: { each: 0.03, from: "start" }
-          }, "snap");
-
-        // Phase 5: Swap Image Set
-        tl.call(() => {
-          setProjectSet(prev => {
-            const next = [...prev];
-            const first = next.shift()!;
-            next.push(first);
-            return next;
-          });
+        // 5. Swap Prep
+        tl!.call(() => {
+          projectIdx.current = (projectIdx.current + 1) % ALL_PROJECTS.length;
+          if (isFirst) {
+            setGroupB(getSet(projectIdx.current + 1));
+          } else {
+            setGroupA(getSet(projectIdx.current + 1));
+          }
         });
 
-        tl.set(cards.slice(0, -1), { autoAlpha: 0 });
-        tl.to({}, { duration: 0.5 }); // Mini pause after swap
+        tl!.set(activeCards.slice(0, -1), { autoAlpha: 0 });
+        tl!.to(activeCards, { autoAlpha: 0, duration: 0.6 });
+        tl!.to(inactiveWrap, { autoAlpha: 1, duration: 0.6 }, "<");
       };
 
-      buildTimeline();
+      // Play A
+      gsap.set(wrapARef.current, { autoAlpha: 1 });
+      gsap.set(wrapBRef.current, { autoAlpha: 0 });
+      addSequence(cardsA, wrapBRef.current, true);
+      
+      // Play B
+      addSequence(cardsB, wrapARef.current, false);
     };
 
     boot();
-    return () => { 
-      alive = false; 
-      tl?.kill(); 
-    };
-  }, [projectSet]); 
-  // We re-run the effect when projectSet changes to re-capture DOM elements and build timeline 
-  // However, it's better to keep projectSet swap inside the loop if possible.
-  // But since we are swapping React state, the DOM will re-render.
+    return () => { alive = false; tl?.kill(); };
+  }, [groupA.length, groupB.length]); // Re-run only on init or if structure changes (rare)
 
   return (
     <section id="top" className="section-shell hero-shell z-0">
@@ -129,26 +150,23 @@ export default function HeroSection() {
           ref={stageRef}
           className="hero-stage absolute inset-0 z-30 pointer-events-none"
         >
-          <div
-            ref={unitRef}
-            className="hero-unit"
-            style={{ opacity: 0 }}
-          >
-            {projectSet.map((card, ci) => (
-              <article
-                key={`${card.src}-${ci}`}
-                className="hero-card"
-                data-ci={ci}
-                style={{ zIndex: ci + 1 }}
-              >
-                <Image
-                  src={assetPath(card.src)}
-                  alt={card.alt}
-                  fill
-                  priority={ci === projectSet.length - 1}
-                  sizes="(max-width: 767px) 42vw, (max-width: 1023px) 28vw, 360px"
-                  className="hero-card-image"
-                />
+          {/* Layer A */}
+          <div ref={wrapARef} className="hero-unit" style={{ opacity: 0 }}>
+            {groupA.map((card, ci) => (
+              <article key={`a-${ci}`} className="hero-card" style={{ zIndex: ci + 1 }}>
+                <Image src={assetPath(card.src)} alt={card.alt} fill 
+                  priority={ci === 6} className="hero-card-image" 
+                  sizes="360px" />
+              </article>
+            ))}
+          </div>
+
+          {/* Layer B */}
+          <div ref={wrapBRef} className="hero-unit" style={{ opacity: 0 }}>
+            {groupB.map((card, ci) => (
+              <article key={`b-${ci}`} className="hero-card" style={{ zIndex: ci + 1 }}>
+                <Image src={assetPath(card.src)} alt={card.alt} fill 
+                  className="hero-card-image" sizes="360px" />
               </article>
             ))}
           </div>
@@ -157,4 +175,5 @@ export default function HeroSection() {
     </section>
   );
 }
+
 
