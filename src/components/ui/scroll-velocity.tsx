@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import {
   motion,
   useScroll,
   useSpring,
   useTransform,
   useVelocity,
-  useAnimationFrame,
-  wrap,
+  useMotionValue,
 } from "framer-motion";
 
 interface VelocityRowProps {
@@ -22,7 +21,7 @@ export function VelocityRow({
   baseVelocity = 5,
   className = "",
 }: VelocityRowProps) {
-  const baseX = useRef(0);
+  const baseX = useMotionValue(0);
   const { scrollY } = useScroll();
   const scrollVelocity = useVelocity(scrollY);
   const smoothVelocity = useSpring(scrollVelocity, {
@@ -33,48 +32,53 @@ export function VelocityRow({
     clamp: false,
   });
 
-  const [repetitions, setRepetitions] = useState(4);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const directionFactor = useRef(1);
+  const prevTimestamp = useRef(0);
 
   useEffect(() => {
-    const updateRepetitions = () => {
-      if (!containerRef.current) return;
-      const el = containerRef.current.querySelector("[data-text]") as HTMLElement;
-      if (!el) return;
-      const textWidth = el.offsetWidth;
-      const screenWidth = window.innerWidth;
-      const needed = Math.ceil(screenWidth / textWidth) + 2;
-      setRepetitions(Math.max(needed, 4));
+    let rafId: number;
+
+    const tick = (timestamp: number) => {
+      const delta = prevTimestamp.current
+        ? (timestamp - prevTimestamp.current) / 1000
+        : 0.016;
+      prevTimestamp.current = timestamp;
+
+      let moveBy = directionFactor.current * baseVelocity * delta;
+
+      const vf = velocityFactor.get();
+      if (vf < 0) {
+        directionFactor.current = -1;
+      } else if (vf > 0) {
+        directionFactor.current = 1;
+      }
+
+      moveBy += directionFactor.current * moveBy * Math.abs(vf);
+
+      let newX = baseX.get() + moveBy;
+
+      // Wrap at -50% (2x content for seamless loop)
+      if (newX <= -50) newX += 50;
+      if (newX >= 0) newX -= 50;
+
+      baseX.set(newX);
+      rafId = requestAnimationFrame(tick);
     };
-    updateRepetitions();
-    window.addEventListener("resize", updateRepetitions);
-    return () => window.removeEventListener("resize", updateRepetitions);
-  }, [children]);
 
-  const x = useTransform(() => `${wrap(-100 / repetitions, 0, baseX.current)}%`);
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [baseVelocity, baseX, velocityFactor]);
 
-  const directionFactor = useRef(1);
-  useAnimationFrame((_, delta) => {
-    let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
-
-    if (velocityFactor.get() < 0) {
-      directionFactor.current = -1;
-    } else if (velocityFactor.get() > 0) {
-      directionFactor.current = 1;
-    }
-
-    moveBy += directionFactor.current * moveBy * velocityFactor.get();
-    baseX.current += moveBy;
-  });
+  const x = useTransform(baseX, (v) => `${v}%`);
 
   return (
-    <div className="overflow-hidden whitespace-nowrap" ref={containerRef}>
-      <motion.div className={`inline-flex whitespace-nowrap ${className}`} style={{ x }}>
-        {Array.from({ length: repetitions }).map((_, i) => (
-          <span key={i} className="inline-block" data-text={i === 0 ? true : undefined}>
-            {children}
-          </span>
-        ))}
+    <div className="overflow-hidden whitespace-nowrap">
+      <motion.div
+        className={`inline-flex whitespace-nowrap ${className}`}
+        style={{ x }}
+      >
+        <span className="inline-block">{children}</span>
+        <span className="inline-block">{children}</span>
       </motion.div>
     </div>
   );

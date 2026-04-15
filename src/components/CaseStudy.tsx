@@ -99,13 +99,12 @@ export default function CaseStudy() {
               style={{ touchAction: "none" }}
             >
               {/* Before image — full resolution, no crop */}
-              <div className="relative w-full">
+              <div className="relative w-full aspect-[9/16] bg-black">
                 <Image
                   src={assetPath("/images/case-study/before.jpg")}
                   alt="Before design"
-                  width={480}
-                  height={854}
-                  className="block w-full h-auto grayscale"
+                  fill
+                  className="object-contain grayscale"
                   sizes="(max-width: 767px) 90vw, 480px"
                   priority
                 />
@@ -113,15 +112,16 @@ export default function CaseStudy() {
 
               {/* After image — absolute overlay clipped */}
               <motion.div className="absolute inset-0" style={{ clipPath }}>
-                <Image
-                  src={assetPath("/images/case-study/after.jpg")}
-                  alt="After design"
-                  width={480}
-                  height={854}
-                  className="block w-full h-auto"
-                  sizes="(max-width: 767px) 90vw, 480px"
-                  priority
-                />
+                <div className="relative w-full h-full">
+                  <Image
+                    src={assetPath("/images/case-study/after.jpg")}
+                    alt="After design"
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 767px) 90vw, 480px"
+                    priority
+                  />
+                </div>
               </motion.div>
 
               <motion.div

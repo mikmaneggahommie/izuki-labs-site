@@ -15,11 +15,13 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = menuOpen ? "hidden" : originalOverflow;
-
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
     return () => {
-      document.body.style.overflow = originalOverflow;
+      document.body.style.overflow = "";
     };
   }, [menuOpen]);
 
@@ -27,15 +29,18 @@ export default function Header() {
     event: React.MouseEvent<HTMLAnchorElement>,
     href: string
   ) => {
+    event.preventDefault();
     setMenuOpen(false);
 
     if (!href.startsWith("#")) {
       return;
     }
 
-    event.preventDefault();
-    const target = document.getElementById(href.slice(1));
-    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Delay scroll to let menu close & overflow reset
+    setTimeout(() => {
+      const target = document.getElementById(href.slice(1));
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 350);
   };
 
   return (
