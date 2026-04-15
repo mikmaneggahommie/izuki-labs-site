@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
 import { studioSystemPrompt } from "@/lib/studio-concierge";
@@ -17,74 +17,71 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "GEMINI_API_KEY is not configured." }, { status: 500 });
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
+    // Initialize New 2026 SDK
+    const genAI = new GoogleGenAI({ apiKey });
 
-    const safetySettings = [
-      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-    ];
-
+    // Model IDs (2026 stabilized)
     const modelIds = [
-      "gemini-1.5-flash",
+      "gemini-3.1-flash-lite-preview",
+      "gemini-3.1-flash-preview",
       "gemini-1.5-pro",
-      "gemini-2.0-flash-exp"
+      "gemini-1.5-flash"
     ];
 
     let result;
     let successModel = "";
 
+    const systemPrompt = `${studioSystemPrompt}
+
+VITAL INSTRUCTIONS:
+- Name: ${userInfo?.name || "Unknown"}
+- Telegram: ${userInfo?.telegram || "Unknown"}
+- Phone: ${userInfo?.phone || "Unknown"}
+- Email: ${userInfo?.email || "Unknown"}
+`.trim();
+
+    // Prepare contents for new API
+    const contents = [
+      { role: "user" as const, parts: [{ text: systemPrompt }] },
+      { role: "model" as const, parts: [{ text: "Understood. I am your design partner." }] },
+      ...messages.map(m => ({
+        role: (m.role === "assistant" ? "model" : "user") as "user" | "model",
+        parts: [{ text: m.content }]
+      }))
+    ];
+
     for (const modelId of modelIds) {
       try {
         console.log(`Trying model: ${modelId}`);
-        const model = genAI.getGenerativeModel({ model: modelId, safetySettings });
-        const lastMessage = messages[messages.length - 1]?.content ?? "";
-
-        const systemPrompt = `${studioSystemPrompt}
-
-VITAL INSTRUCTIONS FOR THIS MESSAGE:
-1. You already know the following details about the visitor. DO NOT ask for them again:
-   - Name: ${userInfo?.name || "Unknown"}
-   - Telegram: ${userInfo?.telegram || "Unknown"}
-   - Phone: ${userInfo?.phone || "Unknown"}
-   - Email: ${userInfo?.email || "Unknown"}
-
-2. 🚫 STRICT PROHIBITION: You are FORBIDDEN from mentioning "10,000 Birr" or the "Mini Identity" package. These do not exist.
-3. If they ask for a logo, provide the tiered add-on rates (2500, 3500, 4000) only.
-`.trim();
-
-        const conversationHistory = messages.slice(0, -1).map((msg) => ({
-          role: msg.role === "assistant" ? "model" : "user",
-          parts: [{ text: msg.content }],
-        }));
-
-        const chat = model.startChat({
-          history: [
-            { role: "user", parts: [{ text: systemPrompt }] },
-            {
-              role: "model",
-              parts: [{ text: "Understood. I am now acting as the interactive assistant for the izuki.labs website." }],
-            },
-            ...conversationHistory,
-          ],
+        
+        // New generateContentStream protocol
+        result = await genAI.models.generateContentStream({
+          model: modelId,
+          contents: contents,
+          config: {
+            // Updated safety structure for 2026 SDK
+            safetySettings: [
+              { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+              { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+              { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+              { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+            ]
+          }
         });
-
-        result = await chat.sendMessageStream(lastMessage);
+        
         successModel = modelId;
         break; // Success!
       } catch (err) {
         console.error(`Model ${modelId} failed:`, err);
-        continue; // Try next move
+        continue;
       }
     }
 
     if (!result) {
-      throw new Error("All model IDs failed to initialize. Check API key permissions.");
+      throw new Error("All model IDs failed.");
     }
 
-    console.log(`Successfully connected using model: ${successModel}`);
-
+    console.log(`Connected via: ${successModel}`);
 
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
@@ -92,11 +89,11 @@ VITAL INSTRUCTIONS FOR THIS MESSAGE:
         try {
           for await (const chunk of result.stream) {
             const text = chunk.text();
-            controller.enqueue(encoder.encode(text));
+            if (text) controller.enqueue(encoder.encode(text));
           }
           controller.close();
         } catch (streamErr: any) {
-          console.error("Stream generation error:", streamErr);
+          console.error("Stream error:", streamErr);
           controller.error(streamErr);
         }
       },
