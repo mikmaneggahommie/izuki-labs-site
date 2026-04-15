@@ -15,7 +15,7 @@ type FlowState =
 type Message = {
   role: "assistant" | "user";
   content: string;
-  isInfoRequest?: boolean; // New flag for messages that request contact info
+  isInfoRequest?: boolean;
 };
 
 type ChatApiResponse = {
@@ -83,10 +83,10 @@ export default function ChatBubble() {
     }
   }, [isOpen, isLoading, messages]);
 
-  const appendAssistantMessage = (content: string) => {
+  const appendAssistantMessage = (content: string, isInfoRequest = false) => {
     setMessages((current) => [
       ...current,
-      { role: "assistant", content },
+      { role: "assistant", content, isInfoRequest },
     ]);
   };
 
@@ -112,12 +112,7 @@ export default function ChatBubble() {
     }
   };
 
-  const appendAssistantMessage = (content: string, isInfoRequest = false) => {
-    setMessages((current) => [
-      ...current,
-      { role: "assistant", content, isInfoRequest },
-    ]);
-  };
+
 
   const submitMessage = async (event: React.FormEvent) => {
     event.preventDefault();
