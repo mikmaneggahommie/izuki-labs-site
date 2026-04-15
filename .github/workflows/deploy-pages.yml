@@ -34,15 +34,12 @@ jobs:
         with:
           enablement: true
 
-      - name: Prepare GitHub Pages export
-        run: rm -rf src/app/api
-
       - name: Install dependencies
         run: npm install --legacy-peer-deps --no-audit
 
       - name: Build static site
         env:
-          NEXT_PUBLIC_CHAT_MODE: disabled
+          NEXT_PUBLIC_CHAT_MODE: enabled
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
         run: npm run build
 

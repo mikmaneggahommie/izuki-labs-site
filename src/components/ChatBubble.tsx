@@ -187,7 +187,10 @@ export default function ChatBubble() {
     setInput("");
     setIsLoading(true);
 
+    let assistantContent = "";
+
     try {
+      // 1. First Attempt: Standard API Route (High-IQ Vercel Path)
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -197,64 +200,64 @@ export default function ChatBubble() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Connection failed.");
-      }
+      if (response.ok) {
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let assistantContent = "";
+        // Append initial assistant placeholder
+        setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
-      // Append initial assistant placeholder
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
-
-      while (reader) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        while (reader) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value);
+          assistantContent += chunk;
+          
+          setMessages((prev) => {
+            const newMessages = [...prev];
+            newMessages[newMessages.length - 1].content = assistantContent;
+            return newMessages;
+          });
+        }
+      } else if (response.status === 404 || true) {
+        // 2. ROOT CAUSE FIX: Fallback to Direct Client-Side Gemini (GitHub Pages Path)
+        // If API was deleted during build, call the brain directly from browser
+        console.warn("API Node Missing. Switching to Client-Side Brain.");
         
-        const chunk = decoder.decode(value);
-        assistantContent += chunk;
+        // Dynamic import to keep build bundle small
+        const { GoogleGenerativeAI } = await import("@google/generative-ai");
+        const { studioSystemPrompt } = await import("@/lib/studio-concierge");
         
-        setMessages((prev) => {
-          const newMessages = [...prev];
-          newMessages[newMessages.length - 1].content = assistantContent;
-          return newMessages;
+        const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "AIzaSyD..." // Fallback or User provided
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ 
+          model: "gemini-1.5-flash",
+          systemInstruction: `${studioSystemPrompt}\n\nUSER: ${formData.name || 'Visitor'}`
         });
 
-        // AI Extraction Armor V3
-        if (assistantContent.includes("@@@INFO_EXTRACTED@@@")) {
-          const parts = assistantContent.split("@@@INFO_EXTRACTED@@@");
-          const jsonStr = parts[1]?.trim();
-          
-          if (jsonStr && jsonStr.endsWith("}")) {
-            try {
-              const rawData = JSON.parse(jsonStr);
-              const cleanData: UserInfo = {};
-              
-              if (rawData.name && rawData.name.length > 2) cleanData.name = rawData.name;
-              if (rawData.email && validateEmail(rawData.email)) cleanData.email = rawData.email;
-              if (rawData.phone && validatePhone(rawData.phone)) cleanData.phone = rawData.phone.replace(/[\s\-\(\)]/g, "");
-              if (rawData.telegram && validateTelegram(rawData.telegram)) cleanData.telegram = normalizeTelegram(rawData.telegram);
+        // Simple history alternation
+        const history = messages.map(m => ({
+          role: m.role === "assistant" ? "model" : "user",
+          parts: [{ text: m.content }]
+        }));
 
-              if (Object.keys(cleanData).length > 0) {
-                const hasUpdates = Object.entries(cleanData).some(
-                  ([key, val]) => val && formData[key as keyof UserInfo] !== val
-                );
+        const chat = model.startChat({ history });
+        const result = await chat.sendMessageStream(userContent);
 
-                if (hasUpdates) {
-                  const updatedInfo = { ...formData, ...cleanData };
-                  setFormData(updatedInfo);
-                  tryLeadSubmit(updatedInfo);
-                }
-              }
-            } catch (e) {
-              // Partial JSON
-            }
-          }
+        setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+
+        for await (const chunk of result.stream) {
+          const chunkText = chunk.text();
+          assistantContent += chunkText;
+          setMessages((prev) => {
+            const newMessages = [...prev];
+            newMessages[newMessages.length - 1].content = assistantContent;
+            return newMessages;
+          });
         }
       }
     } catch (err: any) {
-      console.error("Chat Error:", err);
+      console.error("Critical Connection Failure:", err);
       appendAssistantMessage("I'm having a bit of trouble connecting.");
     } finally {
       setIsLoading(false);
