@@ -219,46 +219,23 @@ export default function ChatBubble() {
             return newMessages;
           });
         }
-      } else if (response.status === 404 || true) {
-        // 2. ROOT CAUSE FIX: Fallback to Direct Client-Side Gemini (GitHub Pages Path)
-        // If API was deleted during build, call the brain directly from browser
-        console.warn("API Node Missing. Switching to Client-Side Brain.");
+      } else {
+        // DETAILED DIAGNOSTICS FOR VERCEL
+        const errorBody = await response.json().catch(() => ({}));
+        console.error(`[IZUKI-FRONTEND] API Failed (${response.status}):`, errorBody);
         
-        // Dynamic import to keep build bundle small
-        const { GoogleGenerativeAI } = await import("@google/generative-ai");
-        const { studioSystemPrompt } = await import("@/lib/studio-concierge");
-        
-        const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "AIzaSyD..." // Fallback or User provided
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ 
-          model: "gemini-1.5-flash",
-          systemInstruction: `${studioSystemPrompt}\n\nUSER: ${formData.name || 'Visitor'}`
-        });
-
-        // Simple history alternation
-        const history = messages.map(m => ({
-          role: m.role === "assistant" ? "model" : "user",
-          parts: [{ text: m.content }]
-        }));
-
-        const chat = model.startChat({ history });
-        const result = await chat.sendMessageStream(userContent);
-
-        setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
-
-        for await (const chunk of result.stream) {
-          const chunkText = chunk.text();
-          assistantContent += chunkText;
-          setMessages((prev) => {
-            const newMessages = [...prev];
-            newMessages[newMessages.length - 1].content = assistantContent;
-            return newMessages;
-          });
+        if (response.status === 404) {
+           throw new Error("API Route Missing (Check Vercel Deployment).");
+        } else if (response.status === 500) {
+           throw new Error(`Server Error: ${errorBody.message || 'Check Vercel Logs'}`);
+        } else {
+           throw new Error(`Connection failed (${response.status})`);
         }
       }
     } catch (err: any) {
       console.error("Critical Connection Failure:", err);
-      appendAssistantMessage("I'm having a bit of trouble connecting.");
+      // Show the actual error to the user for one turn to debug
+      appendAssistantMessage(`Connection Refused: ${err.message}. Please verify your Gemini API Key is set in Vercel.`);
     } finally {
       setIsLoading(false);
     }
