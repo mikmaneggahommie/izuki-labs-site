@@ -7,13 +7,13 @@ import { assetPath } from "@/lib/asset-path";
 type HeroCardData = { src: string; alt: string };
 
 const HERO_IMAGES: HeroCardData[] = [
-  { src: "/images/7.jpg", alt: "Luminous motion artwork" },
+  { src: "/images/7.jpg", alt: "Luminous artwork" },
   { src: "/images/6.jpg", alt: "Launch artwork" },
   { src: "/images/5.jpg", alt: "Poster layout artwork" },
   { src: "/images/4.jpg", alt: "Brand composition artwork" },
   { src: "/images/3.jpg", alt: "Mobile system artwork" },
   { src: "/images/2.jpg", alt: "Campaign detail artwork" },
-  { src: "/images/1.JPG", alt: "Editorial surface artwork" },
+  { src: "/images/1.JPG", alt: "Front Hero - Guy in Suit" },
 ];
 
 export default function HeroSection() {
@@ -39,7 +39,7 @@ export default function HeroSection() {
         tl?.kill();
 
         // 1. INITIAL SETUP
-        // Anchor point is top: 50%, left: 70% as requested by User
+        // Fixed Anchor point: top: 50%, left: 70%
         gsap.set(cards, {
           position: "absolute",
           top: "50%",
@@ -54,59 +54,47 @@ export default function HeroSection() {
 
         tl = gsap.timeline({ repeat: -1 });
 
-        // Cycle through all cards as the "Anchor"
+        // Sequential cycle for the 7 images
         for (let cycle = 0; cycle < cards.length; cycle++) {
           const currentAnchorIdx = (cards.length - 1 - cycle + cards.length) % cards.length;
           const otherCards = cards.filter((_, i) => i !== currentAnchorIdx);
           
-          // Split of the other 6 cards into Top-Left and Bottom-Right groups
-          const tlGroup = otherCards.slice(0, 3);
-          const brGroup = otherCards.slice(3, 6);
-
           const labelPrefix = `cycle-${cycle}`;
 
-          // Setup z-index so the current anchor is on top
+          // Step 0: Prep Cycle (Instantly swap z-index)
           tl.set(cards, { zIndex: (i) => (i === currentAnchorIdx ? 100 : 10) }, `${labelPrefix}-start`)
             .set(otherCards, { autoAlpha: 0 }, `${labelPrefix}-start`);
 
-          // Step 1: Hold (Consolidated)
+          // Phase 1: Consolidated Static State (Hold: 1.5s)
           tl.to({}, { duration: 1.5 });
 
-          // Step 2: Fan Out (The Spread)
-          // Top-Left: indices 0-2 (multiplied by 160/140 for large spread)
-          // Bottom-Right: indices 3-5 (multiplied by 160/140)
+          // Phase 2: The Burst (Duration: 1.0s)
+          // Unified stagger from: "center" for true ripple effect
           tl.addLabel(`${labelPrefix}-fan`)
             .set(otherCards, { autoAlpha: 1 }, `${labelPrefix}-fan`)
-            .to(tlGroup, {
-              x: (i) => -(i + 1) * 160,
-              y: (i) => -(i + 1) * 140,
-              duration: 1.2,
+            .to(otherCards, {
+              x: (i) => (i < 3 ? -(3 - i) * 150 : (i - 2) * 150),
+              y: (i) => (i < 3 ? -(3 - i) * 150 : (i - 2) * 150),
+              duration: 1.0,
               ease: "power3.out",
-              stagger: { amount: 0.3, from: "center" }
-            }, `${labelPrefix}-fan`)
-            .to(brGroup, {
-              x: (i) => (i + 1) * 160,
-              y: (i) => (i + 1) * 140,
-              duration: 1.2,
-              ease: "power3.out",
-              stagger: { amount: 0.3, from: "center" }
+              stagger: { amount: 0.4, from: "center" }
             }, `${labelPrefix}-fan`);
 
-          // Step 3: Hold Spread
+          // Phase 3: Momentum Hold (Duration: 1.5s)
           tl.to({}, { duration: 1.5 });
 
-          // Step 4: Consolidate (The Ripple Slap In)
-          // Stagger amount: 0.3, from: "edges" for the slap-back look
+          // Phase 4: Velocity Snap (Duration: 0.6s)
+          // High-velocity return using expo.in
           tl.addLabel(`${labelPrefix}-snap`)
             .to(otherCards, {
               x: 0,
               y: 0,
-              duration: 0.8,
-              ease: "power3.inOut",
+              duration: 0.6,
+              ease: "expo.in",
               stagger: { amount: 0.3, from: "edges" }
             }, `${labelPrefix}-snap`);
 
-          // Reset visibility for next cycle
+          // Reset visibility for the next cycle transition
           tl.set(otherCards, { autoAlpha: 0 });
         }
       };

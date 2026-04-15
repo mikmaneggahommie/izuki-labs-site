@@ -46,6 +46,13 @@ export default function ChatBubble() {
   const [isNearBottom, setIsNearBottom] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const formatMarkdown = (text: string) => {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-white">$1</strong>')
+      .replace(/^\s*-\s+(.*)$/gm, '<li class="ml-4 list-disc">$1</li>')
+      .replace(/\n/g, '<br />');
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       const scrollHeight = document.documentElement.scrollHeight;
@@ -116,9 +123,7 @@ export default function ChatBubble() {
 
   const submitMessage = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!input.trim() || isLoading) {
-      return;
-    }
+    if (!input.trim() || isLoading) return;
 
     const userContent = input.trim();
     const userMessage: Message = { role: "user", content: userContent };
@@ -127,9 +132,6 @@ export default function ChatBubble() {
     setInput("");
     setIsLoading(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 420));
-
-    // If backend chat is enabled, we let Gemini handle the reasoning
     if (backendChatEnabled) {
       try {
         const response = await fetch("/api/chat", {
@@ -141,46 +143,54 @@ export default function ChatBubble() {
           }),
         });
 
-        const data = (await response.json()) as ChatApiResponse;
+        if (!response.ok) throw new Error("Stream failed");
 
-        if (data.content && data.role === "assistant") {
-          // ... update info logic remains ...
-          if (data.extractedInfo) {
-            const { name, phone, email } = data.extractedInfo;
-            setFormData(prev => ({
-              name: name || prev.name,
-              phone: phone || prev.phone,
-              email: email || prev.email,
-            }));
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error("No reader");
 
-            if (name && flowState === "COLLECTING_NAME") setFlowState("COLLECTING_PHONE");
-            if (phone && flowState === "COLLECTING_PHONE") setFlowState("COLLECTING_EMAIL");
-            if (email && flowState === "COLLECTING_EMAIL") {
-              setFlowState("CHATTING");
-              fetch("/api/lead", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...formData, email }),
-              }).catch(err => console.error("Failed to save lead:", err));
-            }
+        let assistantContent = "";
+        const decoder = new TextDecoder();
+        setMessages((current) => [...current, { role: "assistant", content: "" }]);
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          assistantContent += chunk;
+
+          const parts = assistantContent.split("@@@INFO_EXTRACTED@@@");
+          const uiText = parts[0];
+          const jsonText = parts[1];
+
+          setMessages((current) => {
+            const next = [...current];
+            const last = next[next.length - 1];
+            if (last && last.role === "assistant") last.content = uiText;
+            return next;
+          });
+
+          if (jsonText) {
+            try {
+              const info = JSON.parse(jsonText);
+              setFormData(prev => ({
+                name: info.name || prev.name,
+                phone: info.phone || prev.phone,
+                email: info.email || prev.email,
+              }));
+            } catch (e) {}
           }
-
-          appendAssistantMessage(data.content, data.content.includes("?") && (flowState !== "CHATTING"));
-        } else {
-          appendAssistantMessage("I'm having trouble connecting to my design systems right now. Try again in a second or reach out on Telegram.");
         }
       } catch (err) {
         console.error("Chat Error:", err);
-        appendAssistantMessage("System temporarily offline. I'm working on getting the assistant back up.");
+        appendAssistantMessage("System temporarily offline.");
       } finally {
         setIsLoading(false);
       }
       return;
     }
 
-    // Fallback/Legacy heuristic logic REMOVED. 
-    // If backend is disabled, we just show offensive/direct error as requested.
-    appendAssistantMessage("The bot is currently disabled in your settings.");
+    appendAssistantMessage("The bot is currently disabled.");
     setIsLoading(false);
   };
 
@@ -248,8 +258,8 @@ export default function ChatBubble() {
                         : "ml-auto rounded-[12px_12px_4px_12px] bg-[#E8503A] text-white"
                     }`}
                   >
-                    {message.content}
-                  </motion.div>
+                    dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content) }}
+                  />
                   
                   {message.role === "assistant" && message.isInfoRequest && (
                     <motion.div

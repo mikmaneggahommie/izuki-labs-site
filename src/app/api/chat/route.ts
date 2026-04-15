@@ -14,10 +14,7 @@ export async function POST(req: Request) {
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return NextResponse.json(
-        { error: "GEMINI_API_KEY is not configured." },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "GEMINI_API_KEY is not configured." }, { status: 500 });
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -33,12 +30,10 @@ Known visitor details:
 
 IMPORTANT: 
 - Stay strictly within the Izuki Labs knowledge base. 
-- If asked about "20k plan", refer to the Remote Designer.
-- Keep responses under 3 sentences unless technical details are requested.
-- Maintain a sharp, premium, and calm tone.
-`;
+- Output your conversational reply first.
+- ONLY when you are completely finished with the reply, output the delimiter "@@@INFO_EXTRACTED@@@" followed by the JSON object with the extracted info.
+`.trim();
 
-    // Format the conversation history for Gemini (excluding the final message which is sent below)
     const conversationHistory = messages.slice(0, -1).map((msg) => ({
       role: msg.role === "assistant" ? "model" : "user",
       parts: [{ text: msg.content }],
@@ -49,43 +44,35 @@ IMPORTANT:
         { role: "user", parts: [{ text: systemPrompt }] },
         {
           role: "model",
-          parts: [
-            {
-              text: "Understood. I am now acting as the interactive assistant for the izuki.labs website. I will be direct, systems-focused, and premium in my advice.",
-            },
-          ],
+          parts: [{ text: "Understood. I am now acting as the interactive assistant for the izuki.labs website. I will use the established knowledge base and the @@@INFO_EXTRACTED@@@ delimiter for data." }],
         },
         ...conversationHistory,
       ],
     });
 
-    const result = await chat.sendMessage(lastMessage);
-    const response = await result.response;
-    const text = response.text();
+    const result = await chat.sendMessageStream(lastMessage);
 
-    try {
-      // Attempt to parse JSON from Gemini's response
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      const data = jsonMatch ? JSON.parse(jsonMatch[0]) : { reply: text, extractedInfo: null };
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        for await (const chunk of result.stream) {
+          const text = chunk.text();
+          controller.enqueue(encoder.encode(text));
+        }
+        controller.close();
+      },
+    });
 
-      return NextResponse.json({
-        role: "assistant",
-        content: data.reply || text,
-        extractedInfo: data.extractedInfo || null,
-      });
-    } catch (e) {
-      console.error("Failed to parse Gemini JSON:", e);
-      return NextResponse.json({
-        role: "assistant",
-        content: text,
-      });
-    }
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      },
+    });
 
   } catch (error: unknown) {
-    console.error("Gemini API Error:", error);
-    return NextResponse.json(
-      { error: "Failed to process chat" },
-      { status: 500 }
-    );
+    console.error("Gemini Streaming Error:", error);
+    return NextResponse.json({ error: "Failed to process stream" }, { status: 500 });
   }
 }

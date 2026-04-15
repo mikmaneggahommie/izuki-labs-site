@@ -356,7 +356,7 @@ button {
   height: 100vh;
   overflow: visible !important;
   pointer-events: none;
-  perspective: 1800px;
+  perspective: 1000px;
   z-index: 2;
 }
 
