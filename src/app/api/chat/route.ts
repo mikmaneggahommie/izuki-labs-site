@@ -37,15 +37,15 @@ function sanitizeContents(rawContents: any[]) {
   return sanitized;
 }
 
-// Model IDs (2026 stabilized)
+// Model IDs (High-IQ 2026 stabilized)
 const modelIds = [
+  "gemini-2.0-flash",
+  "gemini-2.0-flash-exp",
   "gemini-3.1-flash-lite-preview",
-  "gemini-3.1-flash-preview",
-  "gemini-1.5-pro",
-  "gemini-1.5-flash"
+  "gemini-1.5-pro"
 ];
 
-let result;
+let result: any;
 let successModel = "";
 
 const systemPrompt = `${studioSystemPrompt}
@@ -60,7 +60,7 @@ VITAL INSTRUCTIONS:
 // Construct raw history
 const rawContents = [
   { role: "user" as const, parts: [{ text: systemPrompt }] },
-  { role: "model" as const, parts: [{ text: "Understood. I'm ready." }] },
+  { role: "model" as const, parts: [{ text: "Understood. I am your High-IQ partner. I follow all pricing rules precisely." }] },
   ...messages.map(m => ({
     role: (m.role === "assistant" ? "model" : "user") as "user" | "model",
     parts: [{ text: m.content }]
@@ -79,8 +79,9 @@ const safetySettings = [
 
 for (const modelId of modelIds) {
   try {
-    console.log(`Trying model: ${modelId}`);
+    console.log(`Trying high-IQ model: ${modelId}`);
     
+    // 2026 Protocol Fix: consume generateContentStream result directly
     result = await genAI.models.generateContentStream({
       model: modelId,
       contents: contents,
@@ -97,28 +98,29 @@ for (const modelId of modelIds) {
   }
 }
 
+if (!result) {
+  throw new Error("All High-IQ models failed to initialize.");
+}
 
-    if (!result) {
-      throw new Error("All model IDs failed.");
+console.log(`Connected via: ${successModel}`);
+
+const encoder = new TextEncoder();
+const stream = new ReadableStream({
+  async start(controller) {
+    try {
+      // 2026 Protocol: Iterate directly over the result
+      for await (const chunk of result) {
+        const text = chunk.text();
+        if (text) controller.enqueue(encoder.encode(text));
+      }
+      controller.close();
+    } catch (streamErr: any) {
+      console.error("High-IQ Stream error:", streamErr);
+      controller.error(streamErr);
     }
+  },
+});
 
-    console.log(`Connected via: ${successModel}`);
-
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const chunk of result.stream) {
-            const text = chunk.text();
-            if (text) controller.enqueue(encoder.encode(text));
-          }
-          controller.close();
-        } catch (streamErr: any) {
-          console.error("Stream error:", streamErr);
-          controller.error(streamErr);
-        }
-      },
-    });
 
     return new Response(stream, {
       headers: {
