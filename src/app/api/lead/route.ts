@@ -40,13 +40,15 @@ export async function POST(req: Request) {
           }),
         });
 
+        const responseText = await sheetResponse.text();
+        console.log(`Composio V1 Success [${sheetResponse.status}]:`, responseText);
+
         if (!sheetResponse.ok) {
-          const errorData = await sheetResponse.text();
-          console.error("Composio Stable V1 Error:", errorData);
+          console.error("Composio V1 Failure Payload:", responseText);
           throw new Error(`Composio Error: ${sheetResponse.status}`);
         }
       } catch (sheetErr) {
-        console.error("Composio Google Sheets Logging Failed:", sheetErr);
+        console.error("Composio Google Sheets Logging Final Failure:", sheetErr);
       }
     }
 

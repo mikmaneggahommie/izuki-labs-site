@@ -137,27 +137,26 @@ export default function ChatBubble() {
     if (!val) return;
 
     if (flowState === "COLLECTING_NAME") {
-      if (val.length < 2) {
-        setError("Please enter your real name.");
+      if (val.length < 2 || /\d/.test(val)) {
+        setError("Please enter a valid name (no numbers).");
         return;
       }
       const newData = { ...formData, name: val };
       setFormData(newData);
       setMessages(prev => [...prev, { role: "user", content: val }]);
-      appendAssistantMessage(`Nice to meet you, ${val}. What's the best way to reach you? (Telegram @username or Phone)`);
+      appendAssistantMessage(`Nice to meet you, ${val}. What's the best way to reach you? (Telegram, Phone, or Link)`);
       setFlowState("COLLECTING_CONTACT");
     } else if (flowState === "COLLECTING_CONTACT") {
-      const isTelegram = val.startsWith("@") || !/^\d/.test(val);
-      if (isTelegram && !validateTelegram(val)) {
-        setError("Invalid Telegram format.");
-        return;
-      }
-      if (!isTelegram && !validatePhone(val)) {
-        setError("Invalid phone number.");
+      const isEmail = validateEmail(val);
+      const isPhone = !isEmail && /^\+?\d{7,15}$/.test(val.replace(/[\s\-\(\)]/g, ""));
+      const isTelegram = !isEmail && !isPhone;
+
+      if (isTelegram && val.length < 3) {
+        setError("Please enter a valid contact method.");
         return;
       }
       
-      const normalizedValue = isTelegram ? normalizeTelegram(val) : val.replace(/[\s\-\(\)]/g, "");
+      const normalizedValue = isTelegram && !val.includes("/") ? normalizeTelegram(val) : val;
       const newData = { ...formData, [isTelegram ? "telegram" : "phone"]: normalizedValue };
       setFormData(newData);
       setMessages(prev => [...prev, { role: "user", content: val }]);
@@ -365,7 +364,7 @@ export default function ChatBubble() {
                       }}
                       placeholder={
                         flowState === "COLLECTING_NAME" ? "Enter your name..." : 
-                        flowState === "COLLECTING_CONTACT" ? "@telegram or phone..." : 
+                        flowState === "COLLECTING_CONTACT" ? "@telegram, phone, or link..." : 
                         "Enter your email..."
                       }
                       className={`w-full rounded-none border py-3.5 pl-5 pr-14 text-[14px] text-white placeholder:text-white/20 focus:outline-none transition-all ${
@@ -373,7 +372,7 @@ export default function ChatBubble() {
                       }`}
                     />
                     {error && (
-                      <span className="absolute left-0 -top-6 text-[11px] font-bold text-red-500">
+                      <span className="absolute left-0 top-full mt-1 text-[11px] font-bold text-red-500">
                         {error}
                       </span>
                     )}
