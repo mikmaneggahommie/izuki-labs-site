@@ -126,7 +126,7 @@ export default function ChatBubble() {
 
     if (flowState === "COLLECTING_EMAIL") {
       // Basic email validation regex
-      const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(userContent)) {
         appendAssistantMessage(
           "That doesn't look like a valid email. Please provide a valid email address."
