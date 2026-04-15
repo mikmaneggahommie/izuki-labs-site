@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { VerticalCutReveal, ScrollReveal } from "@/components/FancyText";
 
 const policies = [
   {
@@ -33,55 +34,59 @@ export default function PoliciesAccordion() {
   return (
     <section className="section-shell">
       <div className="content-shell">
-        <div className="mb-12 space-y-5">
-          <div className="section-label-row">
-            <span className="accent-square accent-square--tiny" aria-hidden />
-            <span className="section-label">Terms &amp; Policies</span>
-          </div>
+        <ScrollReveal>
+          <div className="mb-14 space-y-6">
+            <div className="section-label-row">
+              <span className="accent-square accent-square--tiny" aria-hidden />
+              <span className="section-label">Terms &amp; Policies</span>
+            </div>
 
-          <h2 className="display-title max-w-[10ch]">
-            HOW IT WORKS
-            <span className="accent-square" aria-hidden />
-          </h2>
-        </div>
+            <h2 className="display-title max-w-[10ch]">
+              <VerticalCutReveal>HOW IT WORKS</VerticalCutReveal>
+              <span className="accent-square" aria-hidden />
+            </h2>
+          </div>
+        </ScrollReveal>
 
         <div className="w-full border-t border-white/15">
           {policies.map((policy, index) => {
             const isOpen = openIndex === index;
 
             return (
-              <div key={policy.title} className="border-b border-white/15">
-                <button
-                  type="button"
-                  onClick={() => setOpenIndex(isOpen ? null : index)}
-                  className="group flex w-full items-center justify-between gap-6 py-7 text-left"
-                >
-                  <span className="text-xl font-semibold tracking-[-0.03em] text-white transition-all duration-300 group-hover:translate-x-2 group-hover:text-[#E8503A]">
-                    {policy.title}
-                  </span>
-                  <ChevronDown
-                    className={`h-5 w-5 flex-none text-white/45 transition-transform duration-300 ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
+              <ScrollReveal key={policy.title} delay={index * 0.06}>
+                <div className="border-b border-white/15">
+                  <button
+                    type="button"
+                    onClick={() => setOpenIndex(isOpen ? null : index)}
+                    className="group flex w-full items-center justify-between gap-6 py-7 text-left"
+                  >
+                    <span className="text-xl font-semibold tracking-[-0.03em] text-white transition-all duration-300 group-hover:translate-x-2 group-hover:text-[var(--accent)]">
+                      {policy.title}
+                    </span>
+                    <ChevronDown
+                      className={`h-5 w-5 flex-none text-white/45 transition-transform duration-300 ${
+                        isOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
 
-                <AnimatePresence initial={false}>
-                  {isOpen ? (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                      className="overflow-hidden"
-                    >
-                      <div className="max-w-4xl pb-7 pr-10 text-[15px] leading-[1.7] text-white/58">
-                        {policy.content}
-                      </div>
-                    </motion.div>
-                  ) : null}
-                </AnimatePresence>
-              </div>
+                  <AnimatePresence initial={false}>
+                    {isOpen ? (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="max-w-4xl pb-7 pr-10 text-[15px] leading-[1.7] text-white/58">
+                          {policy.content}
+                        </div>
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
+                </div>
+              </ScrollReveal>
             );
           })}
         </div>

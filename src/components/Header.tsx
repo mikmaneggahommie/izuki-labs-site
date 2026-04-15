@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { LetterSwapHover } from "@/components/FancyText";
 
 const menuItems = [
   { label: "Home", href: "#top" },
@@ -48,7 +49,7 @@ export default function Header() {
               onClick={(event) => handleAnchorClick(event, "#top")}
               className="nav-copy interactive-link flex w-fit items-center tracking-[0.14em] text-white"
             >
-              IZUKI.LABS
+              IZUKI<span className="inline-block w-[6px] h-[6px] bg-[var(--accent)] mx-[2px] translate-y-[1px]" />LABS
             </a>
 
             <div className="justify-self-start md:justify-self-center">
@@ -97,7 +98,7 @@ export default function Header() {
                     }}
                     className="display-title interactive-link leading-[0.88]"
                   >
-                    {item.label}
+                    <LetterSwapHover>{item.label}</LetterSwapHover>
                   </motion.a>
                 ))}
               </nav>
@@ -125,22 +126,22 @@ export default function Header() {
                 </div>
 
                 <div className="space-y-3">
-                  <p className="section-label">Social</p>
+                  <p className="section-label">Channels</p>
                   <a
-                    href="https://t.me/snowplugwalk"
+                    href="https://t.me/IZUKILABS"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="body-copy interactive-link block text-white"
                   >
-                    Telegram
+                    t.me/IZUKILABS
                   </a>
                   <a
-                    href="https://www.instagram.com/izuki.labs/"
+                    href="https://t.me/netlaserz"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="body-copy interactive-link block text-white"
                   >
-                    Instagram
+                    t.me/netlaserz
                   </a>
                 </div>
               </div>

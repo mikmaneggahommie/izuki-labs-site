@@ -10,9 +10,8 @@
   --text-soft: rgba(255, 255, 255, 0.4);
   --line: rgba(255, 255, 255, 0.1);
   --line-strong: rgba(255, 255, 255, 0.16);
-  --radius: 12px;
-  --accent: #FF0000;
-  --accent: #FF0000;
+  --radius: 0px;
+  --accent: #E50000;
   --accent-foreground: #FFFFFF;
   --container: 1400px;
   --section-padding-y: clamp(8.5rem, 12vw, 12rem);
@@ -83,7 +82,7 @@ button {
 }
 
 ::selection {
-  background: rgba(255, 68, 37, 0.95);
+  background: var(--accent);
   color: #ffffff;
 }
 
@@ -117,60 +116,39 @@ button {
   pointer-events: none;
 }
 
+/* No red halo, no gradients — clean black */
 .experience-aura {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 42rem;
-  height: 42rem;
-  margin-left: -21rem;
-  margin-top: -21rem;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 0, 0, 0.1), transparent 70%);
-  filter: none;
-  opacity: 0.4;
+  display: none;
 }
 
 .experience-gradient {
-  position: absolute;
-  inset: auto;
-  border-radius: 0;
-  filter: none;
-  opacity: 1;
+  display: none;
 }
 
 .experience-gradient--top {
-  top: 0;
-  right: 0;
-  width: 20rem;
-  height: 20rem;
-  background: linear-gradient(to bottom left, rgba(255, 0, 0, 0.05), transparent);
+  display: none;
 }
 
 .experience-gradient--bottom {
-  right: 0;
-  bottom: 0;
-  width: 20rem;
-  height: 20rem;
-  background: linear-gradient(to top left, rgba(255, 0, 0, 0.05), transparent);
+  display: none;
 }
 
 .experience-noise {
   position: absolute;
   inset: 0;
-  opacity: 0.07;
+  opacity: 0.05;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 120px 120px;
   mask-image: radial-gradient(circle at center, black 40%, transparent 82%);
 }
 
 .liquid-glass {
-  background: rgba(10, 10, 10, 0.7);
+  background: rgba(10, 10, 10, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
 }
 
@@ -204,6 +182,7 @@ button {
   color: var(--text-soft);
 }
 
+/* SHARP RECTANGLE DOT — no border-radius */
 .accent-square {
   display: inline-block;
   width: 14px;
@@ -213,6 +192,7 @@ button {
   vertical-align: baseline;
   transform: translateY(-0.08em);
   margin-left: clamp(0.35rem, 1vw, 0.65rem);
+  border-radius: 0;
 }
 
 .accent-square--tiny {
@@ -221,6 +201,7 @@ button {
   flex-basis: 8px;
   margin-left: 0;
   transform: none;
+  border-radius: 0;
 }
 
 .display-title {
@@ -304,8 +285,8 @@ button {
 }
 
 .primary-button:hover {
-  box-shadow: 2px 2px 0px rgba(255, 0, 0, 0.4);
-  transform: translate(4px, 4px);
+  box-shadow: 4px 4px 0px var(--accent);
+  transform: translate(-2px, -2px);
 }
 
 .secondary-button:hover {
@@ -313,52 +294,10 @@ button {
   color: var(--accent);
 }
 
-.marquee-shell {
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  overflow: hidden;
-  background: #000000;
-}
-
-.marquee-track {
-  display: flex;
-  width: max-content;
-  min-width: 200%;
-  animation: marqueeLoop 30s linear infinite;
-}
-
-.marquee-group {
-  display: flex;
-  align-items: center;
-  gap: 1.35rem;
-  padding-right: 1.35rem;
-}
-
-.marquee-item,
-.marquee-separator {
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.marquee-item {
-  color: rgba(255, 255, 255, 0.3);
-}
-
-.marquee-item--accent {
-  color: var(--accent);
-}
-
-.marquee-separator {
-  color: rgba(255, 255, 255, 0.16);
-}
-
 .work-preview {
   position: relative;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 0;
   aspect-ratio: 1 / 1;
   background: #050505;
 }
@@ -377,20 +316,6 @@ button {
   background: rgba(255, 255, 255, 0.14);
 }
 
-@keyframes onlinePulse {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4); }
-  70% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(255, 0, 0, 0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
-}
-
-.animate-online-pulse {
-  animation: onlinePulse 2s infinite;
-}
-
-.animate-dot-pulse {
-  animation: dotPulse 2s infinite;
-}
-
 @keyframes marqueeLoop {
   0% {
     transform: translateX(0);
@@ -398,16 +323,6 @@ button {
 
   100% {
     transform: translateX(-50%);
-  }
-}
-
-@keyframes ambientShift {
-  0% {
-    transform: translate3d(0, 0, 0) scale(0.96);
-  }
-
-  100% {
-    transform: translate3d(1.5%, -2.5%, 0) scale(1.05);
   }
 }
 

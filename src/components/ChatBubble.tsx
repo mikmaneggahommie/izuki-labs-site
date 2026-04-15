@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, Send, X, ExternalLink } from "lucide-react";
+import { MessageSquare, Send, X } from "lucide-react";
 
 type Message = {
   role: "assistant" | "user";
@@ -32,7 +32,7 @@ const formatMarkdown = (text: string) => {
     .replace(/^\s*[\-\*]\s+(.*)$/gm, '<li class="ml-4 list-disc">$1</li>') // Bullet points
     .replace(/^\s*(\d+)\.\s+(.*)$/gm, '<li class="ml-4 list-decimal">$1</li>') // Numbered lists
     .replace(/\n/g, '<br />')
-    .replace(/(<li[\s\S]*?<\/li>)/g, '<ul class="my-2">$1</ul>'); // Wrap lists
+    .replace(/((<li[\s\S]*?<\/li>))/g, '<ul class="my-2">$1</ul>'); // Wrap lists
 };
 
 export default function ChatBubble() {
@@ -40,7 +40,7 @@ export default function ChatBubble() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isNearBottom, setIsNearBottom] = useState(false);
+  const [hasAutoOpened, setHasAutoOpened] = useState(false);
   const [flowState, setFlowState] = useState<"COLLECTING_NAME" | "COLLECTING_CONTACT" | "COLLECTING_EMAIL" | "CHATTING">("COLLECTING_NAME");
   const [formData, setFormData] = useState<UserInfo>({});
   const [leadStepInput, setLeadStepInput] = useState("");
@@ -86,17 +86,30 @@ export default function ChatBubble() {
     scrollToBottom();
   }, [messages, isLoading]);
 
+  // Auto-open chat when user scrolls to footer
   useEffect(() => {
     const handleScroll = () => {
-      const scrollHeight = document.documentElement.scrollHeight;
-      const scrollTop = document.documentElement.scrollTop;
-      const clientHeight = document.documentElement.clientHeight;
-      setIsNearBottom(scrollTop + clientHeight > scrollHeight - 100);
+      if (hasAutoOpened || isOpen) return;
+      const footer = document.getElementById("contact");
+      if (!footer) return;
+      const rect = footer.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.6) {
+        setIsOpen(true);
+        setHasAutoOpened(true);
+        // Add a greeting if in CHATTING mode
+        if (flowState === "CHATTING") {
+          setMessages(prev => {
+            const lastMsg = prev[prev.length - 1];
+            if (lastMsg?.content?.includes("got a question")) return prev;
+            return [...prev, { role: "assistant", content: "Hey, got a question? 👋" }];
+          });
+        }
+      }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [hasAutoOpened, isOpen, flowState]);
 
   const appendAssistantMessage = (content: string, isInfoRequest = false) => {
     setMessages((prev) => [...prev, { role: "assistant", content, isInfoRequest }]);
@@ -244,9 +257,7 @@ export default function ChatBubble() {
         <motion.button
           type="button"
           onClick={() => setIsOpen(true)}
-          className={`fixed bottom-8 right-8 z-[100] flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-[#0A0A0A] text-white shadow-2xl transition-all hover:scale-110 active:scale-95 md:bottom-10 md:right-10 ${
-            isNearBottom ? "ring-2 ring-[#00FF00]/50" : ""
-          }`}
+          className="fixed bottom-8 right-8 z-[100] flex h-14 w-14 items-center justify-center border border-white/10 bg-[#0A0A0A] text-white shadow-2xl transition-all hover:scale-110 active:scale-95 md:bottom-10 md:right-10"
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           whileHover={{ rotate: 12 }}
@@ -262,20 +273,20 @@ export default function ChatBubble() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 32, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-4 right-4 z-[110] flex h-[520px] w-[calc(100vw-32px)] max-w-[400px] flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#0A0A0A] shadow-[0_32px_128px_rgba(0,0,0,0.8)] backdrop-blur-xl md:bottom-10 md:right-10"
+            className="fixed bottom-4 right-4 z-[110] flex h-[520px] w-[calc(100vw-32px)] max-w-[400px] flex-col overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_32px_128px_rgba(0,0,0,0.8)] backdrop-blur-xl md:bottom-10 md:right-10"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/5 bg-[#111111] px-6 py-4">
               <div className="flex items-center gap-2.5">
                 <span className="text-lg font-black tracking-tight text-white uppercase">IZUKI LABS</span>
                 <span className="relative flex h-2.5 w-2.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00FF00] opacity-75" />
-                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#00FF00]" />
+                  <span className="absolute inline-flex h-full w-full animate-ping bg-[#00FF00] opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 bg-[#00FF00]" />
                 </span>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="rounded-full p-2 text-white/40 transition-colors hover:bg-white/5 hover:text-white"
+                className="p-2 text-white/40 transition-colors hover:bg-white/5 hover:text-white"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -294,8 +305,8 @@ export default function ChatBubble() {
                     <div
                       className={`max-w-[85%] px-4 py-3 text-[14px] leading-relaxed ${
                         message.role === "user"
-                          ? "rounded-[1.25rem] rounded-br-[4px] bg-[#FF0000] text-white font-medium shadow-[0_4px_12px_rgba(255,0,0,0.2)]"
-                          : "rounded-[1.25rem] rounded-bl-[4px] bg-[#1A1A1A] text-white/90 border border-white/5"
+                          ? "bg-[#E50000] text-white font-medium"
+                          : "bg-[#1A1A1A] text-white/90 border border-white/5"
                       }`}
                       dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content) }}
                     />
@@ -303,7 +314,7 @@ export default function ChatBubble() {
                 ))}
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="rounded-[1.25rem] rounded-bl-[4px] bg-[#1A1A1A] px-5 py-4 border border-white/5">
+                    <div className="bg-[#1A1A1A] px-5 py-4 border border-white/5">
                       <div className="flex gap-1.5">
                         <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/30" style={{ animationDelay: "0ms" }} />
                         <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/30" style={{ animationDelay: "150ms" }} />
@@ -347,14 +358,14 @@ export default function ChatBubble() {
                         flowState === "COLLECTING_CONTACT" ? "@telegram, phone, or link..." : 
                         "Enter your email..."
                       }
-                      className={`w-full rounded-xl border py-3 pl-4 pr-14 text-[14px] text-white placeholder:text-white/20 focus:outline-none transition-all ${
-                        error ? "border-red-500/60 bg-red-500/5" : "border-white/10 bg-[#1A1A1A] focus:border-white/20"
+                      className={`w-full border py-3 pl-4 pr-14 text-[14px] text-white placeholder:text-white/20 focus:outline-none transition-all ${
+                        error ? "border-[var(--accent)]/60 bg-[var(--accent)]/5" : "border-white/10 bg-[#1A1A1A] focus:border-white/20"
                       }`}
                     />
                     <button
                       type="submit"
                       disabled={!leadStepInput.trim()}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF0000] text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-30"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center bg-[#E50000] text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-30"
                     >
                       <Send className="h-3.5 w-3.5" />
                     </button>
@@ -365,15 +376,15 @@ export default function ChatBubble() {
                       <motion.span
                         initial={{ opacity: 0, y: -4 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="block text-[11px] font-medium text-red-400"
+                        className="block text-[11px] font-medium text-[var(--accent)]"
                       >
                         {error}
                       </motion.span>
                     )}
                   </div>
-                  <div className="h-1 w-full rounded-full bg-white/5 overflow-hidden">
+                  <div className="h-1 w-full bg-white/5 overflow-hidden">
                     <motion.div 
-                      className="h-full bg-[#FF0000] rounded-full"
+                      className="h-full bg-[#E50000]"
                       initial={{ width: "33.33%" }}
                       animate={{ 
                         width: flowState === "COLLECTING_NAME" ? "33.33%" : 
@@ -390,12 +401,12 @@ export default function ChatBubble() {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       placeholder="Ask anything..."
-                      className="w-full rounded-xl border border-white/10 bg-[#1A1A1A] py-3 pl-4 pr-14 text-[14px] text-white placeholder:text-white/20 focus:border-white/20 focus:outline-none transition-all"
+                      className="w-full border border-white/10 bg-[#1A1A1A] py-3 pl-4 pr-14 text-[14px] text-white placeholder:text-white/20 focus:border-white/20 focus:outline-none transition-all"
                     />
                     <button
                       type="submit"
                       disabled={!input.trim() || isLoading}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF0000] text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-30"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center bg-[#E50000] text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-30"
                     >
                       <Send className="h-3.5 w-3.5" />
                     </button>
@@ -404,15 +415,15 @@ export default function ChatBubble() {
                   <div className="grid grid-cols-2 gap-2.5">
                     <a
                       href="mailto:it.mikiyas.daniel@gmail.com"
-                      className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[#FF0000] text-[12px] font-bold uppercase tracking-tight text-white transition-all hover:brightness-110 active:scale-[0.98]"
+                      className="flex h-11 items-center justify-center gap-2 bg-[#E50000] text-[12px] font-bold uppercase tracking-tight text-white transition-all hover:brightness-110 active:scale-[0.98]"
                     >
                       Email Me
                     </a>
                     <a
-                      href="https://t.me/snowplugwalk"
+                      href="https://t.me/IZUKILABS"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex h-11 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 text-[12px] font-bold uppercase tracking-tight text-white transition-all hover:bg-white/10 active:scale-[0.98]"
+                      className="flex h-11 items-center justify-center gap-2 border border-white/10 bg-white/5 text-[12px] font-bold uppercase tracking-tight text-white transition-all hover:bg-white/10 active:scale-[0.98]"
                     >
                       Message Telegram
                     </a>

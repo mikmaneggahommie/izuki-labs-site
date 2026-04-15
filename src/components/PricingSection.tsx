@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { VerticalCutReveal, ScrollReveal } from "@/components/FancyText";
 
 type AddOn = {
   name: string;
@@ -11,7 +12,6 @@ type AddOn = {
 
 type Package = {
   id: string;
-  packageLabel: string;
   name: string;
   price: string;
   period: string;
@@ -24,7 +24,6 @@ type Package = {
 const packages: Package[] = [
   {
     id: "remote",
-    packageLabel: "Package 1",
     name: "Remote Designer",
     price: "20,000",
     period: "Birr / month",
@@ -49,7 +48,6 @@ const packages: Package[] = [
   },
   {
     id: "starter",
-    packageLabel: "Package 2",
     name: "Starter",
     price: "12,000",
     period: "Birr / month",
@@ -79,7 +77,6 @@ const packages: Package[] = [
   },
   {
     id: "basic",
-    packageLabel: "Package 3",
     name: "Basic",
     price: "7,500",
     period: "Birr / month",
@@ -140,13 +137,13 @@ export default function PricingSection() {
 
         gsap.fromTo(
           revealTargets,
-          { y: 48, opacity: 0, filter: "blur(10px)" },
+          { y: 60, opacity: 0, filter: "blur(10px)" },
           {
             y: 0,
             opacity: 1,
             filter: "blur(0px)",
             duration: 0.95,
-            stagger: 0.12,
+            stagger: 0.15,
             ease: "power3.out",
             scrollTrigger: {
               trigger: sectionRef.current,
@@ -169,19 +166,19 @@ export default function PricingSection() {
 
   return (
     <section ref={sectionRef} id="pricing" className="section-shell">
-      <div className="content-shell space-y-14">
+      <div className="content-shell space-y-16">
         <div
           data-price-reveal
-          className="grid gap-8 border-b border-white/10 pb-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.48fr)] lg:items-end"
+          className="grid gap-10 border-b border-white/10 pb-14 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.48fr)] lg:items-end"
         >
-          <div className="space-y-5">
+          <div className="space-y-6">
             <div className="section-label-row">
               <span className="accent-square accent-square--tiny" aria-hidden />
               <span className="section-label">Retainer Packages</span>
             </div>
 
             <h2 className="display-title max-w-[9ch]">
-              Pricing
+              <VerticalCutReveal>Pricing</VerticalCutReveal>
               <span className="accent-square" aria-hidden />
             </h2>
           </div>
@@ -194,116 +191,116 @@ export default function PricingSection() {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-3">
-          {packages.map((pkg) => {
+          {packages.map((pkg, pkgIndex) => {
             const isOpen = openAddOns[pkg.id];
 
             return (
-              <article
-                key={pkg.id}
-                data-price-reveal
-                className={`group flex h-full flex-col justify-between rounded-[18px] border p-8 transition-transform duration-500 hover:-translate-y-2 xl:min-h-[640px] ${
-                  pkg.featured
-                    ? "border-[#E8503A] bg-[linear-gradient(180deg,rgba(255,68,37,0.08),rgba(10,10,10,1)_18%)] shadow-[0_0_0_1px_rgba(255,68,37,0.16),0_30px_80px_rgba(255,68,37,0.08)]"
-                    : "border-white/10 bg-[#0A0A0A]"
-                }`}
-              >
-                <div className="space-y-10">
-                  <div className="space-y-5">
-                    {pkg.featured ? (
-                      <span className="inline-flex rounded-full border border-[#E8503A]/30 bg-[#E8503A]/12 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#ff7f69]">
-                        Most Requested
-                      </span>
-                    ) : null}
-
-                    <div className="space-y-3">
-                      <p className="section-label text-white/45">{pkg.packageLabel}</p>
-                      <h3 className="text-[30px] font-bold tracking-[-0.04em] text-white">
-                        {pkg.name}
-                      </h3>
-                    </div>
-
-                    <div className="flex flex-wrap items-end gap-3">
-                      <span className="text-[60px] font-black leading-none tracking-[-0.06em] text-white">
-                        {pkg.price}
-                      </span>
-                      <span className="pb-2 text-base text-white/42">
-                        {pkg.period}
-                      </span>
-                    </div>
-                  </div>
-
-                  <ul className="space-y-3.5">
-                    {pkg.features.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-start gap-3 text-[15px] leading-[1.8] text-white/68"
-                      >
-                        <span className="pt-1 text-sm font-bold text-[#E8503A]">
-                          +
+              <ScrollReveal key={pkg.id} delay={pkgIndex * 0.12}>
+                <article
+                  data-price-reveal
+                  className={`group flex h-full flex-col justify-between border p-8 transition-transform duration-500 hover:-translate-y-2 xl:min-h-[640px] ${
+                    pkg.featured
+                      ? "border-[var(--accent)] bg-[linear-gradient(180deg,rgba(229,0,0,0.06),rgba(10,10,10,1)_18%)]"
+                      : "border-white/10 bg-[#0A0A0A]"
+                  }`}
+                >
+                  <div className="space-y-10">
+                    <div className="space-y-6">
+                      {pkg.featured ? (
+                        <span className="inline-flex border border-[var(--accent)]/30 bg-[var(--accent)]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
+                          Most Requested
                         </span>
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="mt-10 space-y-6">
-                  <a
-                    href="#contact"
-                    className={`${
-                      pkg.featured ? "primary-button" : "secondary-button"
-                    } flex w-full`}
-                  >
-                    {pkg.cta}
-                  </a>
-
-                  <div className="border-t border-white/10 pt-5">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setOpenAddOns((current) => ({
-                          ...current,
-                          [pkg.id]: !current[pkg.id],
-                        }))
-                      }
-                      className="flex w-full items-center justify-between gap-4 text-left"
-                    >
-                      <span className="text-sm font-medium tracking-[0.04em] text-white/74">
-                        Optional add-ons
-                      </span>
-                      <ChevronDown
-                        className={`h-4 w-4 text-white/45 transition-transform duration-300 ${
-                          isOpen ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-
-                    <AnimatePresence initial={false}>
-                      {isOpen ? (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                          className="overflow-hidden"
-                        >
-                          <div className="space-y-3 pt-5">
-                            {pkg.addOns.map((addOn) => (
-                              <div
-                                key={addOn.name}
-                                className="flex items-center justify-between gap-4 border-b border-white/6 pb-3 text-[14px] text-white/58 last:border-b-0"
-                              >
-                                <span>{addOn.name}</span>
-                                <span className="text-white/78">{addOn.price}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </motion.div>
                       ) : null}
-                    </AnimatePresence>
+
+                      <div className="space-y-2">
+                        <h3 className="text-[30px] font-bold tracking-[-0.04em] text-white">
+                          {pkg.name}
+                        </h3>
+                      </div>
+
+                      <div className="flex flex-wrap items-end gap-3 pt-2">
+                        <span className="text-[60px] font-black leading-none tracking-[-0.06em] text-white">
+                          {pkg.price}
+                        </span>
+                        <span className="pb-2 text-base text-white/42">
+                          {pkg.period}
+                        </span>
+                      </div>
+                    </div>
+
+                    <ul className="space-y-4">
+                      {pkg.features.map((feature) => (
+                        <li
+                          key={feature}
+                          className="flex items-start gap-3 text-[15px] leading-[1.8] text-white/68"
+                        >
+                          <span className="pt-1 text-sm font-bold text-[var(--accent)]">
+                            +
+                          </span>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
-              </article>
+
+                  <div className="mt-12 space-y-6">
+                    <a
+                      href="#contact"
+                      className={`${
+                        pkg.featured ? "primary-button" : "secondary-button"
+                      } flex w-full`}
+                    >
+                      {pkg.cta}
+                    </a>
+
+                    <div className="border-t border-white/10 pt-5">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOpenAddOns((current) => ({
+                            ...current,
+                            [pkg.id]: !current[pkg.id],
+                          }))
+                        }
+                        className="flex w-full items-center justify-between gap-4 text-left"
+                      >
+                        <span className="text-sm font-medium tracking-[0.04em] text-white/74">
+                          Optional add-ons
+                        </span>
+                        <ChevronDown
+                          className={`h-4 w-4 text-white/45 transition-transform duration-300 ${
+                            isOpen ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+
+                      <AnimatePresence initial={false}>
+                        {isOpen ? (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                            className="overflow-hidden"
+                          >
+                            <div className="space-y-3 pt-5">
+                              {pkg.addOns.map((addOn) => (
+                                <div
+                                  key={addOn.name}
+                                  className="flex items-center justify-between gap-4 border-b border-white/6 pb-3 text-[14px] text-white/58 last:border-b-0"
+                                >
+                                  <span>{addOn.name}</span>
+                                  <span className="text-white/78">{addOn.price}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </motion.div>
+                        ) : null}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </article>
+              </ScrollReveal>
             );
           })}
         </div>

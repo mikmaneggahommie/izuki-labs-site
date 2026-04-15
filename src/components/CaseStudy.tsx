@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { VerticalCutReveal, ScrollReveal } from "@/components/FancyText";
 
 import { assetPath } from "@/lib/asset-path";
 
@@ -83,119 +84,122 @@ export default function CaseStudy() {
       <div className="content-shell space-y-16">
         <div
           data-case-reveal
-          className="grid gap-8 border-b border-white/10 pb-12 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,0.52fr)] lg:items-end"
+          className="grid gap-10 border-b border-white/10 pb-14 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,0.52fr)] lg:items-end"
         >
-          <div className="space-y-5">
+          <div className="space-y-6">
             <div className="section-label-row">
               <span className="accent-square accent-square--tiny" aria-hidden />
-              <span className="section-label">Case Study</span>
+              <span className="section-label">Design Spotlight</span>
             </div>
 
-            <h2 className="display-title max-w-[10ch]">
-              InVision Africa
+            <h2 className="display-title max-w-[12ch]">
+              <VerticalCutReveal>This Month&apos;s Highlight</VerticalCutReveal>
               <span className="accent-square" aria-hidden />
             </h2>
           </div>
 
-          <p className="body-copy max-w-[34ch] lg:justify-self-end">
-            A tighter, more vertical campaign system designed to land faster in
-            feed and communicate with more urgency the moment someone sees it.
-          </p>
+          <ScrollReveal delay={0.2}>
+            <p className="body-copy max-w-[34ch] lg:justify-self-end">
+              A tighter, more vertical campaign system designed to land faster in
+              feed and communicate with more urgency the moment someone sees it.
+            </p>
+          </ScrollReveal>
         </div>
 
-        <div data-case-reveal className="flex justify-center">
-          <div
-            ref={containerRef}
-            className="relative aspect-[9/16] w-full max-w-[430px] overflow-hidden rounded-[28px] border border-white/10 bg-[#0A0A0A] shadow-[0_28px_90px_rgba(0,0,0,0.42)]"
-            onPointerDown={(event) => {
-              setDragging(true);
-              updateSlider(event.clientX);
-            }}
-            onPointerMove={(event) => {
-              if (dragging) {
+        <ScrollReveal>
+          <div className="flex justify-center">
+            <div
+              ref={containerRef}
+              className="relative aspect-[9/16] w-full max-w-[430px] overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_28px_90px_rgba(0,0,0,0.42)]"
+              onPointerDown={(event) => {
+                setDragging(true);
                 updateSlider(event.clientX);
-              }
-            }}
-            onPointerUp={() => setDragging(false)}
-            onPointerLeave={() => setDragging(false)}
-            style={{ touchAction: "none" }}
-          >
-            <div className="absolute inset-0">
-              <Image
-                src={assetPath("/images/case-study/before.jpg")}
-                alt="Before design"
-                fill
-                sizes="(max-width: 767px) 84vw, 430px"
-                className="object-cover grayscale"
-              />
-            </div>
-
-            <motion.div className="absolute inset-0" style={{ clipPath }}>
-              <Image
-                src={assetPath("/images/case-study/after.jpg")}
-                alt="After design"
-                fill
-                sizes="(max-width: 767px) 84vw, 430px"
-                className="object-cover"
-              />
-            </motion.div>
-
-            <motion.div
-              className="absolute bottom-0 top-0 z-20 w-px bg-white"
-              style={{ left: sliderLeft }}
+              }}
+              onPointerMove={(event) => {
+                if (dragging) {
+                  updateSlider(event.clientX);
+                }
+              }}
+              onPointerUp={() => setDragging(false)}
+              onPointerLeave={() => setDragging(false)}
+              style={{ touchAction: "none" }}
             >
-              <div className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black text-white shadow-[0_14px_40px_rgba(0,0,0,0.45)]">
-                <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" aria-hidden>
-                  <path
-                    d="M6 10H2m0 0 3-3m-3 3 3 3m9-3h4m0 0-3-3m3 3-3 3"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="1.5"
-                  />
-                </svg>
+              <div className="absolute inset-0">
+                <Image
+                  src={assetPath("/images/case-study/before.jpg")}
+                  alt="Before design"
+                  fill
+                  sizes="(max-width: 767px) 84vw, 430px"
+                  className="object-cover grayscale"
+                />
               </div>
-            </motion.div>
 
-            <div className="absolute left-4 top-4 z-30 rounded-full border border-white/10 bg-black/72 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white/68">
-              Before
+              <motion.div className="absolute inset-0" style={{ clipPath }}>
+                <Image
+                  src={assetPath("/images/case-study/after.jpg")}
+                  alt="After design"
+                  fill
+                  sizes="(max-width: 767px) 84vw, 430px"
+                  className="object-cover"
+                />
+              </motion.div>
+
+              <motion.div
+                className="absolute bottom-0 top-0 z-20 w-px bg-white"
+                style={{ left: sliderLeft }}
+              >
+                <div className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center border border-white/15 bg-black text-white shadow-[0_14px_40px_rgba(0,0,0,0.45)]">
+                  <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" aria-hidden>
+                    <path
+                      d="M6 10H2m0 0 3-3m-3 3 3 3m9-3h4m0 0-3-3m3 3-3 3"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.5"
+                    />
+                  </svg>
+                </div>
+              </motion.div>
+
+              <div className="absolute left-4 top-4 z-30 border border-white/10 bg-black/72 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white/68">
+                Before
+              </div>
+              <div className="absolute right-4 top-4 z-30 border border-white/10 bg-black/72 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white/68">
+                After
+              </div>
             </div>
-            <div className="absolute right-4 top-4 z-30 rounded-full border border-white/10 bg-black/72 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white/68">
-              After
+          </div>
+        </ScrollReveal>
+
+        <ScrollReveal>
+          <div className="mx-auto grid max-w-[980px] gap-12 pt-4 lg:grid-cols-[minmax(0,0.34fr)_minmax(0,0.66fr)]">
+            <div className="space-y-4">
+              <p className="section-label text-white/42">Campaign</p>
+              <p className="text-[19px] font-medium leading-[1.45] text-white">
+                5th Round Student Registration
+              </p>
+              <p className="section-label text-white/35 pt-1">April 2026</p>
+            </div>
+
+            <div className="space-y-5">
+              <p className="body-copy">
+                The original campaign needed stronger hierarchy, sharper
+                messaging, and a more immediate sense of urgency for the launch.
+              </p>
+
+              <p className="body-copy">
+                I rebuilt the visual system for a vertical-first format, tightened
+                the spacing, lifted contrast, and reorganized the information so
+                it could stop the scroll faster.
+              </p>
+
+              <p className="text-[18px] font-semibold leading-[1.7] text-white">
+                The result is a cleaner campaign with better focus, stronger
+                momentum, and a more premium registration push.
+              </p>
             </div>
           </div>
-        </div>
-
-        <div
-          data-case-reveal
-          className="mx-auto grid max-w-[980px] gap-10 lg:grid-cols-[minmax(0,0.34fr)_minmax(0,0.66fr)]"
-        >
-          <div className="space-y-3">
-            <p className="section-label text-white/42">Campaign</p>
-            <p className="text-[19px] font-medium leading-[1.45] text-white">
-              5th Round Student Registration
-            </p>
-            <p className="section-label text-white/35">April 2026</p>
-          </div>
-
-          <div className="space-y-5">
-            <p className="body-copy">
-              The original campaign needed stronger hierarchy, sharper
-              messaging, and a more immediate sense of urgency for the launch.
-            </p>
-
-            <p className="body-copy">
-              I rebuilt the visual system for a vertical-first format, tightened
-              the spacing, lifted contrast, and reorganized the information so
-              it could stop the scroll faster.
-            </p>
-
-            <p className="text-[18px] font-semibold leading-[1.7] text-white">
-              The result is a cleaner campaign with better focus, stronger
-              momentum, and a more premium registration push.
-            </p>
-          </div>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

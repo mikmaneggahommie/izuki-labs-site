@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { VerticalCutReveal, ScrollReveal } from "@/components/FancyText";
 
 import { assetPath } from "@/lib/asset-path";
 
@@ -14,8 +15,15 @@ const workAccounts = [
     href: "https://www.instagram.com/atmosphere_251/",
     summary:
       "A multipurpose cultural and creative space in the heart of Addis Ababa with a feed built around atmosphere, events, and visual culture.",
-    avatar: "/images/2.jpg",
-    previews: ["/images/2.jpg", "/images/4.jpg", "/images/6.jpg", "/images/7.jpg", "/images/5.jpg", "/images/3.jpg"],
+    avatar: "/images/atmosphere/profile.jpeg",
+    previews: [
+      "/images/atmosphere/1.jpeg",
+      "/images/atmosphere/2.png",
+      "/images/atmosphere/3.png",
+      "/images/atmosphere/4.png",
+      "/images/atmosphere/5.png",
+      "/images/atmosphere/6.png",
+    ],
   },
   {
     name: "Loline Mag | Ethiopian Digital Magazine",
@@ -24,8 +32,15 @@ const workAccounts = [
     href: "https://www.instagram.com/loline_mag/",
     summary:
       "An Ethiopian digital magazine focused on stories, entrepreneurship, and community-led editorial publishing.",
-    avatar: "/images/1.JPG",
-    previews: ["/images/1.JPG", "/images/3.jpg", "/images/5.jpg", "/images/6.jpg", "/images/7.jpg", "/images/4.jpg"],
+    avatar: "/images/loline/profile.jpeg",
+    previews: [
+      "/images/loline/1.jpeg",
+      "/images/loline/2.jpeg",
+      "/images/loline/3.jpeg",
+      "/images/loline/4.jpeg",
+      "/images/loline/5.jpeg",
+      "/images/loline/6.jpeg",
+    ],
   },
 ];
 
@@ -99,15 +114,14 @@ export default function WorkShowcase() {
               <span className="section-label">Selected Work</span>
             </div>
 
-            <h2 className="display-title max-w-[10ch]">
-              Selected Work
+            <h2 className="display-title max-w-[14ch]">
+              <VerticalCutReveal>Accounts I&apos;ve Shaped</VerticalCutReveal>
               <span className="accent-square" aria-hidden />
             </h2>
           </div>
 
           <p className="body-copy max-w-[36ch] md:justify-self-end">
-            My work is about crafting compelling social media identities through
-            strategic design and visual storytelling.
+            Social media accounts I designed, managed, and grew from the ground up.
           </p>
         </div>
 
@@ -119,7 +133,7 @@ export default function WorkShowcase() {
               href={account.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex h-full flex-col gap-9 rounded-[24px] border border-white/8 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.06),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-8 transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)]"
+              className="group flex h-full flex-col gap-9 border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-8 transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)]"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -143,7 +157,7 @@ export default function WorkShowcase() {
                   </div>
                 </div>
 
-                <ArrowUpRight className="h-5 w-5 text-white/40 transition-colors group-hover:text-[#E8503A]" />
+                <ArrowUpRight className="h-5 w-5 text-white/40 transition-colors group-hover:text-[var(--accent)]" />
               </div>
 
               <div className="flex items-center justify-between gap-4 border-y border-white/8 py-4 text-sm">

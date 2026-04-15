@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { TypewriterText, LetterSwapHover, ScrollReveal } from "@/components/FancyText";
 
 export default function ContactFooter() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -60,15 +61,12 @@ export default function ContactFooter() {
   }, []);
 
   return (
-    <footer ref={sectionRef} id="contact" className="section-shell pb-0">
-      <div
-        className="content-shell flex flex-col justify-between gap-20"
-        style={{ minHeight: "calc(100svh - var(--section-padding-y))" }}
-      >
+    <footer ref={sectionRef} id="contact" className="section-shell" style={{ paddingBottom: 0 }}>
+      <div className="content-shell flex flex-col justify-between gap-16">
         <div className="space-y-14">
           <div
             data-contact-reveal
-            className="grid gap-8 border-t border-white/10 pt-16 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,0.5fr)] lg:items-end"
+            className="grid gap-10 border-t border-white/10 pt-16 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,0.5fr)] lg:items-end"
           >
             <div className="space-y-6">
               <div className="section-label-row">
@@ -76,16 +74,18 @@ export default function ContactFooter() {
                 <span className="section-label">Start A Project</span>
               </div>
 
-              <h2 className="display-title max-w-[8ch]">
-                Let&apos;s build the next version of your brand
+              <h2 className="display-title max-w-[10ch]">
+                <TypewriterText text="Write to me." speed={80} />
               </h2>
             </div>
 
-            <p className="body-copy max-w-[34ch] lg:justify-self-end">
-              If you already know what you need, send the brief. If you&apos;re
-              still shaping it, send the rough idea and I&apos;ll help turn it
-              into a clear direction.
-            </p>
+            <ScrollReveal delay={0.3}>
+              <p className="body-copy max-w-[34ch] lg:justify-self-end">
+                If you already know what you need, send the brief. If you&apos;re
+                still shaping it, send the rough idea and I&apos;ll help turn it
+                into a clear direction.
+              </p>
+            </ScrollReveal>
           </div>
 
           <div
@@ -96,7 +96,7 @@ export default function ContactFooter() {
               Start A Project
             </a>
             <a
-              href="https://t.me/snowplugwalk"
+              href="https://t.me/IZUKILABS"
               target="_blank"
               rel="noopener noreferrer"
               className="secondary-button"
@@ -106,7 +106,7 @@ export default function ContactFooter() {
           </div>
         </div>
 
-        <div className="space-y-10">
+        <div>
           <div
             data-contact-reveal
             className="grid gap-10 border-t border-white/10 pt-14 md:grid-cols-3"
@@ -115,16 +115,16 @@ export default function ContactFooter() {
               <p className="section-label">Sitemap</p>
               <div className="space-y-2.5 text-[15px] leading-[2.2] text-white">
                 <a href="#top" className="interactive-link block">
-                  Home
+                  <LetterSwapHover>Home</LetterSwapHover>
                 </a>
                 <a href="#work" className="interactive-link block">
-                  Work
+                  <LetterSwapHover>Work</LetterSwapHover>
                 </a>
                 <a href="#pricing" className="interactive-link block">
-                  Pricing
+                  <LetterSwapHover>Pricing</LetterSwapHover>
                 </a>
                 <a href="#about" className="interactive-link block">
-                  About
+                  <LetterSwapHover>About</LetterSwapHover>
                 </a>
               </div>
             </div>
@@ -141,35 +141,27 @@ export default function ContactFooter() {
                 >
                   it.mikiyas.daniel@gmail.com
                 </a>
-                <a
-                  href="https://t.me/snowplugwalk"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="interactive-link block"
-                >
-                  Telegram — @snowplugwalk
-                </a>
               </div>
             </div>
 
             <div className="space-y-5">
-              <p className="section-label">Social</p>
+              <p className="section-label">Channels</p>
               <div className="space-y-2.5 text-[15px] leading-[2.2] text-white">
                 <a
-                  href="https://www.instagram.com/izuki.labs/"
+                  href="https://t.me/IZUKILABS"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="interactive-link block"
                 >
-                  Instagram — @izuki.labs
+                  Telegram — t.me/IZUKILABS
                 </a>
                 <a
-                  href="https://www.tiktok.com/@izuki.labs"
+                  href="https://t.me/netlaserz"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="interactive-link block"
                 >
-                  TikTok — @izuki.labs
+                  Telegram — t.me/netlaserz
                 </a>
               </div>
             </div>
@@ -177,7 +169,7 @@ export default function ContactFooter() {
 
           <div
             data-contact-reveal
-            className="flex flex-col gap-3 border-t border-white/10 py-6 text-[12px] text-white/35 md:flex-row md:items-center md:justify-between"
+            className="flex flex-col gap-3 border-t border-white/10 py-5 text-[12px] text-white/35 md:flex-row md:items-center md:justify-between"
           >
             <p>© 2026 izuki.labs — All rights reserved</p>
             <p>Based in Addis Ababa, available worldwide</p>
