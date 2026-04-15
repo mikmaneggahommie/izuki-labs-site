@@ -23,9 +23,10 @@ export default function HeroSection() {
   const LOCK_THRESHOLD = 2000; 
 
   useEffect(() => {
-    const handleGlobalWheel = (e: WheelEvent) => {
-      if (!isLocked) return;
+    // Once unlocked, never re-lock (prevents infinite scroll trap from menu)
+    if (!isLocked) return;
 
+    const handleGlobalWheel = (e: WheelEvent) => {
       // Only capture if we are at the top of the page
       if (window.scrollY > 10) {
         setIsLocked(false);

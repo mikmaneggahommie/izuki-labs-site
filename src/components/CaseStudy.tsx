@@ -92,10 +92,8 @@ export default function CaseStudy() {
               <span className="section-label">Design Spotlight</span>
             </div>
 
-            <h2 className="display-title">
-              This Month&apos;s Highlight
-              <span className="accent-square" aria-hidden />
-            </h2>
+            <h2 className="display-title">This Month&apos;s Highlight</h2>
+            <span className="accent-square mt-3" aria-hidden />
           </div>
 
           <ScrollReveal delay={0.2}>

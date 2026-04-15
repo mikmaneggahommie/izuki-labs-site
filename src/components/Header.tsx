@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { LetterSwapHover } from "@/components/FancyText";
 
 const menuItems = [
   { label: "Home", href: "#top" },
@@ -82,7 +81,7 @@ export default function Header() {
             className="fixed inset-0 z-40 overflow-y-auto bg-black/95 backdrop-blur-2xl"
           >
             <div className="content-shell flex min-h-full flex-col justify-between px-[var(--section-padding-x)] pb-10 pt-28">
-              <nav className="grid gap-3 sm:gap-4">
+              <nav className="grid gap-2">
                 {menuItems.map((item, index) => (
                   <motion.a
                     key={item.label}
@@ -96,9 +95,9 @@ export default function Header() {
                       delay: index * 0.06,
                       ease: [0.16, 1, 0.3, 1],
                     }}
-                    className="text-[clamp(40px,10vw,120px)] font-black leading-[0.95] tracking-[-0.03em] text-white interactive-link"
+                    className="block text-[clamp(32px,8vw,80px)] font-black leading-[1.15] tracking-[-0.03em] text-white transition-colors duration-200 hover:text-[var(--accent)]"
                   >
-                    <LetterSwapHover>{item.label}</LetterSwapHover>
+                    {item.label}
                   </motion.a>
                 ))}
               </nav>

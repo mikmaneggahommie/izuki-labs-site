@@ -41,10 +41,8 @@ export default function PoliciesAccordion() {
               <span className="section-label">Terms &amp; Policies</span>
             </div>
 
-            <h2 className="display-title">
-              How It Works
-              <span className="accent-square" aria-hidden />
-            </h2>
+            <h2 className="display-title">How It Works</h2>
+            <span className="accent-square mt-4" aria-hidden />
           </div>
         </ScrollReveal>
 

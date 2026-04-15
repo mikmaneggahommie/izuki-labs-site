@@ -205,10 +205,10 @@ button {
 }
 
 .display-title {
-  font-size: clamp(48px, 8vw, 120px);
+  font-size: clamp(36px, 6vw, 88px);
   font-weight: 900;
   letter-spacing: -0.03em;
-  line-height: 0.95;
+  line-height: 1;
 }
 
   .hero-wordmark {

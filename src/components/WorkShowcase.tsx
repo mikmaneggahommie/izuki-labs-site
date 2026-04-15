@@ -109,10 +109,8 @@ export default function WorkShowcase() {
           className="grid gap-10 border-b border-white/10 pb-12 md:grid-cols-[minmax(0,1fr)_minmax(280px,400px)] md:items-end"
         >
           <div className="space-y-5">
-            <h2 className="display-title">
-              Featured Brands
-              <span className="accent-square" aria-hidden />
-            </h2>
+            <h2 className="display-title">Featured Brands</h2>
+            <span className="accent-square mt-3" aria-hidden />
           </div>
 
           <p className="body-copy max-w-[36ch] md:justify-self-end">

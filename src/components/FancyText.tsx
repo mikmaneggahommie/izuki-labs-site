@@ -118,18 +118,20 @@ export function TypewriterText({
   className = "",
   speed = 60,
   delay = 0,
-  cursor = true,
 }: {
   text: string;
   className?: string;
   speed?: number;
   delay?: number;
-  cursor?: boolean;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-5% 0px" });
   const [displayedText, setDisplayedText] = useState("");
-  const [showCursor, setShowCursor] = useState(true);
+  const [isTyping, setIsTyping] = useState(true);
+
+  // Separate the text into body + final char (the dot)
+  const textBody = text.endsWith(".") ? text.slice(0, -1) : text;
+  const hasDot = text.endsWith(".");
 
   useEffect(() => {
     if (!isInView) return;
@@ -138,27 +140,36 @@ export function TypewriterText({
     const delayTimer = setTimeout(() => {
       const interval = setInterval(() => {
         i++;
-        setDisplayedText(text.slice(0, i));
-        if (i >= text.length) {
+        setDisplayedText(textBody.slice(0, i));
+        if (i >= textBody.length) {
           clearInterval(interval);
-          setTimeout(() => setShowCursor(false), 2000);
+          setIsTyping(false);
         }
       }, speed);
       return () => clearInterval(interval);
     }, delay);
 
     return () => clearTimeout(delayTimer);
-  }, [isInView, text, speed, delay]);
+  }, [isInView, textBody, speed, delay]);
 
   return (
     <span ref={ref} className={className} aria-label={text}>
       {displayedText}
-      {cursor && showCursor && (
+      {isTyping && (
         <motion.span
-          className="inline-block w-[3px] h-[0.85em] bg-[#E50000] ml-1 align-middle"
+          className="inline-block w-[3px] h-[0.75em] bg-[#E50000] ml-[2px] align-baseline"
           animate={{ opacity: [1, 0] }}
-          transition={{ duration: 0.6, repeat: Infinity, repeatType: "reverse" }}
+          transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
         />
+      )}
+      {!isTyping && hasDot && (
+        <motion.span
+          className="inline-block text-[#E50000] font-black"
+          animate={{ opacity: [1, 0.2] }}
+          transition={{ duration: 0.7, repeat: Infinity, repeatType: "reverse" }}
+        >
+          .
+        </motion.span>
       )}
     </span>
   );
