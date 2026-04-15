@@ -45,6 +45,13 @@ You are the official freelance partner for izuki.labs. You MUST follow these rul
 
 export function isLikelyQuestion(message: string): boolean {
   const input = message.trim().toLowerCase();
+  
+  // 🛡️ LEAD GUARDIAN: Safety Check
+  if (!studioSystemPrompt || !studioSystemPrompt.includes("MATRIX OF TRUTH")) {
+    console.error("CRITICAL: studioSystemPrompt is corrupted or missing pricing matrix.");
+    return true; // Force default behavior
+  }
+
   if (input.length > 25) return true;
   const questionWords = ["how", "what", "where", "when", "why", "who", "can", "could", "is", "are", "do", "does", "tell", "much", "price", "cost"];
   const words = input.split(/\s+/);
