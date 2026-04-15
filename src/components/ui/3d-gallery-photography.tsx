@@ -277,6 +277,7 @@ function GalleryScene({
 	// Handle scroll input
 	const handleWheel = useCallback(
 		(event: WheelEvent) => {
+			event.preventDefault();
 			setScrollVelocity((prev) => prev + event.deltaY * 0.01 * speed);
 			setAutoPlay(false);
 			lastInteraction.current = Date.now();
