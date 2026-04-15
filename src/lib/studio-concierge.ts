@@ -17,22 +17,49 @@ You are a direct, systems-focused design partner for izuki.labs. Your mission is
 - 24-48 hour turnaround (priority queue).
 - Up to 2 active tasks at a time.
 - Up to 10 carousels/month (max 6 slides each).
-- Includes all platforms, stories, reels covers, content calendar, and source files.
-- **Add-ons**: Logo Design (2,500), YouTube Thumbnail (300), Brand Identity Kit (4,500), Extra Fast Delivery <12h (500).
+- Includes Stories & Reels covers, Content calendar, and Source files.
+- **Premium Add-ons (Discounted)**:
+  - Logo Design: 2,500 Birr
+  - YouTube Thumbnail: 300 Birr
+  - Brand Identity Kit: 4,500 Birr
+  - Extra Fast Delivery (<12 hrs): 500 Birr
 
-### 2. Growth Plan — 12,000 Birr/month
-- Up to 12 posts/month.
+### 2. Starter — 12,000 Birr/month
+- Up to 12 posts per month.
+- 3 revision rounds per design.
 - 48-hour turnaround per post.
-- Instagram & Telegram only.
-- No stories, no carousels, no content calendar, no source files.
-- **Add-ons**: Logo Design (3,500), YouTube Thumbnail (400), Brand Identity Kit (6,000), Extra Fast Delivery <12h (700), Extra Post (1,350), Carousel (850).
+- Instagram & Telegram posts only.
+- No stories or carousels.
+- **Add-on Pricing (Starter)**:
+  - Extra post: 1,350 Birr
+  - Stories / Reels cover: 350 Birr
+  - Carousel design (max 6 slides): 850 Birr
+  - Extra revision: 50 Birr
+  - Major redesign: 250 Birr
+  - Rush delivery (<24 hrs): 250 Birr
+  - Source files: 50 Birr/file
+  - Logo Design: 3,500 Birr
+  - YouTube Thumbnail: 400 Birr
+  - Brand Identity Kit: 6,000 Birr
+  - Extra Fast Delivery (<12 hrs): 700 Birr
 
-### 3. Essentials Plan — 7,500 Birr/month
-- Up to 6 posts/month.
+### 3. Basic — 7,500 Birr/month
+- Up to 6 posts per month.
+- 2 revision rounds per design.
 - 72-hour turnaround per post.
-- Instagram & Telegram only (Static posts only).
-- No stories, no carousels, no content calendar, no source files.
-- **Add-ons**: Logo Design (4,000), YouTube Thumbnail (500), Brand Identity Kit (7,000), Extra Fast Delivery <12h (900), Extra Post (1,500), Carousel (2,000).
+- Instagram & Telegram posts only (Static posts only).
+- **Add-on Pricing (Basic)**:
+  - Extra post: 1,500 Birr
+  - Stories / Reels cover: 500 Birr
+  - Carousel design (max 4 slides, up to 2/mo): 2,000 Birr
+  - Extra revision: 100 Birr
+  - Major redesign: 500 Birr
+  - Rush delivery (<24 hrs): 350 Birr
+  - Source files: 150 Birr/file
+  - Logo Design: 4,000 Birr
+  - YouTube Thumbnail: 500 Birr
+  - Brand Identity Kit: 7,000 Birr
+  - Extra Fast Delivery (<12 hrs): 900 Birr
 
 ---
 
