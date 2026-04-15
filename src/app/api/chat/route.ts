@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     ];
 
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash-latest",
+      model: "gemini-1.5-flash",
       safetySettings 
     });
 
@@ -66,11 +66,8 @@ Known visitor details:
       async start(controller) {
         try {
           for await (const chunk of result.stream) {
-            // Safe chunk verification
-            if (chunk.candidates?.[0]?.content?.parts?.[0]?.text) {
-              const text = chunk.text();
-              controller.enqueue(encoder.encode(text));
-            }
+            const text = chunk.text();
+            controller.enqueue(encoder.encode(text));
           }
           controller.close();
         } catch (streamErr: any) {
