@@ -32,7 +32,7 @@ const formatMarkdown = (text: string) => {
     .replace(/^\s*[\-\*]\s+(.*)$/gm, '<li class="ml-4 list-disc">$1</li>') // Bullet points
     .replace(/^\s*(\d+)\.\s+(.*)$/gm, '<li class="ml-4 list-decimal">$1</li>') // Numbered lists
     .replace(/\n/g, '<br />')
-    .replace(/(<li.*<\/li>)/gs, '<ul class="my-2">$1</ul>'); // Wrap lists
+    .replace(/(<li[\s\S]*?<\/li>)/g, '<ul class="my-2">$1</ul>'); // Wrap lists
 };
 
 export default function ChatBubble() {
