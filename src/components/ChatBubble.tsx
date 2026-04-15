@@ -37,7 +37,7 @@ export default function ChatBubble() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "How can I help with your design systems today?",
+      content: "What would you like to know?",
     },
   ]);
   const [input, setInput] = useState("");
