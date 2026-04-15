@@ -212,21 +212,8 @@ export default function ChatBubble() {
         const { done, value } = await reader.read();
         if (done) break;
         
-        const rawPart = decoder.decode(value);
-        // Vercel AI Data Stream Parser (2026 Compatible)
-        // Format: 0:"text" or 0:"text"\n
-        const lines = rawPart.split("\n").filter(l => l.trim() !== "");
-        
-        for (const line of lines) {
-          if (line.startsWith('0:')) {
-            try {
-              const text = JSON.parse(line.substring(2));
-              assistantContent += text;
-            } catch (e) {
-              console.warn("Stream parse skip:", line);
-            }
-          }
-        }
+        const chunk = decoder.decode(value);
+        assistantContent += chunk;
         
         setMessages((prev) => {
           const newMessages = [...prev];

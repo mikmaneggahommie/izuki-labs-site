@@ -29,8 +29,8 @@ VITAL INSTRUCTIONS:
       maxTokens: 2000,
     });
 
-    // Returns a production-grade data stream (Fixes 400/500 connection errors)
-    return result.toDataStreamResponse();
+    // Returns a production-grade TEXT stream (Fixes the blank response issue)
+    return result.toTextStreamResponse();
 
   } catch (error: any) {
     console.error("AI SDK Critical Failure:", error);
