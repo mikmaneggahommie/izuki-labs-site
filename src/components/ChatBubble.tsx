@@ -221,12 +221,12 @@ export default function ChatBubble() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about design systems..."
-                  className="w-full rounded-xl border border-white/10 bg-[#1A1A1A] py-3.5 pl-5 pr-14 text-[14px] text-white placeholder:text-white/20 focus:border-[#E8503A]/50 focus:outline-none transition-all"
+                  className="w-full rounded-none border border-white/10 bg-[#1A1A1A] py-3.5 pl-5 pr-14 text-[14px] text-white placeholder:text-white/20 focus:border-[#FF0000]/50 focus:outline-none transition-all"
                 />
                 <button
                   type="submit"
                   disabled={!input.trim() || isLoading}
-                  className="absolute right-2 top-1.5 flex h-10 w-10 items-center justify-center rounded-lg bg-[#FF0000] text-white shadow-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+                  className="absolute right-2 top-1.5 flex h-10 w-10 items-center justify-center rounded-none bg-[#FF0000] text-white shadow-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
                 >
                   <Send className="h-4 w-4" />
                 </button>
@@ -235,7 +235,7 @@ export default function ChatBubble() {
               <div className="grid grid-cols-2 gap-3">
                 <a
                   href="mailto:it.mikiyas.daniel@gmail.com"
-                  className="flex h-12 items-center justify-center gap-2 rounded-xl bg-[#FF0000] text-[13px] font-bold uppercase tracking-tight text-white transition-all hover:brightness-110 active:scale-[0.98]"
+                  className="flex h-12 items-center justify-center gap-2 rounded-none bg-[#FF0000] text-[13px] font-bold uppercase tracking-tight text-white transition-all hover:brightness-110 active:scale-[0.98]"
                 >
                   Email Me
                 </a>
@@ -243,7 +243,7 @@ export default function ChatBubble() {
                   href="https://t.me/snowplugwalk"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-12 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 text-[13px] font-bold uppercase tracking-tight text-white transition-all hover:bg-white/10 active:scale-[0.98]"
+                  className="flex h-12 items-center justify-center gap-2 rounded-none border border-white/10 bg-white/5 text-[13px] font-bold uppercase tracking-tight text-white transition-all hover:bg-white/10 active:scale-[0.98]"
                 >
                   Message Telegram
                 </a>
