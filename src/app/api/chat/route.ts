@@ -33,11 +33,8 @@ IDENTIFIED VISITOR:
 `.trim(),
     });
 
-    // 2. High-Resilience History Sanitizer
-    const history: any[] = [];
-    
-    // Ensure the model knows its identity first in history if needed
-    // But systemInstruction usually handles this.
+    // 2. High-Resilience History Sanitizer (Armor V17)
+    let history: any[] = [];
     
     for (const m of messages) {
        if (!m.content || m.role === 'system') continue;
@@ -50,17 +47,23 @@ IDENTIFIED VISITOR:
        }
     }
 
-    // 3. Fallback for Empty History
-    if (history.length === 0) {
-       history.push({ role: "user", parts: [{ text: "Hello" }] });
+    // CRITICAL: Google AI Protocol Enforcement
+    // The very first message in history MUST be from the 'user'.
+    while (history.length > 0 && history[0].role !== "user") {
+      history.shift();
     }
 
-    // Ensure last message is from User
+    // Ensure we have something left
+    if (history.length === 0) {
+      history.push({ role: "user", parts: [{ text: "Hello" }] });
+    }
+
+    // Ensure the last message is from User to be used as final prompt
     if (history[history.length - 1].role === "model") {
        history.pop();
     }
 
-    const lastMessage = history.pop().parts[0].text;
+    const lastMessage = history.length > 0 ? history.pop().parts[0].text : "What can you do?";
     const chat = model.startChat({ history });
 
     console.log("[IZUKI-API] Starting stream with Pro Engine...");
