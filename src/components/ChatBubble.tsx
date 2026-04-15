@@ -130,7 +130,20 @@ export default function ChatBubble() {
     setInput("");
     setIsLoading(true);
 
-    if (backendChatEnabled) {
+    // Manually advance flow state to ensure UI stays in sync with placeholders
+    if (flowState === "COLLECTING_NAME") {
+      setFormData(prev => ({ ...prev, name: userContent }));
+      setFlowState("COLLECTING_TELEGRAM");
+    } else if (flowState === "COLLECTING_TELEGRAM") {
+      setFormData(prev => ({ ...prev, telegram: userContent }));
+      setFlowState("COLLECTING_PHONE");
+    } else if (flowState === "COLLECTING_PHONE") {
+      setFormData(prev => ({ ...prev, phone: userContent }));
+      setFlowState("COLLECTING_EMAIL");
+    } else if (flowState === "COLLECTING_EMAIL") {
+      setFormData(prev => ({ ...prev, email: userContent }));
+      setFlowState("CHATTING");
+    }
       try {
         const response = await fetch("/api/chat", {
           method: "POST",

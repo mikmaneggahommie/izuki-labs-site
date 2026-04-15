@@ -5,15 +5,16 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    const { name, phone, email } = (await req.json()) as {
-      name: string;
-      phone: string;
-      email: string;
+    const { name, telegram, phone, email } = (await req.json()) as {
+      name?: string;
+      telegram?: string;
+      phone?: string;
+      email?: string;
     };
 
-    if (!name || !phone || !email) {
+    if (!name && !phone && !email && !telegram) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "No lead information provided" },
         { status: 400 }
       );
     }
@@ -28,7 +29,7 @@ export async function POST(req: Request) {
     }
 
     const { error } = await supabase.from("leads").insert([
-      { name, phone, email },
+      { name, phone, email, telegram },
     ]);
 
     if (error) {
@@ -44,7 +45,7 @@ export async function POST(req: Request) {
     const telegramChatId = process.env.TELEGRAM_CHAT_ID;
 
     if (telegramToken && telegramChatId) {
-      const message = `🚨 *NEW STUDIO LEAD* 🚨\n\n*Name:* ${name}\n*Phone:* ${phone}\n*Email:* ${email}\n\n_Lead secured and saved to Supabase._`;
+      const message = `🚨 *NEW STUDIO LEAD* 🚨\n\n*Name:* ${name || "N/A"}\n*Telegram:* ${telegram || "N/A"}\n*Phone:* ${phone || "N/A"}\n*Email:* ${email || "N/A"}\n\n_Lead secured and saved to Supabase._`;
       
       try {
         await fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {

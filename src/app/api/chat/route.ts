@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   try {
     const { messages, userInfo } = (await req.json()) as {
       messages: Array<{ role: string; content: string }>;
-      userInfo?: { name?: string; phone?: string; email?: string };
+      userInfo?: { name?: string; telegram?: string; phone?: string; email?: string };
     };
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -49,6 +49,7 @@ export async function POST(req: Request) {
 
 Known visitor details:
 - Name: ${userInfo?.name || "Unknown"}
+- Telegram: ${userInfo?.telegram || "Unknown"}
 - Phone: ${userInfo?.phone || "Unknown"}
 - Email: ${userInfo?.email || "Unknown"}
 `.trim();
