@@ -21,8 +21,11 @@ type UserInfo = {
 const formatMarkdown = (text: string) => {
   if (!text) return "";
   
-  // Strip extraction signals
-  const cleanText = text.split("@@@INFO_EXTRACTED@@@")[0].trim();
+  // Strip extraction signals and associated JSON block
+  const cleanText = text
+    .replace(/@@@INFO_EXTRACTED@@@\s*\{[\s\S]*?\}/g, "")
+    .replace(/@@@INFO_EXTRACTED@@@/g, "")
+    .trim();
 
   return cleanText
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
@@ -56,6 +59,13 @@ export default function ChatBubble() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading]);
+
+  // Restore lead capture flow when bubble is opened if info is missing
+  useEffect(() => {
+    if (isOpen && !formData.name && flowState === "CHATTING") {
+      setFlowState("COLLECTING_NAME");
+    }
+  }, [isOpen, formData.name, flowState]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -171,17 +181,26 @@ export default function ChatBubble() {
         if (assistantContent.includes("@@@INFO_EXTRACTED@@@")) {
           const parts = assistantContent.split("@@@INFO_EXTRACTED@@@");
           const jsonStr = parts[1]?.trim();
-          if (jsonStr) {
+          
+          if (jsonStr && jsonStr.endsWith("}")) {
             try {
               const extractedData = JSON.parse(jsonStr);
-              setFormData(prev => ({ ...prev, ...extractedData }));
-              // Save lead silently
-              fetch("/api/lead", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...formData, ...extractedData }),
-              });
-            } catch (e) {}
+              // Only trigger if we actually got new info
+              const hasNewInfo = Object.entries(extractedData).some(
+                ([key, val]) => val && formData[key as keyof UserInfo] !== val
+              );
+
+              if (hasNewInfo) {
+                setFormData(prev => ({ ...prev, ...extractedData }));
+                fetch("/api/lead", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ ...formData, ...extractedData }),
+                });
+              }
+            } catch (e) {
+              // Partial JSON during stream, ignore until complete
+            }
           }
         }
       }
