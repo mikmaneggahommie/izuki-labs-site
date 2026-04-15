@@ -69,22 +69,28 @@ export default function HeroSection() {
         const n = cardsA.length;
 
       // Math Helpers
+      const Y_OFFSET = -80; // Pushed "up" as requested by user
+
       // Perfect zero-offset stack logic: The cards perfectly overlap during consolidation
-      // so it looks like a single card.
+      // and we hide the ones behind the front one to ensure zero peeking/ghosting.
       const getStackX = (i: number) => 0;
       const getStackY = (i: number) => 0;
 
       // Fanned state logic: Perfectly spread across the screen
-      // Reduced spread to 70% so they do NOT push off the screen edge
-      const stepSpreadX = (stageW * 0.70) / (cardsA.length - 1);
-      const stepSpreadY = (stageH * 0.70) / (cardsA.length - 1);
+      // Use 65% spread to keep everything within safe view on laptops
+      const stepSpreadX = (stageW * 0.65) / (cardsA.length - 1);
+      const stepSpreadY = (stageH * 0.65) / (cardsA.length - 1);
       
       const getFanX = (i: number) => (i - (cardsA.length - 1) / 2) * stepSpreadX;
       const getFanY = (i: number) => (i - (cardsA.length - 1) / 2) * stepSpreadY;
 
-      // Mathematical offset to push exactly out of frame seamlessly
-      const pushX = cardsA.length * stepSpreadX;
-      const pushY = cardsA.length * stepSpreadY;
+      // Calculate the displacement needed to center any specific card index
+      const getCenterWrapX = (i: number) => -getFanX(i);
+      const getCenterWrapY = (i: number) => -getFanY(i);
+
+      // Total width of the fanned line
+      const fanWidthX = (cardsA.length - 1) * stepSpreadX;
+      const fanWidthY = (cardsA.length - 1) * stepSpreadY;
 
       const buildTimeline = () => {
         tl?.kill();
@@ -92,11 +98,12 @@ export default function HeroSection() {
 
         // ─── GEOMETRIC ALIGNMENT ───
         
-        // 1. Force the wrappers to stay perfectly dead center at 50% 50% ignoring any external CSS!
+        // 1. Force the wrappers to stay perfectly dead center at 50% 50%
         gsap.set([wrapA, wrapB], { 
           position: "absolute",
           top: "50%", 
-          left: "50%"
+          left: "50%",
+          y: Y_OFFSET
         });
 
         // 2. The CARDS get xPercent/yPercent because they have the physical dims. 
@@ -104,21 +111,24 @@ export default function HeroSection() {
         gsap.set([...cardsA, ...cardsB], { 
           xPercent: -50, 
           yPercent: -50,
-          scale: 1 
+          scale: 1,
+          autoAlpha: 1 
         });
 
         // ─── INITIAL STATE ───
         
-        // Group A: Start PERFECTLY STACKED. Z-Index 10.
-        gsap.set(cardsA, { x: getStackX, y: getStackY });
+        // Group A: Start in center stack. Only the TOP card is fully visible to prevent ghosting.
+        gsap.set(cardsA, { x: 0, y: 0 });
+        gsap.set(cardsA.slice(0, -1), { autoAlpha: 0 }); 
         gsap.set(wrapA, { x: 0, y: 0, zIndex: 10, autoAlpha: 1 });
 
-        // Group B: Prepared offscreen (Top-Left), already FANNED!
-        gsap.set(cardsB, { 
-          x: getFanX, 
-          y: getFanY
-        });
-        gsap.set(wrapB, { x: -pushX, y: -pushY, zIndex: 5, autoAlpha: 1 });
+        // Group B: Prepared at the perfect starting point to trail Group A
+        // Moved back by exactly the fan width + one step
+        const startX = getCenterWrapX(cardsA.length - 1) - (fanWidthX + stepSpreadX);
+        const startY = getCenterWrapY(cardsA.length - 1) - (fanWidthY + stepSpreadY);
+
+        gsap.set(cardsB, { x: getFanX, y: getFanY, autoAlpha: 1 });
+        gsap.set(wrapB, { x: startX, y: startY, zIndex: 5, autoAlpha: 1 });
 
         tl = gsap.timeline({ repeat: -1 });
 
@@ -131,60 +141,74 @@ export default function HeroSection() {
 
         // 1. FAN OUT BURST (Explode from the pack)
         tl.addLabel("unstack-a")
+          .to(cardsA, { autoAlpha: 1, duration: 0.1 }, "unstack-a") // Show all hidden cards immediately
           .to(cardsA, {
             x: getFanX,
             y: getFanY,
             duration: 1.2,
             ease: "expo.out",
-            stagger: { each: 0.04, from: "end" } // Front cards fly out first
+            stagger: { each: 0.04, from: "end" }
           }, "unstack-a");
 
-        tl.to({}, { duration: 0.8 }); // Pause before first step
+        tl.to({}, { duration: 1.0 }); // Long pause at the start
 
-        // 2. CONVEYOR BELT (Step-by-step sequential shifting)
-        for(let step = 1; step <= cardsA.length; step++) {
-           const curX = step * stepSpreadX;
-           const curY = step * stepSpreadY;
-           const label = `push-a-${step}`;
+        // 2. THE STEPPED CONVEYOR
+        // We move the wrappers such that EACH card in the fan passes through the center point (0,0)
+        // A goes from center to bottom-right, B follows into center.
+        for(let i = cardsA.length - 1; i >= -1; i--) {
+           const label = `step-a-${i}`;
            
+           // If i is -1, it means we've passed all cards and Group B's first card is coming to center
+           const targetAx = i >= 0 ? getCenterWrapX(i) : getCenterWrapX(0) + stepSpreadX;
+           const targetAy = i >= 0 ? getCenterWrapY(i) : getCenterWrapY(0) + stepSpreadY;
+           
+           // B always trails A by exactly the fan-width gap
+           const targetBx = targetAx - (fanWidthX + stepSpreadX);
+           const targetBy = targetAy - (fanWidthY + stepSpreadY);
+
            tl.addLabel(label)
-             .to(wrapA, { x: curX, y: curY, duration: 0.6, ease: "power2.inOut" }, label)
-             .to(wrapB, { x: curX - pushX, y: curY - pushY, duration: 0.6, ease: "power2.inOut" }, label);
+             .to(wrapA, { x: targetAx, y: targetAy, duration: 0.8, ease: "power3.inOut" }, label)
+             .to(wrapB, { x: targetBx, y: targetBy, duration: 0.8, ease: "power3.inOut" }, label);
            
-           tl.to({}, { duration: 0.8 }); // The decisive pause you requested between EACH card
+           tl.to({}, { duration: 1.2 }); // DECISIVE PAUSE at each card as requested
         }
 
-        // HIDE Group A immediately before snap, killing any ghost edge cards!
-        tl.set(wrapA, { autoAlpha: 0 });
-
         // 3. CONSOLIDATE B (Snap perfectly back to center stack)
+        // Group B is now at x:0, y:0 essentially (well, the first card index is).
+        tl.set(wrapA, { autoAlpha: 0 }); // KILL GHOSTS: Hide the outgoing group completely
+        
         tl.addLabel("snap-b")
           .to(cardsB, {
-            x: getStackX,
-            y: getStackY,
+            x: 0,
+            y: 0,
             duration: 1.2,
             ease: "expo.inOut",
-            stagger: { each: 0.04, from: "start" } // Snaps from the back into the stack
+            stagger: { each: 0.04, from: "start" }
           }, "snap-b");
 
-        // Admire the finished B stack cleanly centered
-        tl.to({}, { duration: 1.5 });
+        // KILL GHOSTS: Once stacked, hide everything except the top card
+        tl.set(cardsB.slice(0, -1), { autoAlpha: 0 });
+        
+        tl.to({}, { duration: 2.0 }); // Long hold on the clean single image
 
-        // 5. HIDDEN RESET & Z-INDEX SWAP
+        // 5. HIDDEN RESET & SWAP
         tl.call(() => {
-          gsap.set(wrapB, { zIndex: 10 }); // Center becomes leader
-          gsap.set(wrapA, { zIndex: 5, x: -pushX, y: -pushY, autoAlpha: 1 }); // Prepare A top-left cleanly
-          gsap.set(cardsA, { 
-            x: getFanX, 
-            y: getFanY
-          });
+          gsap.set(wrapB, { zIndex: 10 });
+          gsap.set(wrapA, { zIndex: 5, autoAlpha: 1 });
+          gsap.set(cardsA, { x: getFanX, y: getFanY, autoAlpha: 1 });
+          
+          // Recalculate start for B now that it's leading
+          const resetX = getCenterWrapX(cardsB.length - 1) - (fanWidthX + stepSpreadX);
+          const resetY = getCenterWrapY(cardsB.length - 1) - (fanWidthY + stepSpreadY);
+          gsap.set(wrapA, { x: resetX, y: resetY });
         });
 
         /* ═══════════════════════════════════
-           CYCLE B → A
+           CYCLE B → A (Identical Logic)
            ═══════════════════════════════════ */
 
         tl.addLabel("unstack-b")
+          .to(cardsB, { autoAlpha: 1, duration: 0.1 }, "unstack-b")
           .to(cardsB, {
             x: getFanX,
             y: getFanY,
@@ -193,39 +217,39 @@ export default function HeroSection() {
             stagger: { each: 0.04, from: "end" }
           }, "unstack-b");
 
-        tl.to({}, { duration: 0.8 }); // Pause before first step
+        tl.to({}, { duration: 1.0 });
 
-        // CONVEYOR BELT B (Step-by-step)
-        for(let step = 1; step <= cardsB.length; step++) {
-           const curX = step * stepSpreadX;
-           const curY = step * stepSpreadY;
-           const label = `push-b-${step}`;
-           
+        for(let i = cardsB.length - 1; i >= -1; i--) {
+           const label = `step-b-${i}`;
+           const targetBx = i >= 0 ? getCenterWrapX(i) : getCenterWrapX(0) + stepSpreadX;
+           const targetBy = i >= 0 ? getCenterWrapY(i) : getCenterWrapY(0) + stepSpreadY;
+           const targetAx = targetBx - (fanWidthX + stepSpreadX);
+           const targetAy = targetBy - (fanWidthY + stepSpreadY);
+
            tl.addLabel(label)
-             .to(wrapB, { x: curX, y: curY, duration: 0.6, ease: "power2.inOut" }, label)
-             .to(wrapA, { x: curX - pushX, y: curY - pushY, duration: 0.6, ease: "power2.inOut" }, label);
+             .to(wrapB, { x: targetBx, y: targetBy, duration: 0.8, ease: "power3.inOut" }, label)
+             .to(wrapA, { x: targetAx, y: targetAy, duration: 0.8, ease: "power3.inOut" }, label);
            
-           tl.to({}, { duration: 0.8 }); // The decisive pause
+           tl.to({}, { duration: 1.2 });
         }
 
-        // HIDE Group B immediately before snap
         tl.set(wrapB, { autoAlpha: 0 });
 
         tl.addLabel("snap-a")
           .to(cardsA, {
-            x: getStackX,
-            y: getStackY,
+            x: 0,
+            y: 0,
             duration: 1.2,
             ease: "expo.inOut",
             stagger: { each: 0.04, from: "start" }
           }, "snap-a");
 
-        tl.to({}, { duration: 1.5 });
+        tl.set(cardsA.slice(0, -1), { autoAlpha: 0 });
+        
+        tl.to({}, { duration: 2.0 });
 
         tl.call(() => {
           gsap.set(wrapA, { zIndex: 10 });
-          gsap.set(wrapB, { zIndex: 5, x: -pushX, y: -pushY, autoAlpha: 1 });
-          gsap.set(cardsB, { 
             x: getFanX, 
             y: getFanY
           });

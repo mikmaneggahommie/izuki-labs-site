@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { MessageSquare, Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import { getStudioConciergeReply } from "@/lib/studio-concierge";
+import { getStudioConciergeReply, isLikelyQuestion } from "@/lib/studio-concierge";
 
 type FlowState =
   | "COLLECTING_NAME"
@@ -79,6 +79,27 @@ export default function ChatBubble() {
     ]);
   };
 
+  const handleSkip = () => {
+    if (flowState === "COLLECTING_PHONE") {
+      appendAssistantMessage("No worries. Drop your email too and I’ll keep the thread organized.");
+      setFlowState("COLLECTING_EMAIL");
+    } else if (flowState === "COLLECTING_EMAIL") {
+      appendAssistantMessage(
+        backendChatEnabled
+          ? "Locked in. Ask about pricing, timelines, retainers, or the best package for your brand."
+          : "Locked in. I’ve got your details in this chat, and I can still guide you through pricing, timelines, and the best package right here."
+      );
+      setFlowState("CHATTING");
+      
+      // Save partial lead
+      fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      }).catch(err => console.error("Failed to save partial lead:", err));
+    }
+  };
+
   const submitMessage = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!input.trim() || isLoading) {
@@ -105,58 +126,70 @@ export default function ChatBubble() {
     }
 
     if (flowState === "COLLECTING_PHONE") {
-      // Basic phone validation: strips non-digits and checks length
-      const digitCount = userContent.replace(/\\D/g, "").length;
-      if (digitCount < 9 || digitCount > 15) {
+      // Pivot check: if it looks like a question, skip to chatting
+      if (isLikelyQuestion(userContent)) {
+        setFlowState("CHATTING");
+        // Proceed to chat logic below
+      } else {
+        // Basic phone validation: strips non-digits and checks length
+        const digitCount = userContent.replace(/\D/g, "").length;
+        if (digitCount < 9 || digitCount > 15) {
+          appendAssistantMessage(
+            "That doesn't look like a valid phone number. Please provide a valid number with country code if needed."
+          );
+          setIsLoading(false);
+          return;
+        }
+
+        setFormData((current) => ({ ...current, phone: userContent }));
         appendAssistantMessage(
-          "That doesn't look like a valid phone number. Please provide a valid number with country code if needed."
+          "Great. Drop your email too and I’ll keep the thread organized."
         );
+        setFlowState("COLLECTING_EMAIL");
         setIsLoading(false);
         return;
       }
-
-      setFormData((current) => ({ ...current, phone: userContent }));
-      appendAssistantMessage(
-        "Great. Drop your email too and I’ll keep the thread organized."
-      );
-      setFlowState("COLLECTING_EMAIL");
-      setIsLoading(false);
-      return;
     }
 
     if (flowState === "COLLECTING_EMAIL") {
-      // Basic email validation regex
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(userContent)) {
+      // Pivot check
+      if (isLikelyQuestion(userContent)) {
+        setFlowState("CHATTING");
+        // Proceed to chat logic below
+      } else {
+        // Basic email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(userContent)) {
+          appendAssistantMessage(
+            "That doesn't look like a valid email. Please provide a valid email address."
+          );
+          setIsLoading(false);
+          return;
+        }
+
+        const nextUserInfo = { ...formData, email: userContent };
+        setFormData(nextUserInfo);
         appendAssistantMessage(
-          "That doesn't look like a valid email. Please provide a valid email address."
+          backendChatEnabled
+            ? "Locked in. Ask about pricing, timelines, retainers, or the best package for your brand."
+            : "Locked in. I’ve got your details in this chat, and I can still guide you through pricing, timelines, and the best package right here."
         );
+        setFlowState("CHATTING");
         setIsLoading(false);
+
+        // Silently save the lead to the backend
+        try {
+          await fetch("/api/lead", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(nextUserInfo),
+          });
+        } catch (err) {
+          console.error("Failed to save lead:", err);
+        }
+
         return;
       }
-
-      const nextUserInfo = { ...formData, email: userContent };
-      setFormData(nextUserInfo);
-      appendAssistantMessage(
-        backendChatEnabled
-          ? "Locked in. Ask about pricing, timelines, retainers, or the best package for your brand."
-          : "Locked in. I’ve got your details in this chat, and I can still guide you through pricing, timelines, and the best package right here."
-      );
-      setFlowState("CHATTING");
-      setIsLoading(false);
-
-      // Silently save the lead to the backend
-      try {
-        await fetch("/api/lead", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(nextUserInfo),
-        });
-      } catch (err) {
-        console.error("Failed to save lead:", err);
-      }
-
-      return;
     }
 
     const nextMessages = [...messages, userMessage];
@@ -308,6 +341,17 @@ export default function ChatBubble() {
                   </button>
                 </div>
               </form>
+
+              {flowState === "COLLECTING_PHONE" || flowState === "COLLECTING_EMAIL" ? (
+                <div className="flex justify-start">
+                  <button
+                    onClick={handleSkip}
+                    className="text-[12px] font-medium text-white/45 transition-colors hover:text-white"
+                  >
+                    Skip for now
+                  </button>
+                </div>
+              ) : null}
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <a
