@@ -51,7 +51,7 @@ export default function ChatBubble() {
       const scrollHeight = document.documentElement.scrollHeight;
       const scrollTop = window.scrollY;
       const clientHeight = window.innerHeight;
-      const nearBottom = scrollTop + clientHeight >= scrollHeight - 350;
+      const nearBottom = scrollTop + clientHeight >= scrollHeight - 400;
       
       setIsNearBottom(nearBottom);
 
@@ -212,7 +212,7 @@ export default function ChatBubble() {
         <motion.button
           type="button"
           onClick={() => setIsOpen(true)}
-          className={`fixed bottom-8 right-8 z-[100] flex h-14 w-14 items-center justify-center rounded-full border border-[#00FF00]/40 bg-[#000000] text-[#00FF00] shadow-[0_0_20px_rgba(0,255,0,0.2)] md:bottom-8 md:right-8 transition-all hover:scale-110 hover:border-[#00FF00] ${
+          className={`fixed bottom-8 right-8 z-[100] flex h-14 w-14 items-center justify-center rounded-full border border-[#FF0000]/40 bg-[#000000] text-[#FF0000] shadow-[0_0_20px_rgba(255,0,0,0.2)] md:bottom-8 md:right-8 transition-all hover:scale-110 hover:border-[#FF0000] ${
             isNearBottom ? "animate-pulse" : ""
           }`}
           aria-label="Open chat"
@@ -227,19 +227,19 @@ export default function ChatBubble() {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed bottom-6 right-6 z-[200] flex h-[580px] w-full max-w-[420px] flex-col overflow-hidden border-[2.5px] border-[#00FF00] bg-[#000000] shadow-[12px_12px_0px_#000000]"
+            className="fixed bottom-6 right-6 z-[200] flex h-[580px] w-full max-w-[420px] flex-col overflow-hidden border-[2.5px] border-[#FF0000] bg-[#000000] shadow-[12px_12px_0px_#000000]"
           >
             {/* HEADER */}
-            <div className="flex items-center justify-between border-b-[2.5px] border-[#00FF00] px-6 py-5 bg-[#000000]">
+            <div className="flex items-center justify-between border-b-[2.5px] border-[#FF0000] px-6 py-5 bg-[#000000]">
               <div className="flex items-center gap-3">
-                <span className="font-serif text-xl font-black uppercase tracking-tighter text-white">izuki.labs</span>
+                <span className="font-[family-name:var(--font-neue-haas-display)] text-xl font-black uppercase tracking-tighter text-white">izuki.labs</span>
                 <div className="relative h-2.5 w-2.5">
-                  <span className="absolute inset-0 animate-ping rounded-full bg-[#00FF00] opacity-75" />
-                  <span className="relative block h-2.5 w-2.5 rounded-full bg-[#00FF00]" />
+                  <span className="absolute inset-0 animate-ping rounded-full bg-[#FF0000] opacity-75" />
+                  <span className="relative block h-2.5 w-2.5 rounded-full bg-[#FF0000]" />
                 </div>
               </div>
-              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#00FF00]/60">Ask anything</p>
-              <button onClick={() => setIsOpen(false)} className="text-white hover:text-[#00FF00] transition-colors">
+              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#FF0000]/60">Ask anything</p>
+              <button onClick={() => setIsOpen(false)} className="text-white hover:text-[#FF0000] transition-colors">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -252,8 +252,8 @@ export default function ChatBubble() {
                     <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                       <div className={`max-w-[85%] border-[1.5px] px-4 py-3 text-[14px] leading-relaxed ${
                         m.role === "user" 
-                        ? "border-[#00FF00] bg-[#00FF00] font-black text-black" 
-                        : "border-[#00FF00] bg-[#111111] text-[#00FF00]"
+                        ? "border-[#FF0000] bg-[#FF0000] font-black text-black" 
+                        : "border-[#FF0000] bg-[#111111] text-[#FF0000]"
                       }`}
                       dangerouslySetInnerHTML={{ __html: formatMarkdown(m.content) }}
                       />
@@ -263,8 +263,8 @@ export default function ChatBubble() {
                 </div>
               ) : (
                 <div className="flex h-full items-center justify-center">
-                  <div className="w-full border-[2.5px] border-[#00FF00] bg-[#111111] p-8 text-center shadow-[6px_6px_0px_#00FF00]">
-                    <p className="text-xl font-black leading-tight text-[#00FF00] uppercase tracking-tighter">
+                  <div className="w-full border-[2.5px] border-[#FF0000] bg-[#111111] p-8 text-center shadow-[6px_6px_0px_#FF0000]">
+                    <p className="text-xl font-black leading-tight text-[#FF0000] uppercase tracking-tighter">
                       {getCurrentPrompt()}
                     </p>
                   </div>
@@ -294,7 +294,7 @@ export default function ChatBubble() {
                 {flowState !== "CHATTING" && (
                   <button
                     onClick={handleSkip}
-                    className="h-12 w-full border-[2.5px] border-[#00FF00] bg-[#111111] text-[13px] font-black uppercase tracking-[0.4em] text-[#00FF00] transition-all hover:bg-[#00FF00] hover:text-black"
+                    className="h-12 w-full border-[2.5px] border-[#FF0000] bg-[#111111] text-[13px] font-black uppercase tracking-[0.4em] text-[#FF0000] transition-all hover:bg-[#FF0000] hover:text-black"
                   >
                     SKIP PROTOCOL
                   </button>
@@ -303,7 +303,7 @@ export default function ChatBubble() {
                 <div className="grid grid-cols-2 gap-4">
                   <a
                     href="mailto:it.mikiyas.daniel@gmail.com"
-                    className="flex h-12 items-center justify-center bg-[#00FF00] text-[13px] font-black uppercase tracking-[0.2em] text-black transition-all hover:bg-white"
+                    className="flex h-12 items-center justify-center bg-[#FF0000] text-[13px] font-black uppercase tracking-[0.2em] text-black transition-all hover:bg-white"
                   >
                     EMAIL
                   </a>
@@ -311,7 +311,7 @@ export default function ChatBubble() {
                     href="https://t.me/snowplugwalk"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex h-12 items-center justify-center border-[2px] border-[#00FF00] bg-black text-[13px] font-black uppercase tracking-[0.2em] text-[#00FF00] transition-all hover:bg-[#00FF00] hover:text-black"
+                    className="flex h-12 items-center justify-center border-[2px] border-[#FF0000] bg-black text-[13px] font-black uppercase tracking-[0.2em] text-[#FF0000] transition-all hover:bg-[#FF0000] hover:text-black"
                   >
                     TELEGRAM
                   </a>

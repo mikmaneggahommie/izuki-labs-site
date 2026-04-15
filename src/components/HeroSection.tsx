@@ -126,10 +126,10 @@ export default function HeroSection() {
         <div className="hero-copy absolute left-8 bottom-8 z-10 w-full max-w-lg">
           <h1 className="hero-wordmark" aria-label="Izuki Labs">
             <span className="hero-wordmark-line flex items-center">
-              <span className="font-serif text-6xl md:text-9xl tracking-tighter uppercase font-black text-white">IZUKI</span>
-              <span className="ml-2 h-4 w-4 bg-[#00FF00] rounded-full animate-pulse" aria-hidden />
+              <span className="font-[family-name:var(--font-neue-haas-display)] text-6xl md:text-9xl tracking-tighter uppercase font-black text-white">IZUKI</span>
+              <span className="ml-[0.05em] h-[0.12em] w-[0.12em] bg-[#FF0000] mt-[0.3em]" aria-hidden />
             </span>
-            <span className="hero-wordmark-line block font-serif text-6xl md:text-9xl tracking-tighter uppercase font-black text-white">LABS</span>
+            <span className="hero-wordmark-line block font-[family-name:var(--font-neue-haas-display)] text-6xl md:text-9xl tracking-tighter uppercase font-black text-white">LABS</span>
           </h1>
         </div>
 
@@ -149,7 +149,7 @@ export default function HeroSection() {
                   alt={item.alt}
                   fill
                   priority={i < 2}
-                  className="hero-card-image object-cover border-[1px] border-[#00FF00]/20"
+                  className="hero-card-image object-cover border-[1px] border-white/10"
                   sizes="(max-width: 768px) 100vw, 420px"
                 />
               </article>
