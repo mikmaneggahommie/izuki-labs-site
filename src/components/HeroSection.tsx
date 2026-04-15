@@ -8,21 +8,17 @@ import { assetPath } from "@/lib/asset-path";
 type HeroCard = { src: string; alt: string };
 
 const GROUP_A: HeroCard[] = [
-  { src: "/images/1.JPG", alt: "Editorial surface artwork" },
   { src: "/images/2.jpg", alt: "Campaign detail artwork" },
-  { src: "/images/6.jpg", alt: "Launch artwork" },
   { src: "/images/4.jpg", alt: "Brand composition artwork" },
-  { src: "/images/5.jpg", alt: "Poster layout artwork" },
-  { src: "/images/3.jpg", alt: "Mobile system artwork" },
+  { src: "/images/6.jpg", alt: "Launch artwork" },
+  { src: "/images/1.JPG", alt: "Editorial surface artwork" }, // 1.JPG is top
 ];
 
 const GROUP_B: HeroCard[] = [
+  { src: "/images/3.jpg", alt: "Mobile system artwork" },
+  { src: "/images/5.jpg", alt: "Poster layout artwork" },
   { src: "/images/7.jpg", alt: "Luminous motion artwork" },
-  { src: "/images/5.jpg", alt: "Print layout artwork" },
-  { src: "/images/2.jpg", alt: "Feed design artwork" },
-  { src: "/images/4.jpg", alt: "Graphic composition artwork" },
-  { src: "/images/1.JPG", alt: "Brand motion artwork" },
-  { src: "/images/6.jpg", alt: "Immersive launch artwork" },
+  { src: "/images/1.JPG", alt: "Brand motion artwork" }, // One Hero duplicate is needed for the snap-loop
 ];
 
 const GROUPS = [GROUP_A, GROUP_B];
@@ -55,7 +51,7 @@ export default function HeroSection() {
         const stageH = stage.height || window.innerHeight;
         
         // Math Helpers
-        const Y_OFFSET = -100; // Pushed "up" as requested by user
+        const Y_OFFSET = -120; // Pushed higher as requested by user
 
         // Spread logic
         const stepSpreadX = (stageW * 0.65) / (cardsA.length - 1);
