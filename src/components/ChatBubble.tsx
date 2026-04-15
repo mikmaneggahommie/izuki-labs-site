@@ -74,6 +74,15 @@ export default function ChatBubble() {
   };
 
   const handleSkip = () => {
+    // If we have any data (name, phone, etc.), send it before skipping
+    if (Object.keys(formData).length > 0) {
+      fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+    }
+
     setMessages((prev) => [...prev, 
       { role: "user", content: "I'll skip the details for now." },
       { role: "assistant", content: "No worries! I'm here to help. What can I tell you about my design systems or pricing?" }
