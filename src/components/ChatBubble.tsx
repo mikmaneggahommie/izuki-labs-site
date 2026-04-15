@@ -4,8 +4,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { MessageSquare, Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import { isLikelyQuestion } from "@/lib/studio-concierge";
-
 type FlowState =
   | "COLLECTING_NAME"
   | "COLLECTING_TELEGRAM"
@@ -17,16 +15,6 @@ type Message = {
   role: "assistant" | "user";
   content: string;
   isInfoRequest?: boolean;
-};
-
-type ChatApiResponse = {
-  role: "assistant";
-  content: string;
-  extractedInfo?: {
-    name?: string | null;
-    phone?: string | null;
-    email?: string | null;
-  };
 };
 
 const backendChatEnabled = process.env.NEXT_PUBLIC_CHAT_MODE !== "disabled";
@@ -44,6 +32,7 @@ export default function ChatBubble() {
       hasInitialized.current = true;
     }
   }, [isOpen]);
+
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasAutoOpened, setHasAutoOpened] = useState(false);
@@ -66,15 +55,11 @@ export default function ChatBubble() {
       
       setIsNearBottom(nearBottom);
 
-      if (hasAutoOpened || isOpen) {
-        return;
-      }
+      if (hasAutoOpened || isOpen) return;
 
-      // Trigger auto-open if user is near the bottom (footer reached)
       if (nearBottom) {
         setIsOpen(true);
         setHasAutoOpened(true);
-        // Removed redundant "What would you like to know?" append here to fix doubling.
       }
     };
 
@@ -98,29 +83,25 @@ export default function ChatBubble() {
   const handleSkip = () => {
     if (flowState === "COLLECTING_NAME") {
       setFlowState("COLLECTING_TELEGRAM");
-      appendAssistantMessage("No worries. What's your Telegram handle? (Or skip to use phone)", true);
+      appendAssistantMessage("No worries. What's your Telegram handle?", true);
     } else if (flowState === "COLLECTING_TELEGRAM") {
       setFlowState("COLLECTING_PHONE");
-      appendAssistantMessage("Got it. How about a phone number for direct contact?", true);
+      appendAssistantMessage("Got it. How about a phone number?", true);
     } else if (flowState === "COLLECTING_PHONE") {
       setFlowState("COLLECTING_EMAIL");
-      appendAssistantMessage("Understood. Drop your email if you'd like me to follow up there instead.", true);
+      appendAssistantMessage("Understood. Drop your email if you'd like me to follow up there.", true);
     } else if (flowState === "COLLECTING_EMAIL") {
       setFlowState("CHATTING");
-      appendAssistantMessage("Locked in. Ask about pricing, timelines, or my Remote Designer plan.");
-      
-      // Save partial lead if any
+      appendAssistantMessage("Locked in. Ask about pricing or my Remote Designer plan.");
       if (formData.name || formData.phone || formData.telegram || formData.email) {
         fetch("/api/lead", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
-        }).catch(err => console.error("Failed to save partial lead:", err));
+        }).catch(err => console.error("Failed to save lead:", err));
       }
     }
   };
-
-
 
   const submitMessage = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -133,20 +114,36 @@ export default function ChatBubble() {
     setInput("");
     setIsLoading(true);
 
-    // Manually advance flow state to ensure UI stays in sync with placeholders
     if (flowState === "COLLECTING_NAME") {
       setFormData(prev => ({ ...prev, name: userContent }));
       setFlowState("COLLECTING_TELEGRAM");
+      appendAssistantMessage("Thanks. What's your Telegram handle?", true);
+      setIsLoading(false);
+      return;
     } else if (flowState === "COLLECTING_TELEGRAM") {
       setFormData(prev => ({ ...prev, telegram: userContent }));
       setFlowState("COLLECTING_PHONE");
+      appendAssistantMessage("Great. Any phone number for direct contact?", true);
+      setIsLoading(false);
+      return;
     } else if (flowState === "COLLECTING_PHONE") {
       setFormData(prev => ({ ...prev, phone: userContent }));
       setFlowState("COLLECTING_EMAIL");
+      appendAssistantMessage("Almost done. Enter your email for formal follow-up.", true);
+      setIsLoading(false);
+      return;
     } else if (flowState === "COLLECTING_EMAIL") {
       setFormData(prev => ({ ...prev, email: userContent }));
       setFlowState("CHATTING");
+      // Initial Chat prompt
+      const currentData = { ...formData, email: userContent };
+      fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(currentData),
+      }).catch(err => console.error("Lead save failed:", err));
     }
+
     if (backendChatEnabled) {
       try {
         const response = await fetch("/api/chat", {
@@ -158,10 +155,7 @@ export default function ChatBubble() {
           }),
         });
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.details || errorData.error || "Stream failed");
-        }
+        if (!response.ok) throw new Error("Chat failed");
 
         const reader = response.body?.getReader();
         if (!reader) throw new Error("No reader");
@@ -173,63 +167,43 @@ export default function ChatBubble() {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-
           const chunk = decoder.decode(value, { stream: true });
           assistantContent += chunk;
-
-          const parts = assistantContent.split("@@@INFO_EXTRACTED@@@");
-          const uiText = parts[0];
-          const jsonText = parts[1];
-
+          const uiText = assistantContent.split("@@@INFO_EXTRACTED@@@")[0];
           setMessages((current) => {
             const next = [...current];
             const last = next[next.length - 1];
             if (last && last.role === "assistant") last.content = uiText;
             return next;
           });
-
-          if (jsonText) {
-            try {
-              const info = JSON.parse(jsonText);
-              const name = info.name || "";
-              const phone = info.phone || "";
-              const email = info.email || "";
-
-              setFormData(prev => ({
-                name: name || prev.name,
-                telegram: info.telegram || prev.telegram,
-                phone: phone || prev.phone,
-                email: email || prev.email,
-              }));
-
-              // If we just got an email and it looks valid, fire the lead save automatically
-              if (email && email.includes("@") && email.includes(".")) {
-                const currentData = { ...formData, name: name || formData.name, telegram: info.telegram || formData.telegram, phone: phone || formData.phone, email };
-                
-                // Use a simple guard to prevent triple-firing during the stream
-                if ((window as any)._lastSavedEmail !== email) {
-                  (window as any)._lastSavedEmail = email;
-                  fetch("/api/lead", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(currentData),
-                  }).catch(err => console.error("Auto-lead save failed:", err));
-                }
-              }
-            } catch (e) {}
-          }
         }
       } catch (err: any) {
         console.error("Chat Error:", err);
-        appendAssistantMessage(`Site Error: ${err.message || "System temporarily offline."}`);
+        appendAssistantMessage("System temporarily offline.");
       } finally {
         setIsLoading(false);
       }
-      return;
+    } else {
+      appendAssistantMessage("The bot is currently disabled.");
+      setIsLoading(false);
     }
+  };
 
-    appendAssistantMessage("The bot is currently disabled.");
-    setIsLoading(false);
+  const getPlaceholder = () => {
+    switch (flowState) {
+      case "COLLECTING_NAME": return "Type your name...";
+      case "COLLECTING_TELEGRAM": return "Telegram handle...";
+      case "COLLECTING_PHONE": return "Enter phone number...";
+      case "COLLECTING_EMAIL": return "Enter your email...";
+      default: return "What would you like to know?";
+    }
+  };
+
+  const getCurrentPrompt = () => {
+    if (messages.length === 0) return "What would you like to know?";
+    // For collection states, show the last assistant message content
+    const lastAssistant = [...messages].reverse().find(m => m.role === "assistant");
+    return lastAssistant?.content || "What would you like to know?";
   };
 
   return (
@@ -238,148 +212,110 @@ export default function ChatBubble() {
         <motion.button
           type="button"
           onClick={() => setIsOpen(true)}
-          className={`fixed bottom-8 right-8 z-[100] flex h-14 w-14 items-center justify-center rounded-full border border-white/15 bg-[#111111] text-white shadow-[0_20px_60px_rgba(0,0,0,0.5)] transition-colors hover:border-[#00FF00] md:bottom-8 md:right-8 ${
-            isNearBottom ? "animate-dot-pulse" : ""
+          className={`fixed bottom-8 right-8 z-[100] flex h-14 w-14 items-center justify-center rounded-full border border-[#00FF00]/40 bg-[#000000] text-[#00FF00] shadow-[0_0_20px_rgba(0,255,0,0.2)] md:bottom-8 md:right-8 transition-all hover:scale-110 hover:border-[#00FF00] ${
+            isNearBottom ? "animate-pulse" : ""
           }`}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.96 }}
           aria-label="Open chat"
         >
-          <MessageSquare className="h-5 w-5 stroke-[1.7]" />
+          <MessageSquare className="h-6 w-6" />
         </motion.button>
       ) : null}
 
       <AnimatePresence>
         {isOpen ? (
           <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.96 }}
-            transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-[100px] right-4 z-[95] flex max-h-[560px] w-[calc(100vw-32px)] max-w-[390px] flex-col overflow-hidden rounded-[4px] border-[2px] border-[#00FF00] bg-[#000000] shadow-[8px_8px_0px_#000000] md:right-8"
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="fixed bottom-6 right-6 z-[200] flex h-[580px] w-full max-w-[420px] flex-col overflow-hidden border-[2.5px] border-[#00FF00] bg-[#000000] shadow-[12px_12px_0px_#000000]"
           >
-            <div className="flex items-start justify-between gap-4 border-b-[2px] border-[#00FF00] bg-[#000000] px-6 py-5">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <p className="text-base font-bold tracking-[-0.03em] text-white">
-                    izuki.labs
-                  </p>
-                  <span className="h-2 w-2 rounded-full bg-[#22C55E] animate-online-pulse" />
+            {/* HEADER */}
+            <div className="flex items-center justify-between border-b-[2.5px] border-[#00FF00] px-6 py-5 bg-[#000000]">
+              <div className="flex items-center gap-3">
+                <span className="font-serif text-xl font-black uppercase tracking-tighter text-white">izuki.labs</span>
+                <div className="relative h-2.5 w-2.5">
+                  <span className="absolute inset-0 animate-ping rounded-full bg-[#00FF00] opacity-75" />
+                  <span className="relative block h-2.5 w-2.5 rounded-full bg-[#00FF00]" />
                 </div>
-                <p className="text-[12px] font-medium text-white/45">
-                  {backendChatEnabled
-                    ? "Ask anything"
-                    : "Design Assistant"}
-                </p>
               </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsOpen(false)}
-                    className="flex h-8 w-8 items-center justify-center border border-[#00FF00] bg-[#00FF00] text-black transition-colors hover:bg-white"
-                    aria-label="Close chat"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-
-            <div className="chat-scroll flex-1 space-y-4 overflow-y-auto px-6 py-6">
-              {messages.map((message, index) => (
-                <div key={`${message.role}-${index}`} className="group flex flex-col gap-2">
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.22 }}
-                    className={`max-w-[88%] px-4 py-3 text-[14px] leading-[1.55] border-[1.5px] ${
-                      message.role === "assistant"
-                        ? "border-[#00FF00] bg-[#111111] text-[#00FF00]"
-                        : "ml-auto border-[#00FF00] bg-[#00FF00] text-black font-black"
-                    }`}
-                    dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content) }}
-                  />
-                  
-                  {/* Skip button moved to below input for better visibility */}
-                </div>
-              ))}
-
-              {isLoading ? (
-                <div className="flex max-w-[88%] items-center gap-2 rounded-[12px_12px_12px_4px] border border-white/6 bg-[#1A1A1A] px-4 py-3">
-                  {[0, 1, 2].map((dot) => (
-                    <motion.span
-                      key={dot}
-                      className="h-1.5 w-1.5 rounded-full bg-white/55"
-                      animate={{ opacity: [0.2, 1, 0.2] }}
-                      transition={{
-                        duration: 0.9,
-                        repeat: Infinity,
-                        delay: dot * 0.12,
-                      }}
-                    />
-                  ))}
-                </div>
-              ) : null}
-              <div ref={messagesEndRef} />
+              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#00FF00]/60">Ask anything</p>
+              <button onClick={() => setIsOpen(false)} className="text-white hover:text-[#00FF00] transition-colors">
+                <X className="h-5 w-5" />
+              </button>
             </div>
 
-            <div className="space-y-3 border-t-[2px] border-[#00FF00] bg-[#000000] px-5 py-4">
-              <form onSubmit={submitMessage}>
-                <div className="flex items-center gap-3">
+            {/* MIDDLE SECTION - DYNAMIC HUB */}
+            <div className="flex-1 overflow-hidden p-6">
+              {flowState === "CHATTING" ? (
+                <div className="chat-scroll h-full space-y-4 overflow-y-auto pr-2">
+                  {messages.map((m, i) => (
+                    <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                      <div className={`max-w-[85%] border-[1.5px] px-4 py-3 text-[14px] leading-relaxed ${
+                        m.role === "user" 
+                        ? "border-[#00FF00] bg-[#00FF00] font-black text-black" 
+                        : "border-[#00FF00] bg-[#111111] text-[#00FF00]"
+                      }`}
+                      dangerouslySetInnerHTML={{ __html: formatMarkdown(m.content) }}
+                      />
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <div className="w-full border-[2.5px] border-[#00FF00] bg-[#111111] p-8 text-center shadow-[6px_6px_0px_#00FF00]">
+                    <p className="text-xl font-black leading-tight text-[#00FF00] uppercase tracking-tighter">
+                      {getCurrentPrompt()}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* LOWER SECTION - INPUT & ACTIONS */}
+            <div className="border-t-[2.5px] border-[#00FF00] bg-[#000000]">
+              <form onSubmit={submitMessage} className="border-b-[2.5px] border-[#00FF00]">
+                <div className="flex items-center">
                   <input
                     autoFocus
                     value={input}
                     disabled={isLoading}
-                    onChange={(event) => setInput(event.target.value)}
-                    placeholder={
-                      flowState === "COLLECTING_NAME"
-                        ? "Type your name..."
-                        : flowState === "COLLECTING_TELEGRAM"
-                          ? "Telegram handle (e.g. @username)..."
-                          : flowState === "COLLECTING_PHONE"
-                            ? "Enter phone number..."
-                            : flowState === "COLLECTING_EMAIL"
-                              ? "Enter your email..."
-                              : "Ask about pricing, timelines, or services..."
-                    }
-                    className="h-12 flex-1 border-[1.5px] border-[#00FF00] bg-[#111111] px-4 text-[14px] text-[#00FF00] outline-none placeholder:text-[#00FF00]/40 focus:bg-black"
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder={getPlaceholder()}
+                    className="h-16 flex-1 bg-transparent px-6 text-lg font-bold text-[#00FF00] outline-none placeholder:text-[#00FF00]/30"
                   />
-
-                  <button
-                    type="submit"
-                    disabled={isLoading || !input.trim()}
-                    className="flex h-11 w-11 items-center justify-center border-[2px] border-[#00FF00] bg-[#00FF00] text-black transition-all hover:bg-white disabled:opacity-50"
-                    aria-label="Send message"
-                  >
-                    <Send className="h-4 w-4" />
+                  <button type="submit" className="flex h-16 w-16 items-center justify-center bg-[#00FF00] text-black transition-colors hover:bg-white">
+                    <Send className="h-6 w-6" />
                   </button>
                 </div>
               </form>
 
-              {flowState !== "CHATTING" && (
-                <div className="flex justify-center">
+              <div className="p-5 space-y-4">
+                {flowState !== "CHATTING" && (
                   <button
                     onClick={handleSkip}
-                    className="group flex items-center justify-center gap-2 border border-[#00FF00] bg-[#111111] py-2 text-[11px] font-black uppercase tracking-[0.2em] text-[#00FF00] transition-colors hover:bg-[#00FF00] hover:text-black"
+                    className="h-12 w-full border-[2.5px] border-[#00FF00] bg-[#111111] text-[13px] font-black uppercase tracking-[0.4em] text-[#00FF00] transition-all hover:bg-[#00FF00] hover:text-black"
                   >
                     SKIP PROTOCOL
                   </button>
-                </div>
-              )}
+                )}
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <a
-                  href="mailto:it.mikiyas.daniel@gmail.com"
-                  className="flex h-11 items-center justify-center border-[2px] border-[#00FF00] bg-[#00FF00] px-4 text-[13px] font-black uppercase text-black transition-all hover:bg-white"
-                >
-                  Email
-                </a>
-                <a
-                  href="https://t.me/snowplugwalk"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-11 items-center justify-center border-[2px] border-[#00FF00] bg-[#111111] px-4 text-[13px] font-black uppercase text-[#00FF00] transition-all hover:bg-[#00FF00] hover:text-black"
-                >
-                  Telegram
-                </a>
+                <div className="grid grid-cols-2 gap-4">
+                  <a
+                    href="mailto:it.mikiyas.daniel@gmail.com"
+                    className="flex h-12 items-center justify-center bg-[#00FF00] text-[13px] font-black uppercase tracking-[0.2em] text-black transition-all hover:bg-white"
+                  >
+                    EMAIL
+                  </a>
+                  <a
+                    href="https://t.me/snowplugwalk"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-12 items-center justify-center border-[2px] border-[#00FF00] bg-black text-[13px] font-black uppercase tracking-[0.2em] text-[#00FF00] transition-all hover:bg-[#00FF00] hover:text-black"
+                  >
+                    TELEGRAM
+                  </a>
+                </div>
               </div>
             </div>
           </motion.div>
