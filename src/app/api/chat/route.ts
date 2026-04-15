@@ -109,10 +109,20 @@ Known visitor details:
 
   } catch (error: any) {
     console.error("Gemini API Route Error:", error);
+    
+    let clientMessage = "I'm having a bit of trouble connecting to the network.";
+    
+    // Specifically check for quota/rate limit errors (Free Tier limits)
+    if (error?.status === 429 || error?.message?.includes("429") || error?.message?.includes("quota")) {
+      clientMessage = "Daily knowledge quota exceeded for the free tier. Please try again tomorrow or contact me directly.";
+    } else if (error?.status === 404 || error?.message?.includes("404")) {
+      clientMessage = "The assistant model is currently being updated. Please try again soon.";
+    }
+
     return NextResponse.json({ 
       error: "Failed to process stream", 
-      details: error.message || String(error),
-      stack: error.stack
+      details: clientMessage,
+      isQuotaError: error?.status === 429 || error?.message?.includes("quota")
     }, { status: 500 });
   }
 }

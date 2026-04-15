@@ -89,7 +89,10 @@ export default function ChatBubble() {
         }),
       });
 
-      if (!response.ok) throw new Error("Connection failed.");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.details || "Connection failed.");
+      }
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
@@ -130,8 +133,8 @@ export default function ChatBubble() {
       }
     } catch (err: any) {
       console.error("Chat Error:", err);
-      // Fallback response if API fails
-      appendAssistantMessage("I'm having a bit of trouble connecting to the network. You can reach me directly on Telegram @snowplugwalk or email me at it.mikiyas.daniel@gmail.com.");
+      // Fallback response with specific error detail if available
+      appendAssistantMessage(err.message || "I'm having a bit of trouble connecting to the network. You can reach me directly on Telegram @snowplugwalk or email me at it.mikiyas.daniel@gmail.com.");
     } finally {
       setIsLoading(false);
     }
