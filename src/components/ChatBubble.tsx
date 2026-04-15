@@ -161,14 +161,14 @@ export default function ChatBubble() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 32, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-4 right-4 z-[110] flex h-[620px] w-[calc(100vw-32px)] max-w-[400px] flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#0A0A0A] shadow-[0_32px_128px_rgba(0,0,0,0.8)] backdrop-blur-xl md:bottom-10 md:right-10"
+            className="fixed bottom-4 right-4 z-[110] flex h-[500px] w-[calc(100vw-32px)] max-w-[400px] flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#0A0A0A] shadow-[0_32px_128px_rgba(0,0,0,0.8)] backdrop-blur-xl md:bottom-10 md:right-10"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/5 bg-[#111111] px-6 py-5">
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-black tracking-tight text-white">izuki.labs</span>
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-[#E8503A]" />
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-[#FF0000]" />
                 </div>
                 <span className="text-[11px] font-medium uppercase tracking-widest text-white/40">Studio Concierge</span>
               </div>
@@ -192,7 +192,7 @@ export default function ChatBubble() {
                   <div
                     className={`max-w-[85%] px-5 py-3.5 text-[14.5px] leading-relaxed ${
                       message.role === "user"
-                        ? "rounded-[1.25rem] rounded-br-[4px] bg-[#E8503A] text-white font-medium"
+                        ? "rounded-[1.25rem] rounded-br-[4px] bg-[#FF0000] text-white font-medium shadow-[0_4px_12px_rgba(255,0,0,0.2)]"
                         : "rounded-[1.25rem] rounded-bl-[4px] bg-[#1A1A1A] text-white/90 border border-white/5"
                     }`}
                     dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content) }}
@@ -226,7 +226,7 @@ export default function ChatBubble() {
                 <button
                   type="submit"
                   disabled={!input.trim() || isLoading}
-                  className="absolute right-2 top-1.5 flex h-10 w-10 items-center justify-center rounded-lg bg-[#E8503A] text-white shadow-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+                  className="absolute right-2 top-1.5 flex h-10 w-10 items-center justify-center rounded-lg bg-[#FF0000] text-white shadow-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
                 >
                   <Send className="h-4 w-4" />
                 </button>
@@ -235,7 +235,7 @@ export default function ChatBubble() {
               <div className="grid grid-cols-2 gap-3">
                 <a
                   href="mailto:it.mikiyas.daniel@gmail.com"
-                  className="flex h-12 items-center justify-center gap-2 rounded-xl bg-[#E8503A] text-[13px] font-bold uppercase tracking-tight text-white transition-all hover:brightness-110 active:scale-[0.98]"
+                  className="flex h-12 items-center justify-center gap-2 rounded-xl bg-[#FF0000] text-[13px] font-bold uppercase tracking-tight text-white transition-all hover:brightness-110 active:scale-[0.98]"
                 >
                   Email Me
                 </a>
