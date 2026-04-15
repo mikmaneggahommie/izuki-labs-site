@@ -16,21 +16,39 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "GEMINI_API_KEY is not configured." }, { status: 500 });
     }
 
-    // Initialize New 2026 SDK
-    const genAI = new GoogleGenAI({ apiKey });
+// Initialize New 2026 SDK
+const genAI = new GoogleGenAI({ apiKey });
 
-    // Model IDs (2026 stabilized)
-    const modelIds = [
-      "gemini-3.1-flash-lite-preview",
-      "gemini-3.1-flash-preview",
-      "gemini-1.5-pro",
-      "gemini-1.5-flash"
-    ];
+// Sanitizer to guarantee User/Model alternation (Mandatory for 2026 SDK)
+function sanitizeContents(rawContents: any[]) {
+  const sanitized: any[] = [];
+  for (const item of rawContents) {
+    if (sanitized.length > 0 && sanitized[sanitized.length - 1].role === item.role) {
+      // Merge consecutive same-role messages
+      sanitized[sanitized.length - 1].parts[0].text += "\n" + item.parts[0].text;
+    } else {
+      sanitized.push(item);
+    }
+  }
+  // Ensure we start with User
+  if (sanitized.length > 0 && sanitized[0].role === "model") {
+    sanitized.shift();
+  }
+  return sanitized;
+}
 
-    let result;
-    let successModel = "";
+// Model IDs (2026 stabilized)
+const modelIds = [
+  "gemini-3.1-flash-lite-preview",
+  "gemini-3.1-flash-preview",
+  "gemini-1.5-pro",
+  "gemini-1.5-flash"
+];
 
-    const systemPrompt = `${studioSystemPrompt}
+let result;
+let successModel = "";
+
+const systemPrompt = `${studioSystemPrompt}
 
 VITAL INSTRUCTIONS:
 - Name: ${userInfo?.name || "Unknown"}
@@ -39,43 +57,46 @@ VITAL INSTRUCTIONS:
 - Email: ${userInfo?.email || "Unknown"}
 `.trim();
 
-    // Prepare contents for new API
-    const contents = [
-      { role: "user" as const, parts: [{ text: systemPrompt }] },
-      { role: "model" as const, parts: [{ text: "Understood. I am your design partner." }] },
-      ...messages.map(m => ({
-        role: (m.role === "assistant" ? "model" : "user") as "user" | "model",
-        parts: [{ text: m.content }]
-      }))
-    ];
+// Construct raw history
+const rawContents = [
+  { role: "user" as const, parts: [{ text: systemPrompt }] },
+  { role: "model" as const, parts: [{ text: "Understood. I'm ready." }] },
+  ...messages.map(m => ({
+    role: (m.role === "assistant" ? "model" : "user") as "user" | "model",
+    parts: [{ text: m.content }]
+  }))
+];
 
-    const safetySettings = [
-      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-    ];
+// Sanitize for the strict 2026 backend
+const contents = sanitizeContents(rawContents);
 
-    for (const modelId of modelIds) {
-      try {
-        console.log(`Trying model: ${modelId}`);
-        
-        // New generateContentStream protocol for 2026
-        result = await genAI.models.generateContentStream({
-          model: modelId,
-          contents: contents,
-          config: {
-            safetySettings: safetySettings
-          }
-        });
-        
-        successModel = modelId;
-        break; // Success!
-      } catch (err) {
-        console.error(`Model ${modelId} failed:`, err);
-        continue;
+const safetySettings = [
+  { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+  { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+  { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+  { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+];
+
+for (const modelId of modelIds) {
+  try {
+    console.log(`Trying model: ${modelId}`);
+    
+    result = await genAI.models.generateContentStream({
+      model: modelId,
+      contents: contents,
+      config: {
+        safetySettings: safetySettings
       }
-    }
+    });
+    
+    successModel = modelId;
+    break; // Success!
+  } catch (err: any) {
+    console.error(`Model ${modelId} failed [Status ${err?.status}]:`, err?.message);
+    continue;
+  }
+}
+
 
     if (!result) {
       throw new Error("All model IDs failed.");
