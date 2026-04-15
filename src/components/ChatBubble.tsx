@@ -35,12 +35,15 @@ export default function ChatBubble() {
   const [isOpen, setIsOpen] = useState(false);
   const [flowState, setFlowState] = useState<FlowState>("COLLECTING_NAME");
   const [formData, setFormData] = useState({ name: "", telegram: "", phone: "", email: "" });
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: "What would you like to know?",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    if (isOpen && !hasInitialized.current) {
+      setMessages([{ role: "assistant", content: "What would you like to know?" }]);
+      hasInitialized.current = true;
+    }
+  }, [isOpen]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasAutoOpened, setHasAutoOpened] = useState(false);
@@ -252,9 +255,9 @@ export default function ChatBubble() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.96 }}
             transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-[100px] right-4 z-[95] flex max-h-[560px] w-[calc(100vw-32px)] max-w-[390px] flex-col overflow-hidden rounded-[18px] border border-white/12 bg-[#0A0A0A] shadow-[0_20px_60px_rgba(0,0,0,0.5)] md:right-8"
+            className="fixed bottom-[100px] right-4 z-[95] flex max-h-[560px] w-[calc(100vw-32px)] max-w-[390px] flex-col overflow-hidden rounded-[4px] border-[2px] border-[#00FF00] bg-[#000000] shadow-[8px_8px_0px_#000000] md:right-8"
           >
-            <div className="flex items-start justify-between gap-4 border-b border-white/10 bg-[#111111] px-6 py-5">
+            <div className="flex items-start justify-between gap-4 border-b-[2px] border-[#00FF00] bg-[#000000] px-6 py-5">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <p className="text-base font-bold tracking-[-0.03em] text-white">
@@ -269,15 +272,15 @@ export default function ChatBubble() {
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-white/72 transition-colors hover:text-[#00FF00]"
-                aria-label="Close chat"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    className="flex h-8 w-8 items-center justify-center border border-[#00FF00] bg-[#00FF00] text-black transition-colors hover:bg-white"
+                    aria-label="Close chat"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
 
             <div className="chat-scroll flex-1 space-y-4 overflow-y-auto px-6 py-6">
               {messages.map((message, index) => (
@@ -286,10 +289,10 @@ export default function ChatBubble() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.22 }}
-                    className={`max-w-[88%] px-4 py-3 text-[14px] leading-[1.55] ${
+                    className={`max-w-[88%] px-4 py-3 text-[14px] leading-[1.55] border-[1.5px] ${
                       message.role === "assistant"
-                        ? "rounded-[12px_12px_12px_4px] border border-white/12 bg-[#1A1A1A] text-white"
-                        : "ml-auto rounded-[12px_12px_4px_12px] bg-[#00FF00] text-black font-medium"
+                        ? "border-[#00FF00] bg-[#111111] text-[#00FF00]"
+                        : "ml-auto border-[#00FF00] bg-[#00FF00] text-black font-black"
                     }`}
                     dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content) }}
                   />
@@ -317,7 +320,7 @@ export default function ChatBubble() {
               <div ref={messagesEndRef} />
             </div>
 
-            <div className="space-y-3 border-t border-white/10 bg-[#111111] px-5 py-4">
+            <div className="space-y-3 border-t-[2px] border-[#00FF00] bg-[#000000] px-5 py-4">
               <form onSubmit={submitMessage}>
                 <div className="flex items-center gap-3">
                   <input
@@ -336,13 +339,13 @@ export default function ChatBubble() {
                               ? "Enter your email..."
                               : "Ask about pricing, timelines, or services..."
                     }
-                    className="h-12 flex-1 rounded-[8px] border border-white/10 bg-[#1A1A1A] px-4 text-[14px] text-white outline-none transition-colors placeholder:text-white/30 focus:border-white/20"
+                    className="h-12 flex-1 border-[1.5px] border-[#00FF00] bg-[#111111] px-4 text-[14px] text-[#00FF00] outline-none placeholder:text-[#00FF00]/40 focus:bg-black"
                   />
 
                   <button
                     type="submit"
                     disabled={isLoading || !input.trim()}
-                    className="flex h-11 w-11 items-center justify-center rounded-[8px] bg-[#00FF00] text-black transition-opacity disabled:opacity-40"
+                    className="flex h-11 w-11 items-center justify-center border-[2px] border-[#00FF00] bg-[#00FF00] text-black transition-all hover:bg-white disabled:opacity-50"
                     aria-label="Send message"
                   >
                     <Send className="h-4 w-4" />
@@ -354,10 +357,9 @@ export default function ChatBubble() {
                 <div className="flex justify-center">
                   <button
                     onClick={handleSkip}
-                    className="group flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#00FF00]/60 transition-colors hover:text-[#00FF00]"
+                    className="group flex items-center justify-center gap-2 border border-[#00FF00] bg-[#111111] py-2 text-[11px] font-black uppercase tracking-[0.2em] text-[#00FF00] transition-colors hover:bg-[#00FF00] hover:text-black"
                   >
-                    <span>Skip this step</span>
-                    <div className="h-px w-8 bg-[#00FF00]/20 transition-all group-hover:w-12 group-hover:bg-[#00FF00]/40" />
+                    SKIP PROTOCOL
                   </button>
                 </div>
               )}
@@ -365,17 +367,17 @@ export default function ChatBubble() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <a
                   href="mailto:it.mikiyas.daniel@gmail.com"
-                  className="flex h-11 items-center justify-center rounded-[8px] bg-[#00FF00] px-4 text-[13px] font-bold text-black transition-opacity hover:opacity-90 mt-1"
+                  className="flex h-11 items-center justify-center border-[2px] border-[#00FF00] bg-[#00FF00] px-4 text-[13px] font-black uppercase text-black transition-all hover:bg-white"
                 >
-                  Email Me
+                  Email
                 </a>
                 <a
                   href="https://t.me/snowplugwalk"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-11 items-center justify-center rounded-[8px] border border-[#00FF00]/40 bg-[#111111] px-4 text-[13px] font-bold text-[#00FF00] transition-colors hover:bg-[#00FF00]/10 mt-1"
+                  className="flex h-11 items-center justify-center border-[2px] border-[#00FF00] bg-[#111111] px-4 text-[13px] font-black uppercase text-[#00FF00] transition-all hover:bg-[#00FF00] hover:text-black"
                 >
-                  Message On Telegram
+                  Telegram
                 </a>
               </div>
             </div>
