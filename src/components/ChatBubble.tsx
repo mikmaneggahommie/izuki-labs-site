@@ -63,7 +63,7 @@ export default function ChatBubble() {
     const savedMsg = sessionStorage.getItem("izuki_chat_msgs");
     const savedInfo = sessionStorage.getItem("izuki_chat_info");
     if (savedMsg) setMessages(JSON.parse(savedMsg));
-    else setMessages([{ role: "assistant", content: "Hey! What's your name?" }]);
+    else setMessages([{ role: "assistant", content: "Hey, I'm glad you're here 👋 What's your name?" }]);
     
     if (savedInfo) {
       const info = JSON.parse(savedInfo);
