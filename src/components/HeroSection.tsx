@@ -75,6 +75,7 @@ export default function HeroSection() {
             .to(otherCards, {
               x: (i) => (i < 3 ? -(3 - i) * 150 : (i - 2) * 150),
               y: (i) => (i < 3 ? -(3 - i) * 150 : (i - 2) * 150),
+              rotateY: (i) => (i < 3 ? -12 : 12), // Subtle 3D depth
               duration: 1.0,
               ease: "power3.out",
               stagger: { amount: 0.4, from: "center" }
@@ -89,6 +90,7 @@ export default function HeroSection() {
             .to(otherCards, {
               x: 0,
               y: 0,
+              rotateY: 0,
               duration: 0.6,
               ease: "expo.in",
               stagger: { amount: 0.3, from: "edges" }

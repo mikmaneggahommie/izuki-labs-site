@@ -257,7 +257,6 @@ export default function ChatBubble() {
                         ? "rounded-[12px_12px_12px_4px] border border-white/6 bg-[#1A1A1A] text-white"
                         : "ml-auto rounded-[12px_12px_4px_12px] bg-[#E8503A] text-white"
                     }`}
-                  >
                     dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content) }}
                   />
                   
