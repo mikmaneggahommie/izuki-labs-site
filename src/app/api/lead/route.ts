@@ -18,17 +18,31 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1. Log to Google Sheets (Izuki Labs Leads)
-    // ID: 1DgP1WdGULNf2RMJ1QZPpv9M3yKD_BhLSIct5F_JQHvw
+    // 1. Log to Google Sheets via Composio API
+    const COMPOSIO_API_KEY = process.env.COMPOSIO_API_KEY;
     const SPREADSHEET_ID = "1DgP1WdGULNf2RMJ1QZPpv9M3yKD_BhLSIct5F_JQHvw";
     
-    // We use a webhook or Composio SDK here. 
-    // Since we are in the workspace, we'll try to trigger the Composio log.
-    try {
-      // Logic for logging to Google Sheets via Composio or direct API
-      console.log("Logging lead to Google Sheets:", SPREADSHEET_ID);
-    } catch (sheetErr) {
-      console.error("Google Sheets Logging Failed:", sheetErr);
+    if (COMPOSIO_API_KEY) {
+      try {
+        await fetch("https://api.composio.dev/v1/actions/execute", {
+          method: "POST",
+          headers: { 
+            "x-api-key": COMPOSIO_API_KEY,
+            "Content-Type": "application/json" 
+          },
+          body: JSON.stringify({
+            action_slug: "googlesheets_spreadsheets_values_append",
+            parameters: {
+              spreadsheetId: SPREADSHEET_ID,
+              range: "Sheet1!A:E",
+              valueInputOption: "USER_ENTERED",
+              values: [[name, email, phone, telegram, new Date().toISOString()]]
+            }
+          }),
+        });
+      } catch (sheetErr) {
+        console.error("Composio Google Sheets Logging Failed:", sheetErr);
+      }
     }
 
     // 2. Ping Telegram
