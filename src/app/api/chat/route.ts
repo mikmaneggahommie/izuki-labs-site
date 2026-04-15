@@ -51,7 +51,7 @@ IMPORTANT:
           role: "model",
           parts: [
             {
-              text: "Understood. I am now acting as the Izuki Labs studio concierge. I will be direct, systems-focused, and premium in my advice.",
+              text: "Understood. I am now acting as the interactive assistant for the izuki.labs website. I will be direct, systems-focused, and premium in my advice.",
             },
           ],
         },

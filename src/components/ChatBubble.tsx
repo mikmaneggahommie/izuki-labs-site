@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { MessageSquare, Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import { getStudioConciergeReply, isLikelyQuestion } from "@/lib/studio-concierge";
+import { isLikelyQuestion } from "@/lib/studio-concierge";
 
 type FlowState =
   | "COLLECTING_NAME"
@@ -144,7 +144,7 @@ export default function ChatBubble() {
         const data = (await response.json()) as ChatApiResponse;
 
         if (data.content && data.role === "assistant") {
-          // Update local info if Gemini extracted anything
+          // ... update info logic remains ...
           if (data.extractedInfo) {
             const { name, phone, email } = data.extractedInfo;
             setFormData(prev => ({
@@ -153,12 +153,10 @@ export default function ChatBubble() {
               email: email || prev.email,
             }));
 
-            // Auto-advance states if we got the info we were looking for
             if (name && flowState === "COLLECTING_NAME") setFlowState("COLLECTING_PHONE");
             if (phone && flowState === "COLLECTING_PHONE") setFlowState("COLLECTING_EMAIL");
             if (email && flowState === "COLLECTING_EMAIL") {
               setFlowState("CHATTING");
-              // Final lead save
               fetch("/api/lead", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -169,68 +167,20 @@ export default function ChatBubble() {
 
           appendAssistantMessage(data.content, data.content.includes("?") && (flowState !== "CHATTING"));
         } else {
-          appendAssistantMessage(getStudioConciergeReply(userContent, formData));
+          appendAssistantMessage("I'm having trouble connecting to my design systems right now. Try again in a second or reach out on Telegram.");
         }
-      } catch {
-        appendAssistantMessage(getStudioConciergeReply(userContent, formData));
+      } catch (err) {
+        console.error("Chat Error:", err);
+        appendAssistantMessage("System temporarily offline. I'm working on getting the assistant back up.");
       } finally {
         setIsLoading(false);
       }
       return;
     }
 
-    // Fallback/Legacy heuristic logic (only if backend is disabled)
-    if (flowState === "COLLECTING_NAME") {
-      if (isLikelyQuestion(userContent)) {
-        setFlowState("CHATTING");
-      } else {
-        setFormData((current) => ({ ...current, name: userContent }));
-        appendAssistantMessage(`Perfect, ${userContent}. What phone number should I use for project follow-up?`, true);
-        setFlowState("COLLECTING_PHONE");
-        setIsLoading(false);
-        return;
-      }
-    }
-
-    if (flowState === "COLLECTING_PHONE") {
-      if (isLikelyQuestion(userContent)) {
-        setFlowState("CHATTING");
-      } else {
-        const digitCount = userContent.replace(/\D/g, "").length;
-        if (digitCount < 9 || digitCount > 15) {
-          appendAssistantMessage("That doesn't look like a valid phone number. Please provide a valid number with country code.");
-          setIsLoading(false);
-          return;
-        }
-        setFormData((current) => ({ ...current, phone: userContent }));
-        appendAssistantMessage("Great. Drop your email too and I’ll keep the thread organized.", true);
-        setFlowState("COLLECTING_EMAIL");
-        setIsLoading(false);
-        return;
-      }
-    }
-
-    if (flowState === "COLLECTING_EMAIL") {
-      if (isLikelyQuestion(userContent)) {
-        setFlowState("CHATTING");
-      } else {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(userContent)) {
-          appendAssistantMessage("Please provide a valid email address.");
-          setIsLoading(false);
-          return;
-        }
-        const nextUserInfo = { ...formData, email: userContent };
-        setFormData(nextUserInfo);
-        appendAssistantMessage("Locked in. Ask about pricing, timelines, or my Remote Designer plan.");
-        setFlowState("CHATTING");
-        setIsLoading(false);
-        fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(nextUserInfo) });
-        return;
-      }
-    }
-
-    appendAssistantMessage(getStudioConciergeReply(userContent, formData));
+    // Fallback/Legacy heuristic logic REMOVED. 
+    // If backend is disabled, we just show offensive/direct error as requested.
+    appendAssistantMessage("The bot is currently disabled in your settings.");
     setIsLoading(false);
   };
 
@@ -270,7 +220,7 @@ export default function ChatBubble() {
                 </div>
                 <p className="text-[12px] font-medium text-white/45">
                   {backendChatEnabled
-                    ? "AI Design Partner"
+                    ? "Interactive Assistant"
                     : "Design Assistant"}
                 </p>
               </div>
