@@ -43,6 +43,7 @@ export default function ChatBubble() {
   const [isNearBottom, setIsNearBottom] = useState(false);
   const [flowState, setFlowState] = useState<"COLLECTING_NAME" | "COLLECTING_CONTACT" | "COLLECTING_EMAIL" | "CHATTING">("COLLECTING_NAME");
   const [formData, setFormData] = useState<UserInfo>({});
+  const [leadStepInput, setLeadStepInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
