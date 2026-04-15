@@ -37,7 +37,7 @@ export default function ChatBubble() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Welcome to izuki.labs. What should I call you?",
+      content: "How can I help with your design systems today?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -275,8 +275,8 @@ export default function ChatBubble() {
                 </div>
                 <p className="text-[12px] font-medium text-white/45">
                   {backendChatEnabled
-                    ? "AI Studio Concierge"
-                    : "Studio Concierge"}
+                    ? "AI Design Partner"
+                    : "Design Assistant"}
                 </p>
               </div>
 
