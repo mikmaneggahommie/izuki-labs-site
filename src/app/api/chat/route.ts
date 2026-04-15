@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
     const lastMessage = messages[messages.length - 1]?.content ?? "";
 
     const systemPrompt = `${studioSystemPrompt}
@@ -27,12 +27,9 @@ Known visitor details:
 - Name: ${userInfo?.name || "Unknown"}
 - Phone: ${userInfo?.phone || "Unknown"}
 - Email: ${userInfo?.email || "Unknown"}
-
-IMPORTANT: 
-- Stay strictly within the Izuki Labs knowledge base. 
-- Output your conversational reply first.
-- ONLY when you are completely finished with the reply, output the delimiter "@@@INFO_EXTRACTED@@@" followed by the JSON object with the extracted info.
 `.trim();
+
+    console.log("Initing chat with model: gemini-1.5-flash-latest");
 
     const conversationHistory = messages.slice(0, -1).map((msg) => ({
       role: msg.role === "assistant" ? "model" : "user",
@@ -44,7 +41,7 @@ IMPORTANT:
         { role: "user", parts: [{ text: systemPrompt }] },
         {
           role: "model",
-          parts: [{ text: "Understood. I am now acting as the interactive assistant for the izuki.labs website. I will use the established knowledge base and the @@@INFO_EXTRACTED@@@ delimiter for data." }],
+          parts: [{ text: "Understood. I am now acting as the interactive assistant for the izuki.labs website." }],
         },
         ...conversationHistory,
       ],
@@ -55,11 +52,16 @@ IMPORTANT:
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       async start(controller) {
-        for await (const chunk of result.stream) {
-          const text = chunk.text();
-          controller.enqueue(encoder.encode(text));
+        try {
+          for await (const chunk of result.stream) {
+            const text = chunk.text();
+            controller.enqueue(encoder.encode(text));
+          }
+          controller.close();
+        } catch (streamErr: any) {
+          console.error("Stream generation error:", streamErr);
+          controller.error(streamErr);
         }
-        controller.close();
       },
     });
 
@@ -71,8 +73,11 @@ IMPORTANT:
       },
     });
 
-  } catch (error: unknown) {
-    console.error("Gemini Streaming Error:", error);
-    return NextResponse.json({ error: "Failed to process stream" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Gemini API Route Error:", error);
+    return NextResponse.json({ 
+      error: "Failed to process stream", 
+      details: error.message || String(error) 
+    }, { status: 500 });
   }
 }

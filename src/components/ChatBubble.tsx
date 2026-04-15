@@ -143,7 +143,10 @@ export default function ChatBubble() {
           }),
         });
 
-        if (!response.ok) throw new Error("Stream failed");
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.details || errorData.error || "Stream failed");
+        }
 
         const reader = response.body?.getReader();
         if (!reader) throw new Error("No reader");
@@ -156,7 +159,7 @@ export default function ChatBubble() {
           const { done, value } = await reader.read();
           if (done) break;
 
-          const chunk = decoder.decode(value);
+          const chunk = decoder.decode(value, { stream: true });
           assistantContent += chunk;
 
           const parts = assistantContent.split("@@@INFO_EXTRACTED@@@");
@@ -181,9 +184,9 @@ export default function ChatBubble() {
             } catch (e) {}
           }
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Chat Error:", err);
-        appendAssistantMessage("System temporarily offline.");
+        appendAssistantMessage(`Site Error: ${err.message || "System temporarily offline."}`);
       } finally {
         setIsLoading(false);
       }

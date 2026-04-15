@@ -78,11 +78,8 @@ Clients pay a monthly fee for ongoing design support based on their selected pac
 
 REASONING & EXTRACTION RULES:
 1. **Greetings vs. Identity**: If a user says "hi", "hello", or "hey", treat it as a greeting. DO NOT assume their name is "hi". 
-2. **JSON OUTPUT**: ALWAYS return JSON:
-{
-  "reply": "Your message...",
-  "extractedInfo": { "name": "...", "phone": "...", "email": "..." }
-}
+2. **DELIMITER**: When you have finished your conversational reply and are ready to provide lead data, output the separator "@@@INFO_EXTRACTED@@@" followed by a JSON object containing the name, phone, or email.
+3. **DO NOT** use raw JSON as your primary response. Use plain text first.
 `.trim();
 
 export function isLikelyQuestion(message: string): boolean {
