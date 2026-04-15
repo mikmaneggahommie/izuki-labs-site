@@ -116,13 +116,19 @@ export default function ChatBubble() {
     await new Promise((resolve) => setTimeout(resolve, 420));
 
     if (flowState === "COLLECTING_NAME") {
-      setFormData((current) => ({ ...current, name: userContent }));
-      appendAssistantMessage(
-        `Perfect, ${userContent}. What phone number should I use for project follow-up?`
-      );
-      setFlowState("COLLECTING_PHONE");
-      setIsLoading(false);
-      return;
+      // Pivot check: if it looks like a question, skip to chatting
+      if (isLikelyQuestion(userContent)) {
+        setFlowState("CHATTING");
+        // Proceed to chat logic below
+      } else {
+        setFormData((current) => ({ ...current, name: userContent }));
+        appendAssistantMessage(
+          `Perfect, ${userContent}. What phone number should I use for project follow-up?`
+        );
+        setFlowState("COLLECTING_PHONE");
+        setIsLoading(false);
+        return;
+      }
     }
 
     if (flowState === "COLLECTING_PHONE") {
