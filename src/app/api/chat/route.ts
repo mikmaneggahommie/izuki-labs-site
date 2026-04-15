@@ -23,8 +23,31 @@ export async function POST(req: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
+    
+    // ARMOR V20: AUTO-ENLIGHTENMENT (Model Discovery)
+    // Instead of guessing, we find the absolute best model your key has access to.
+    let targetModel = "gemini-1.5-flash"; 
+    try {
+      const availableModels = await genAI.listModels();
+      console.log("[IZUKI-API] Available Models:", availableModels.models.map(m => m.name));
+      
+      // Auto-Upgrade Logic: Prioritize 2.0 -> 1.5 Pro -> 1.5 Flash
+      const modelNames = availableModels.models.map(m => m.name);
+      if (modelNames.some(n => n.includes("gemini-2.0-flash"))) {
+        targetModel = "gemini-2.0-flash";
+      } else if (modelNames.some(n => n.includes("gemini-1.5-pro"))) {
+        targetModel = "gemini-1.5-pro";
+      } else if (modelNames.some(n => n.includes("gemini-1.5-flash"))) {
+        targetModel = "gemini-1.5-flash";
+      }
+      console.log("[IZUKI-API] Auto-Selected Engine:", targetModel);
+    } catch (discoveryErr: any) {
+      console.warn("[IZUKI-API] Discovery Failed. Falling back to 1.5-flash-latest.", discoveryErr.message);
+      targetModel = "gemini-1.5-flash-latest";
+    }
+
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash-latest", // Use stable alias to avoid 404 on some regions
+      model: targetModel,
       systemInstruction: `${studioSystemPrompt}
 
 IDENTIFIED VISITOR:
