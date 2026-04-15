@@ -1,38 +1,33 @@
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import Header from "@/components/Header";
+import ExperienceLayer from "@/components/ExperienceLayer";
+import HeroSection from "@/components/HeroSection";
+import MarqueeTicker from "@/components/MarqueeTicker";
+import WorkShowcase from "@/components/WorkShowcase";
+import AboutMarquee from "@/components/AboutMarquee";
+import PricingSection from "@/components/PricingSection";
+import CaseStudy from "@/components/CaseStudy";
+import PoliciesAccordion from "@/components/PoliciesAccordion";
+import ContactFooter from "@/components/ContactFooter";
+import ChatBubble from "@/components/ChatBubble";
 
 export default function Home() {
   return (
-    <main className="section-shell flex min-h-screen items-center">
-      <div className="content-shell grid gap-16 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.55fr)] lg:items-end">
-        <div className="space-y-8">
-          <div className="section-label-row">
-            <span className="accent-square accent-square--tiny" aria-hidden />
-            <span className="section-label">izuki.labs</span>
-          </div>
+    <>
+      <ExperienceLayer />
+      <Header />
 
-          <h1 className="display-title max-w-[10ch]">
-            Social media systems for brands that need visual distinction
-            <span className="accent-square" aria-hidden />
-          </h1>
-        </div>
+      <main className="site-main">
+        <HeroSection />
+        <MarqueeTicker />
+        <WorkShowcase />
+        <AboutMarquee />
+        <PricingSection />
+        <CaseStudy />
+        <PoliciesAccordion />
+        <ContactFooter />
+      </main>
 
-        <div className="space-y-8 lg:justify-self-end lg:text-right">
-          <p className="body-copy max-w-xl lg:ml-auto">
-            The full package site lives one click away. Inside, you&apos;ll find
-            the editorial redesign, fixed monthly retainers, highlighted case
-            studies, and a direct path to start a project.
-          </p>
-
-          <Link
-            href="/SocialmediaPackage"
-            className="primary-button inline-flex w-fit lg:ml-auto"
-          >
-            Enter The Package Site
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </div>
-    </main>
+      <ChatBubble />
+    </>
   );
 }
