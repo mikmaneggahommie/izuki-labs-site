@@ -118,3 +118,28 @@ export function getStudioConciergeReply(message: string, userInfo: UserInfo = {}
 
   return `${namePrefix}I build visual systems that make brands feel sharper, cleaner, and harder to ignore. Tell me what you need help with and I can recommend the right package, timeline, and next step.`;
 }
+
+/**
+ * Heuristic check to see if a user message is likely a question or intent 
+ * rather than a specific data point (like a phone number or email).
+ */
+export function isLikelyQuestion(message: string): boolean {
+  const input = message.trim().toLowerCase();
+  
+  // If it's very long, it's probably a message/question
+  if (input.length > 25) return true;
+  
+  // Common question words/starters
+  const questionWords = ["how", "what", "where", "when", "why", "who", "can", "could", "is", "are", "do", "does", "tell", "much", "price"];
+  const words = input.split(/\s+/);
+  
+  if (questionWords.includes(words[0])) return true;
+  
+  // Contains common question punctuation
+  if (input.includes("?") || input.includes("pricing") || input.includes("cost")) return true;
+  
+  // If it has spaces and isn't clearly a phone/email, it might be a sentence
+  if (words.length >= 3) return true;
+
+  return false;
+}
