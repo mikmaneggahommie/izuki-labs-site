@@ -8,6 +8,7 @@ import { isLikelyQuestion } from "@/lib/studio-concierge";
 
 type FlowState =
   | "COLLECTING_NAME"
+  | "COLLECTING_TELEGRAM"
   | "COLLECTING_PHONE"
   | "COLLECTING_EMAIL"
   | "CHATTING";
@@ -33,7 +34,7 @@ const backendChatEnabled = process.env.NEXT_PUBLIC_CHAT_MODE !== "disabled";
 export default function ChatBubble() {
   const [isOpen, setIsOpen] = useState(false);
   const [flowState, setFlowState] = useState<FlowState>("COLLECTING_NAME");
-  const [formData, setFormData] = useState({ name: "", phone: "", email: "" });
+  const [formData, setFormData] = useState({ name: "", telegram: "", phone: "", email: "" });
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -93,8 +94,11 @@ export default function ChatBubble() {
 
   const handleSkip = () => {
     if (flowState === "COLLECTING_NAME") {
-      setFlowState("CHATTING");
-      appendAssistantMessage("No problem. We can keep it casual. How can I help with your design systems today?");
+      setFlowState("COLLECTING_TELEGRAM");
+      appendAssistantMessage("No worries. What's your Telegram handle? (Or skip to use phone)", true);
+    } else if (flowState === "COLLECTING_TELEGRAM") {
+      setFlowState("COLLECTING_PHONE");
+      appendAssistantMessage("Got it. How about a phone number for direct contact?", true);
     } else if (flowState === "COLLECTING_PHONE") {
       setFlowState("COLLECTING_EMAIL");
       appendAssistantMessage("Understood. Drop your email if you'd like me to follow up there instead.", true);
@@ -103,7 +107,7 @@ export default function ChatBubble() {
       appendAssistantMessage("Locked in. Ask about pricing, timelines, or my Remote Designer plan.");
       
       // Save partial lead if any
-      if (formData.name || formData.phone) {
+      if (formData.name || formData.phone || formData.telegram || formData.email) {
         fetch("/api/lead", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -176,13 +180,14 @@ export default function ChatBubble() {
 
               setFormData(prev => ({
                 name: name || prev.name,
+                telegram: info.telegram || prev.telegram,
                 phone: phone || prev.phone,
                 email: email || prev.email,
               }));
 
               // If we just got an email and it looks valid, fire the lead save automatically
               if (email && email.includes("@") && email.includes(".")) {
-                const currentData = { ...formData, name: name || formData.name, phone: phone || formData.phone, email };
+                const currentData = { ...formData, name: name || formData.name, telegram: info.telegram || formData.telegram, phone: phone || formData.phone, email };
                 
                 // Use a simple guard to prevent triple-firing during the stream
                 if ((window as any)._lastSavedEmail !== email) {
@@ -276,20 +281,7 @@ export default function ChatBubble() {
                     dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content) }}
                   />
                   
-                  {message.role === "assistant" && message.isInfoRequest && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="mt-1"
-                    >
-                      <button
-                        onClick={handleSkip}
-                        className="flex h-8 items-center rounded-full border border-white/10 px-4 text-[11px] font-bold uppercase tracking-wider text-white/40 transition-all hover:border-white/20 hover:bg-white/5 hover:text-white"
-                      >
-                        Skip for now
-                      </button>
-                    </motion.div>
-                  )}
+                  {/* Skip button moved to below input for better visibility */}
                 </div>
               ))}
 
@@ -323,11 +315,13 @@ export default function ChatBubble() {
                     placeholder={
                       flowState === "COLLECTING_NAME"
                         ? "Type your name..."
-                        : flowState === "COLLECTING_PHONE"
-                          ? "Enter phone number..."
-                          : flowState === "COLLECTING_EMAIL"
-                            ? "Enter your email..."
-                            : "Ask about pricing, timelines, or services..."
+                        : flowState === "COLLECTING_TELEGRAM"
+                          ? "Telegram handle (e.g. @username)..."
+                          : flowState === "COLLECTING_PHONE"
+                            ? "Enter phone number..."
+                            : flowState === "COLLECTING_EMAIL"
+                              ? "Enter your email..."
+                              : "Ask about pricing, timelines, or services..."
                     }
                     className="h-12 flex-1 rounded-[8px] border border-white/10 bg-[#1A1A1A] px-4 text-[14px] text-white outline-none transition-colors placeholder:text-white/30 focus:border-white/20"
                   />
@@ -342,6 +336,18 @@ export default function ChatBubble() {
                   </button>
                 </div>
               </form>
+
+              {flowState !== "CHATTING" && (
+                <div className="flex justify-center">
+                  <button
+                    onClick={handleSkip}
+                    className="group flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#00FF00]/60 transition-colors hover:text-[#00FF00]"
+                  >
+                    <span>Skip this step</span>
+                    <div className="h-px w-8 bg-[#00FF00]/20 transition-all group-hover:w-12 group-hover:bg-[#00FF00]/40" />
+                  </button>
+                </div>
+              )}
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <a

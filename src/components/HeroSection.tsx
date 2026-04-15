@@ -4,126 +4,131 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { assetPath } from "@/lib/asset-path";
 
-type HeroCardData = { src: string; alt: string };
-
-const HERO_IMAGES: HeroCardData[] = [
-  { src: "/images/7.jpg", alt: "Luminous motion artwork" },
-  { src: "/images/6.jpg", alt: "Launch artwork" },
-  { src: "/images/5.jpg", alt: "Poster layout artwork" },
-  { src: "/images/4.jpg", alt: "Brand composition artwork" },
-  { src: "/images/3.jpg", alt: "Mobile system artwork" },
-  { src: "/images/2.jpg", alt: "Campaign detail artwork" },
-  { src: "/images/1.JPG", alt: "Editorial surface artwork" },
+const HERO_IMAGES = [
+  { src: "/images/7.jpg", alt: "Izuki Portfolio 7" },
+  { src: "/images/6.jpg", alt: "Izuki Portfolio 6" },
+  { src: "/images/5.jpg", alt: "Izuki Portfolio 5" },
+  { src: "/images/4.jpg", alt: "Izuki Portfolio 4" },
+  { src: "/images/3.jpg", alt: "Izuki Portfolio 3" },
+  { src: "/images/2.jpg", alt: "Izuki Portfolio 2" },
+  { src: "/images/1.JPG", alt: "Izuki Portfolio 1" },
 ];
 
 export default function HeroSection() {
   const stageRef = useRef<HTMLDivElement>(null);
   const unitRef = useRef<HTMLDivElement>(null);
+  const projectIdxRef = useRef(0);
 
   useEffect(() => {
     let alive = true;
-    let teardown: (() => void) | undefined;
+    let tl: gsap.core.Timeline | undefined;
 
     const boot = async () => {
-      if (!stageRef.current || !unitRef.current) return;
       const gsap = (await import("gsap")).default;
-      if (!alive) return;
+      if (!alive || !unitRef.current) return;
 
-      const unit = unitRef.current;
-      const cards = Array.from(unit.querySelectorAll<HTMLElement>("[data-ci]"));
-      if (cards.length < 7) return;
+      const cards = Array.from(unitRef.current.querySelectorAll<HTMLElement>(".hero-card"));
+      if (cards.length === 0) return;
 
-      let tl: ReturnType<typeof gsap.timeline> | undefined;
+      const totalImages = HERO_IMAGES.length;
 
-      const buildTimeline = () => {
+      const buildLoop = () => {
         tl?.kill();
-
-        // 1. INITIAL SETUP
-        // Fixed Anchor point: Absolute dead center (top: 50%, left: 50%)
+        
+        // Initial Reset
         gsap.set(cards, {
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          xPercent: -50,
-          yPercent: -50,
           x: 0,
           y: 0,
           scale: 1,
-          autoAlpha: 1
+          autoAlpha: 0,
+          zIndex: 10,
+          rotation: 0
         });
 
         tl = gsap.timeline({ repeat: -1 });
 
-        // Cycle through all cards as the "Anchor"
-        for (let cycle = 0; cycle < cards.length; cycle++) {
-          const currentAnchorIdx = (cards.length - 1 - cycle + cards.length) % cards.length;
-          const otherCards = cards.filter((_, i) => i !== currentAnchorIdx);
+        // THE PIVOT LOOP
+        // We use a manual loop inside GSAP to handle the source swaps on each iteration
+        const runCycle = () => {
+          const leadIdx = projectIdxRef.current % cards.length;
+          const leadCard = cards[leadIdx];
+          const otherCards = cards.filter((_, i) => i !== leadIdx);
           
-          // Split of the other 6 cards into Top-Left and Bottom-Right groups
-          const tlGroup = otherCards.slice(0, 3);
-          const brGroup = otherCards.slice(3, 6);
+          const cycleTl = gsap.timeline();
 
-          const labelPrefix = `cycle-${cycle}`;
+          // PHASE A: The Resting Spotlight (2.5s Hold)
+          // All stacked, only lead visible
+          cycleTl.set(cards, { zIndex: 10, autoAlpha: 0 });
+          cycleTl.set(leadCard, { zIndex: 100, autoAlpha: 1, x: 0, y: 0 });
+          
+          cycleTl.to({}, { duration: 2.5 }); // Hold
 
-          // Setup z-index so the current anchor is on top
-          tl.set(cards, { zIndex: (i) => (i === currentAnchorIdx ? 100 : 10) }, `${labelPrefix}-start`)
-            .set(otherCards, { autoAlpha: 0 }, `${labelPrefix}-start`);
+          // PHASE B: The Diagonal Burst (1.0s Duration)
+          // Expo.out, lead stationary, others fan edge-to-edge
+          cycleTl.addLabel("burst");
+          
+          // Split others into Top-Left and Bottom-Right
+          const tlGroup = otherCards.slice(0, Math.ceil(otherCards.length / 2));
+          const brGroup = otherCards.slice(Math.ceil(otherCards.length / 2));
 
-          // Step 1: Hold (Consolidated)
-          tl.to({}, { duration: 1.5 });
+          cycleTl.set(otherCards, { autoAlpha: 1 }, "burst");
+          
+          cycleTl.to(tlGroup, {
+            x: (i) => -(i + 1) * 280,
+            y: (i) => -(i + 1) * 220,
+            rotation: (i) => -(i + 1) * 5,
+            duration: 1.0,
+            ease: "expo.out",
+            stagger: { amount: 0.1, from: "start" }
+          }, "burst");
 
-          // Step 2: Fan Out (The Spread)
-          // Top-Left: indices 0-2 (multiplied by 160/140 for large spread)
-          // Bottom-Right: indices 3-5 (multiplied by 160/140)
-          tl.addLabel(`${labelPrefix}-fan`)
-            .set(otherCards, { autoAlpha: 1 }, `${labelPrefix}-fan`)
-            .to(tlGroup, {
-              x: (i) => -(i + 1) * 160,
-              y: (i) => -(i + 1) * 140,
-              duration: 1.2,
-              ease: "power3.out",
-              stagger: { amount: 0.3, from: "center" }
-            }, `${labelPrefix}-fan`)
-            .to(brGroup, {
-              x: (i) => (i + 1) * 160,
-              y: (i) => (i + 1) * 140,
-              duration: 1.2,
-              ease: "power3.out",
-              stagger: { amount: 0.3, from: "center" }
-            }, `${labelPrefix}-fan`);
+          cycleTl.to(brGroup, {
+            x: (i) => (i + 1) * 280,
+            y: (i) => (i + 1) * 220,
+            rotation: (i) => (i + 1) * 5,
+            duration: 1.0,
+            ease: "expo.out",
+            stagger: { amount: 0.1, from: "start" }
+          }, "burst");
 
-          // Step 3: Hold Spread
-          tl.to({}, { duration: 1.5 });
+          // Phase B.5: Brief hold at max spread
+          cycleTl.to({}, { duration: 0.4 });
 
-          // Step 4: Consolidate (The Ripple Slap In)
-          // Stagger amount: 0.3, from: "edges" for the slap-back look
-          tl.addLabel(`${labelPrefix}-snap`)
-            .to(otherCards, {
-              x: 0,
-              y: 0,
-              duration: 0.8,
-              ease: "power3.inOut",
-              stagger: { amount: 0.3, from: "edges" }
-            }, `${labelPrefix}-snap`);
+          // PHASE C: The High-Velocity Snap (0.5s Duration)
+          // Expo.in, snap back to exact center (0,0)
+          cycleTl.addLabel("snap");
+          cycleTl.to(otherCards, {
+            x: 0,
+            y: 0,
+            rotation: 0,
+            duration: 0.5,
+            ease: "expo.in",
+            onComplete: () => {
+              // Increment index for next round
+              projectIdxRef.current = (projectIdxRef.current + 1) % totalImages;
+            }
+          }, "snap");
 
-          // Reset visibility for next cycle
-          tl.set(otherCards, { autoAlpha: 0 });
+          return cycleTl;
+        };
+
+        // Master loop logic: 
+        // Since we want to update the lead card on every iteration, 
+        // we'll just build a timeline that does a few cycles or use a recursive function.
+        // Given GSAP's repeat structure, it's cleaner to just append cycles.
+        for (let i = 0; i < cards.length; i++) {
+          tl.add(runCycle());
         }
       };
 
-      const timer = window.setTimeout(buildTimeline, 100);
-      const onResize = () => { window.clearTimeout(timer); buildTimeline(); };
-      window.addEventListener("resize", onResize);
-
-      teardown = () => {
-        window.clearTimeout(timer);
-        window.removeEventListener("resize", onResize);
-        tl?.kill();
-      };
+      buildLoop();
     };
 
-    void boot();
-    return () => { alive = false; teardown?.(); };
+    boot();
+    return () => { 
+      alive = false; 
+      tl?.kill();
+    };
   }, []);
 
   return (
@@ -141,22 +146,22 @@ export default function HeroSection() {
 
         <div
           ref={stageRef}
-          className="hero-stage absolute inset-0 z-30 pointer-events-none"
+          className="hero-stage flex items-center justify-center"
         >
-          <div ref={unitRef} className="hero-unit">
-            {HERO_IMAGES.map((card, ci) => (
+          <div ref={unitRef} className="hero-unit absolute inset-0 flex items-center justify-center">
+            {HERO_IMAGES.map((item, i) => (
               <article
-                key={`${card.src}-${ci}`}
+                key={i}
                 className="hero-card"
-                data-ci={ci}
+                style={{ zIndex: 10 - i }}
               >
                 <Image
-                  src={assetPath(card.src)}
-                  alt={card.alt}
+                  src={assetPath(item.src)}
+                  alt={item.alt}
                   fill
-                  priority={ci === HERO_IMAGES.length - 1}
-                  sizes="(max-width: 767px) 42vw, (max-width: 1023px) 28vw, 360px"
+                  priority={i < 2}
                   className="hero-card-image"
+                  sizes="(max-width: 768px) 100vw, 420px"
                 />
               </article>
             ))}
