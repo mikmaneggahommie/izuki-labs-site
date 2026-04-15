@@ -27,11 +27,11 @@ export async function POST(req: Request) {
     ];
 
     const modelIds = [
-      "gemini-1.5-flash",
-      "gemini-1.5-flash-001",
-      "gemini-1.5-flash-002",
-      "gemini-1.5-pro",
-      "gemini-1.0-pro"
+      "gemini-3.1-flash-lite-preview",
+      "gemini-2.5-flash-native-audio-latest",
+      "gemini-2.5-flash-native-audio-preview-12-2025",
+      "gemini-3.1-pro-preview-customtools",
+      "gemini-2.5-computer-use-preview-10-2025"
     ];
 
     let result;
