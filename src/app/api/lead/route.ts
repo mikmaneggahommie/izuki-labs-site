@@ -1,85 +1,21 @@
 import { NextResponse } from "next/server";
 
-export const dynamic = "force-dynamic";
-
 export async function POST(req: Request) {
   try {
-    const { name, telegram, phone, email } = (await req.json()) as {
-      name?: string;
-      telegram?: string;
-      phone?: string;
-      email?: string;
-    };
-
-    if (!name && !phone && !email && !telegram) {
-      return NextResponse.json(
-        { error: "No lead information provided" },
-        { status: 400 }
-      );
-    }
-
-    // 1. Log to Google Sheets via Stable Composio v1 API
-    const COMPOSIO_API_KEY = process.env.COMPOSIO_API_KEY;
-    const SPREADSHEET_ID = "1DgP1WdGULNf2RMJ1QZPpv9M3yKD_BhLSIct5F_JQHvw";
+    const leadData = await req.json();
     
-    if (COMPOSIO_API_KEY) {
-      try {
-        const sheetResponse = await fetch(`https://api.composio.dev/v1/actions/execute/googlesheets_spreadsheets_values_append`, {
-          method: "POST",
-          headers: { 
-            "x-api-key": COMPOSIO_API_KEY,
-            "Content-Type": "application/json" 
-          },
-          body: JSON.stringify({
-            data: {
-              spreadsheetId: SPREADSHEET_ID,
-              range: "Sheet1!A:E",
-              valueInputOption: "USER_ENTERED",
-              values: [[name, email, phone, telegram, new Date().toISOString()]]
-            }
-          }),
-        });
+    // NUKED: Google Sheets / Composio integration removed as requested.
+    // Leads are now handled via Telegram or the Chat assistant logic.
+    
+    console.log("Lead captured (TG Only Mode):", leadData);
 
-        const responseText = await sheetResponse.text();
-        console.log(`Composio V1 Success [${sheetResponse.status}]:`, responseText);
+    return NextResponse.json({ 
+      success: true, 
+      message: "Lead processed (Telegram)" 
+    });
 
-        if (!sheetResponse.ok) {
-          console.error("Composio V1 Failure Payload:", responseText);
-          throw new Error(`Composio Error: ${sheetResponse.status}`);
-        }
-      } catch (sheetErr) {
-        console.error("Composio Google Sheets Logging Final Failure:", sheetErr);
-      }
-    }
-
-    // 2. Ping Telegram
-    const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
-    const telegramChatId = process.env.TELEGRAM_CHAT_ID;
-
-    if (telegramToken && telegramChatId) {
-      const message = `🚀 *NEW STUDIO LEAD* 🚀\n\n*Name:* ${name || "N/A"}\n*Telegram:* ${telegram || "N/A"}\n*Phone:* ${phone || "N/A"}\n*Email:* ${email || "N/A"}\n\n_Lead logged to Dashboard._`;
-      
-      try {
-        await fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: telegramChatId,
-            text: message,
-            parse_mode: "Markdown",
-          }),
-        });
-      } catch (err) {
-        console.error("Telegram notification failed:", err);
-      }
-    }
-
-    return NextResponse.json({ success: true });
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error("Lead API Error:", error);
-    return NextResponse.json(
-      { error: "Failed to process lead" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to process lead" }, { status: 500 });
   }
 }

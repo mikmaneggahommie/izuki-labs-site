@@ -1,6 +1,5 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from "@google/genai";
 import { NextResponse } from "next/server";
-
 import { studioSystemPrompt } from "@/lib/studio-concierge";
 
 export const dynamic = "force-dynamic";
@@ -50,22 +49,23 @@ VITAL INSTRUCTIONS:
       }))
     ];
 
+    const safetySettings = [
+      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+    ];
+
     for (const modelId of modelIds) {
       try {
         console.log(`Trying model: ${modelId}`);
         
-        // New generateContentStream protocol
+        // New generateContentStream protocol for 2026
         result = await genAI.models.generateContentStream({
           model: modelId,
           contents: contents,
           config: {
-            // Updated safety structure for 2026 SDK
-            safetySettings: [
-              { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-              { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-              { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-              { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
-            ]
+            safetySettings: safetySettings
           }
         });
         
