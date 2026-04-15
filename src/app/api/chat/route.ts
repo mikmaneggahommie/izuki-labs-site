@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 
 import { studioSystemPrompt } from "@/lib/studio-concierge";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   try {
     const { messages, userInfo } = (await req.json()) as {
