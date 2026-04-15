@@ -15,7 +15,7 @@ const HERO_IMAGES = [
 
 export default function HeroSection() {
   return (
-    <section id="top" className="relative h-screen w-full overflow-hidden bg-black">
+    <section id="top" className="sticky top-0 h-screen w-full overflow-hidden bg-black z-0">
       <InfiniteGallery
         images={HERO_IMAGES.map(img => ({ ...img, src: assetPath(img.src) }))}
         speed={0.8}
