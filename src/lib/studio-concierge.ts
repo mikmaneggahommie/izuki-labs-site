@@ -101,9 +101,6 @@ export function getStudioConciergeReply(message: string, userInfo: UserInfo = {}
     return `${namePrefix}${remoteDesignerReply}`;
   }
 
-  // ... rest of fallbacks remain as safety
-
-
   if (/(price|pricing|package|packages|cost|rate|birr|budget)/.test(input)) {
     return `${namePrefix}${packagesReply}`;
   }
