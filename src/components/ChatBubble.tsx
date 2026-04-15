@@ -176,11 +176,30 @@ export default function ChatBubble() {
           if (jsonText) {
             try {
               const info = JSON.parse(jsonText);
+              const name = info.name || "";
+              const phone = info.phone || "";
+              const email = info.email || "";
+
               setFormData(prev => ({
-                name: info.name || prev.name,
-                phone: info.phone || prev.phone,
-                email: info.email || prev.email,
+                name: name || prev.name,
+                phone: phone || prev.phone,
+                email: email || prev.email,
               }));
+
+              // If we just got an email and it looks valid, fire the lead save automatically
+              if (email && email.includes("@") && email.includes(".")) {
+                const currentData = { ...formData, name: name || formData.name, phone: phone || formData.phone, email };
+                
+                // Use a simple guard to prevent triple-firing during the stream
+                if ((window as any)._lastSavedEmail !== email) {
+                  (window as any)._lastSavedEmail = email;
+                  fetch("/api/lead", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(currentData),
+                  }).catch(err => console.error("Auto-lead save failed:", err));
+                }
+              }
             } catch (e) {}
           }
         }
