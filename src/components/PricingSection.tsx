@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { VerticalCutReveal, ScrollReveal } from "@/components/FancyText";
+import { ScrollReveal } from "@/components/FancyText";
 
 type AddOn = {
   name: string;
@@ -178,7 +178,7 @@ export default function PricingSection() {
             </div>
 
             <h2 className="display-title max-w-[9ch]">
-              <VerticalCutReveal>Pricing</VerticalCutReveal>
+              Pricing
               <span className="accent-square" aria-hidden />
             </h2>
           </div>

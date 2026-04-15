@@ -1,18 +1,18 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
+import React, { useEffect, useRef, useState, useMemo } from "react";
+import { motion, useInView } from "framer-motion";
 
 /* ─────────────────────────────────────────────
-   VERTICAL CUT REVEAL — text reveals line-by-line
-   with a vertical clip mask on scroll entry
+   VERTICAL CUT REVEAL — text reveals WORD-BY-WORD
+   to prevent mid-word line breaks
    ───────────────────────────────────────────── */
 
 export function VerticalCutReveal({
   children,
   className = "",
   delay = 0,
-  staggerDelay = 0.04,
+  staggerDelay = 0.06,
 }: {
   children: string;
   className?: string;
@@ -22,28 +22,28 @@ export function VerticalCutReveal({
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-10% 0px" });
 
-  const letters = useMemo(() => children.split(""), [children]);
+  const words = useMemo(() => children.split(" "), [children]);
 
   return (
-    <span ref={ref} className={`inline-flex flex-wrap ${className}`} aria-label={children}>
-      {letters.map((letter, i) => (
+    <span ref={ref} className={`inline ${className}`} aria-label={children}>
+      {words.map((word, i) => (
         <span
-          key={`${letter}-${i}`}
-          className="inline-block overflow-hidden"
+          key={`${word}-${i}`}
+          className="inline-block overflow-hidden align-bottom mr-[0.25em]"
           style={{ lineHeight: "inherit" }}
         >
           <motion.span
             className="inline-block"
-            initial={{ y: "100%", opacity: 0 }}
-            animate={isInView ? { y: "0%", opacity: 1 } : { y: "100%", opacity: 0 }}
+            initial={{ y: "110%", opacity: 0 }}
+            animate={isInView ? { y: "0%", opacity: 1 } : { y: "110%", opacity: 0 }}
             transition={{
-              duration: 0.5,
+              duration: 0.6,
               delay: delay + i * staggerDelay,
               ease: [0.16, 1, 0.3, 1],
             }}
             aria-hidden
           >
-            {letter === " " ? "\u00A0" : letter}
+            {word}
           </motion.span>
         </span>
       ))}
@@ -141,7 +141,6 @@ export function TypewriterText({
         setDisplayedText(text.slice(0, i));
         if (i >= text.length) {
           clearInterval(interval);
-          // Blink cursor then hide
           setTimeout(() => setShowCursor(false), 2000);
         }
       }, speed);
@@ -166,8 +165,7 @@ export function TypewriterText({
 }
 
 /* ─────────────────────────────────────────────
-   SCROLL REVEAL WRAPPER — generic scroll-triggered
-   reveal with blur + y-offset
+   SCROLL REVEAL WRAPPER
    ───────────────────────────────────────────── */
 
 export function ScrollReveal({
@@ -198,7 +196,7 @@ export function ScrollReveal({
 }
 
 /* ─────────────────────────────────────────────
-   PARALLAX WRAPPER — moves at different scroll speed
+   PARALLAX WRAPPER
    ───────────────────────────────────────────── */
 
 export function ParallaxWrap({
@@ -238,7 +236,7 @@ export function ParallaxWrap({
 }
 
 /* ─────────────────────────────────────────────
-   STAGGER CHILDREN — animates children in with stagger
+   STAGGER CHILDREN
    ───────────────────────────────────────────── */
 
 export function StaggerChildren({

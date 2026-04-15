@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { VerticalCutReveal, ScrollReveal } from "@/components/FancyText";
+import { ScrollReveal } from "@/components/FancyText";
 
 import { assetPath } from "@/lib/asset-path";
 
@@ -92,8 +92,8 @@ export default function CaseStudy() {
               <span className="section-label">Design Spotlight</span>
             </div>
 
-            <h2 className="display-title max-w-[12ch]">
-              <VerticalCutReveal>This Month&apos;s Highlight</VerticalCutReveal>
+            <h2 className="display-title">
+              This Month&apos;s Highlight
               <span className="accent-square" aria-hidden />
             </h2>
           </div>
@@ -110,7 +110,7 @@ export default function CaseStudy() {
           <div className="flex justify-center">
             <div
               ref={containerRef}
-              className="relative aspect-[9/16] w-full max-w-[430px] overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_28px_90px_rgba(0,0,0,0.42)]"
+              className="relative w-full max-w-[430px] overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_28px_90px_rgba(0,0,0,0.42)]"
               onPointerDown={(event) => {
                 setDragging(true);
                 updateSlider(event.clientX);
@@ -124,23 +124,27 @@ export default function CaseStudy() {
               onPointerLeave={() => setDragging(false)}
               style={{ touchAction: "none" }}
             >
-              <div className="absolute inset-0">
+              {/* Before image — natural aspect ratio, no crop */}
+              <div className="relative w-full">
                 <Image
                   src={assetPath("/images/case-study/before.jpg")}
                   alt="Before design"
-                  fill
+                  width={430}
+                  height={764}
+                  className="block w-full h-auto grayscale"
                   sizes="(max-width: 767px) 84vw, 430px"
-                  className="object-cover grayscale"
                 />
               </div>
 
+              {/* After image — absolute overlay with clip */}
               <motion.div className="absolute inset-0" style={{ clipPath }}>
                 <Image
                   src={assetPath("/images/case-study/after.jpg")}
                   alt="After design"
-                  fill
+                  width={430}
+                  height={764}
+                  className="block w-full h-auto"
                   sizes="(max-width: 767px) 84vw, 430px"
-                  className="object-cover"
                 />
               </motion.div>
 

@@ -6,7 +6,7 @@ import { LetterSwapHover } from "@/components/FancyText";
 
 const menuItems = [
   { label: "Home", href: "#top" },
-  { label: "Selected Work", href: "#work" },
+  { label: "Work", href: "#work" },
   { label: "Pricing", href: "#pricing" },
   { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
@@ -79,10 +79,10 @@ export default function Header() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-2xl"
+            className="fixed inset-0 z-40 overflow-y-auto bg-black/95 backdrop-blur-2xl"
           >
-            <div className="content-shell flex h-full flex-col justify-between px-[var(--section-padding-x)] pb-10 pt-28">
-              <nav className="grid gap-4">
+            <div className="content-shell flex min-h-full flex-col justify-between px-[var(--section-padding-x)] pb-10 pt-28">
+              <nav className="grid gap-3 sm:gap-4">
                 {menuItems.map((item, index) => (
                   <motion.a
                     key={item.label}
@@ -96,14 +96,14 @@ export default function Header() {
                       delay: index * 0.06,
                       ease: [0.16, 1, 0.3, 1],
                     }}
-                    className="display-title interactive-link leading-[0.88]"
+                    className="text-[clamp(40px,10vw,120px)] font-black leading-[0.95] tracking-[-0.03em] text-white interactive-link"
                   >
                     <LetterSwapHover>{item.label}</LetterSwapHover>
                   </motion.a>
                 ))}
               </nav>
 
-              <div className="grid gap-8 border-t border-white/10 pt-8 text-left md:grid-cols-3">
+              <div className="mt-12 grid gap-8 border-t border-white/10 pt-8 text-left md:grid-cols-3">
                 <div className="space-y-3">
                   <p className="section-label">Location</p>
                   <p className="body-copy text-white">Addis Ababa, Ethiopia</p>

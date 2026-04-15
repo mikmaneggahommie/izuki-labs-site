@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { VerticalCutReveal, ScrollReveal } from "@/components/FancyText";
+import { ScrollReveal } from "@/components/FancyText";
 
 import { assetPath } from "@/lib/asset-path";
 
@@ -109,13 +109,8 @@ export default function WorkShowcase() {
           className="grid gap-10 border-b border-white/10 pb-12 md:grid-cols-[minmax(0,1fr)_minmax(280px,400px)] md:items-end"
         >
           <div className="space-y-5">
-            <div className="section-label-row">
-              <span className="accent-square accent-square--tiny" aria-hidden />
-              <span className="section-label">Selected Work</span>
-            </div>
-
-            <h2 className="display-title max-w-[14ch]">
-              <VerticalCutReveal>Accounts I&apos;ve Shaped</VerticalCutReveal>
+            <h2 className="display-title">
+              Featured Brands
               <span className="accent-square" aria-hidden />
             </h2>
           </div>

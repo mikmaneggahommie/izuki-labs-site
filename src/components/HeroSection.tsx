@@ -69,16 +69,11 @@ export default function HeroSection() {
         </h1>
       </div>
 
+      {/* Subtle scroll hint */}
       <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none z-50 transition-opacity duration-500" style={{ opacity: isLocked ? 1 : 0 }}>
-        <p className="font-mono uppercase text-[10px] tracking-widest text-white/40">
-          Capture Initiated — Scroll to reveal depth
+        <p className="font-mono uppercase text-[10px] tracking-widest text-white/30">
+          Scroll to explore
         </p>
-        <div className="mt-2 h-1 w-24 mx-auto bg-white/5 overflow-hidden">
-          <div 
-            className="h-full bg-[#FF0000] transition-all duration-300" 
-            style={{ width: `${Math.min(100, (virtualScroll / LOCK_THRESHOLD) * 100)}%` }} 
-          />
-        </div>
       </div>
     </section>
   );

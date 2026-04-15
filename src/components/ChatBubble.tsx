@@ -17,22 +17,20 @@ type UserInfo = {
   email?: string;
 };
 
-// Improved Markdown-to-HTML formatter for enterprise styling
 const formatMarkdown = (text: string) => {
   if (!text) return "";
   
-  // Strip extraction signals and associated JSON block
   const cleanText = text
     .replace(/@@@INFO_EXTRACTED@@@\s*\{[\s\S]*?\}/g, "")
     .replace(/@@@INFO_EXTRACTED@@@/g, "")
     .trim();
 
   return cleanText
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
-    .replace(/^\s*[\-\*]\s+(.*)$/gm, '<li class="ml-4 list-disc">$1</li>') // Bullet points
-    .replace(/^\s*(\d+)\.\s+(.*)$/gm, '<li class="ml-4 list-decimal">$1</li>') // Numbered lists
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^\s*[\-\*]\s+(.*)$/gm, '<li class="ml-4 list-disc">$1</li>')
+    .replace(/^\s*(\d+)\.\s+(.*)$/gm, '<li class="ml-4 list-decimal">$1</li>')
     .replace(/\n/g, '<br />')
-    .replace(/((<li[\s\S]*?<\/li>))/g, '<ul class="my-2">$1</ul>'); // Wrap lists
+    .replace(/((<li[\s\S]*?<\/li>))/g, '<ul class="my-2">$1</ul>');
 };
 
 export default function ChatBubble() {
@@ -40,7 +38,8 @@ export default function ChatBubble() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [hasAutoOpened, setHasAutoOpened] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [hasShownTooltip, setHasShownTooltip] = useState(false);
   const [flowState, setFlowState] = useState<"COLLECTING_NAME" | "COLLECTING_CONTACT" | "COLLECTING_EMAIL" | "CHATTING">("COLLECTING_NAME");
   const [formData, setFormData] = useState<UserInfo>({});
   const [leadStepInput, setLeadStepInput] = useState("");
@@ -48,14 +47,12 @@ export default function ChatBubble() {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Validation Patterns
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validatePhone = (phone: string) => {
     const clean = phone.replace(/[\s\-\(\)]/g, "");
     return /^\+?\d{7,15}$/.test(clean);
   };
   const validateTelegram = (tg: string) => /^@?[a-zA-Z0-9_]{5,32}$/.test(tg);
-
   const normalizeTelegram = (tg: string) => tg.startsWith("@") ? tg : "@" + tg;
 
   // Persistence: Load
@@ -86,43 +83,34 @@ export default function ChatBubble() {
     scrollToBottom();
   }, [messages, isLoading]);
 
-  // Auto-open chat when user scrolls to footer
+  // Pulse tooltip when user scrolls to footer (NOT auto-open)
   useEffect(() => {
     const handleScroll = () => {
-      if (hasAutoOpened || isOpen) return;
+      if (hasShownTooltip || isOpen) return;
       const footer = document.getElementById("contact");
       if (!footer) return;
       const rect = footer.getBoundingClientRect();
       if (rect.top < window.innerHeight * 0.6) {
-        setIsOpen(true);
-        setHasAutoOpened(true);
-        // Add a greeting if in CHATTING mode
-        if (flowState === "CHATTING") {
-          setMessages(prev => {
-            const lastMsg = prev[prev.length - 1];
-            if (lastMsg?.content?.includes("got a question")) return prev;
-            return [...prev, { role: "assistant", content: "Hey, got a question? 👋" }];
-          });
-        }
+        setShowTooltip(true);
+        setHasShownTooltip(true);
+        // Hide tooltip after 5 seconds
+        setTimeout(() => setShowTooltip(false), 5000);
       }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasAutoOpened, isOpen, flowState]);
+  }, [hasShownTooltip, isOpen]);
 
   const appendAssistantMessage = (content: string, isInfoRequest = false) => {
     setMessages((prev) => [...prev, { role: "assistant", content, isInfoRequest }]);
   };
 
   const tryLeadSubmit = async (data: UserInfo) => {
-    // Only submit if we have at least one valid contact method
     const hasContact = (data.email && validateEmail(data.email)) || 
                        (data.phone && validatePhone(data.phone)) || 
                        (data.telegram && validateTelegram(data.telegram));
-
     if (!hasContact) return;
-
     try {
       await fetch("/api/lead", {
         method: "POST",
@@ -146,7 +134,7 @@ export default function ChatBubble() {
   const handleLeadStep = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    let val = leadStepInput.trim();
+    const val = leadStepInput.trim();
     if (!val) return;
 
     if (flowState === "COLLECTING_NAME") {
@@ -216,7 +204,6 @@ export default function ChatBubble() {
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
 
-        // Append initial assistant placeholder
         setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
         while (reader) {
@@ -233,18 +220,16 @@ export default function ChatBubble() {
         }
       } else {
         const errorBody = await response.json().catch(() => ({}));
-        console.error(`[IZUKI-FRONTEND] API Failed (${response.status}):`, errorBody);
         
         if (response.status === 404) {
-           throw new Error("API Route Missing. Check Vercel Deployment.");
+           throw new Error("API Route Missing.");
         } else if (response.status === 500) {
-           throw new Error(errorBody.message || 'Something went wrong. Try again.');
+           throw new Error(errorBody.message || 'Something went wrong.');
         } else {
            throw new Error(`Connection failed (${response.status})`);
         }
       }
-    } catch (err: any) {
-      console.error("Critical Connection Failure:", err);
+    } catch {
       appendAssistantMessage("I'm having trouble connecting right now. Try again in a moment, or reach me directly below.");
     } finally {
       setIsLoading(false);
@@ -254,16 +239,42 @@ export default function ChatBubble() {
   return (
     <>
       {!isOpen ? (
-        <motion.button
-          type="button"
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-8 right-8 z-[100] flex h-14 w-14 items-center justify-center border border-white/10 bg-[#0A0A0A] text-white shadow-2xl transition-all hover:scale-110 active:scale-95 md:bottom-10 md:right-10"
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          whileHover={{ rotate: 12 }}
-        >
-          <MessageSquare className="h-6 w-6" />
-        </motion.button>
+        <div className="fixed bottom-8 right-8 z-[100] md:bottom-10 md:right-10">
+          {/* Tooltip bubble */}
+          <AnimatePresence>
+            {showTooltip && (
+              <motion.div
+                initial={{ opacity: 0, y: 8, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 8, scale: 0.9 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute -top-14 right-0 whitespace-nowrap border border-white/10 bg-[#111] px-4 py-2 text-[13px] font-medium text-white shadow-2xl"
+              >
+                Got a question?
+                <div className="absolute -bottom-1 right-5 h-2 w-2 rotate-45 border-b border-r border-white/10 bg-[#111]" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <motion.button
+            type="button"
+            onClick={() => {
+              setIsOpen(true);
+              setShowTooltip(false);
+            }}
+            className="flex h-14 w-14 items-center justify-center border border-white/10 bg-[#0A0A0A] text-white shadow-2xl transition-all hover:scale-110 active:scale-95"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{
+              scale: 1,
+              opacity: 1,
+              ...(showTooltip ? { boxShadow: ["0 0 0 0px rgba(229,0,0,0)", "0 0 0 12px rgba(229,0,0,0.15)", "0 0 0 0px rgba(229,0,0,0)"] } : {}),
+            }}
+            transition={showTooltip ? { boxShadow: { duration: 1.5, repeat: Infinity } } : { duration: 0.4 }}
+            whileHover={{ rotate: 12 }}
+          >
+            <MessageSquare className="h-6 w-6" />
+          </motion.button>
+        </div>
       ) : null}
 
       <AnimatePresence>
@@ -327,7 +338,7 @@ export default function ChatBubble() {
               </div>
             </div>
 
-            {/* Input & Footer */}
+            {/* Input */}
             <div className="border-t border-white/5 bg-[#111111] p-4">
               {flowState !== "CHATTING" ? (
                 <div className="space-y-3">
@@ -370,7 +381,6 @@ export default function ChatBubble() {
                       <Send className="h-3.5 w-3.5" />
                     </button>
                   </form>
-                  {/* Error space — always reserved to prevent layout shift */}
                   <div className="h-4">
                     {error && (
                       <motion.span

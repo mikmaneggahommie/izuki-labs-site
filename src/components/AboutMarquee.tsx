@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { VerticalCutReveal, ScrollReveal, ParallaxWrap, StaggerChildren } from "@/components/FancyText";
+import { ScrollReveal, ParallaxWrap } from "@/components/FancyText";
 
 const headingLines = [
   "I build visual systems",
@@ -65,8 +65,28 @@ export default function AboutMarquee() {
       gsap.registerPlugin(ScrollTrigger);
 
       const context = gsap.context(() => {
+        const headingLinesTargets =
+          sectionRef.current?.querySelectorAll("[data-about-line]");
         const revealTargets =
           sectionRef.current?.querySelectorAll("[data-about-reveal]");
+
+        if (headingLinesTargets?.length) {
+          gsap.fromTo(
+            headingLinesTargets,
+            { yPercent: 110, opacity: 0 },
+            {
+              yPercent: 0,
+              opacity: 1,
+              duration: 1,
+              stagger: 0.08,
+              ease: "expo.out",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 78%",
+              },
+            }
+          );
+        }
 
         if (revealTargets?.length) {
           gsap.fromTo(
@@ -111,10 +131,12 @@ export default function AboutMarquee() {
               </div>
             </ScrollReveal>
 
-            <h2 className="max-w-[14ch] text-[clamp(48px,7vw,112px)] font-black leading-[0.92] tracking-[-0.05em] text-white">
-              {headingLines.map((line, i) => (
+            <h2 className="max-w-[18ch] text-[clamp(36px,6vw,96px)] font-black leading-[1.05] tracking-[-0.04em] text-white">
+              {headingLines.map((line) => (
                 <span key={line} className="block overflow-hidden">
-                  <VerticalCutReveal delay={i * 0.12}>{line}</VerticalCutReveal>
+                  <span className="block" data-about-line>
+                    {line}
+                  </span>
                 </span>
               ))}
             </h2>
@@ -138,14 +160,14 @@ export default function AboutMarquee() {
                   className="border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-10 transition-transform duration-500 hover:-translate-y-2"
                 >
                   <p className="section-label text-white/40">{column.label}</p>
-                  <h3 className="mt-8 text-[clamp(2.4rem,3.2vw,3.9rem)] font-black leading-[0.94] tracking-[-0.05em] text-white">
+                  <h3 className="mt-8 text-[clamp(2rem,3vw,3.5rem)] font-black leading-[0.94] tracking-[-0.05em] text-white">
                     {column.title}
                   </h3>
-                  <ul className="mt-12 space-y-6">
+                  <ul className="mt-10 space-y-5">
                     {column.items.map((item) => (
                       <li
                         key={item}
-                        className="text-[clamp(1.12rem,1.55vw,1.6rem)] font-medium leading-[1.16] tracking-[-0.035em] text-white"
+                        className="text-[clamp(0.95rem,1.3vw,1.35rem)] font-medium leading-[1.3] tracking-[-0.02em] text-white/80"
                       >
                         {item}
                       </li>

@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { VerticalCutReveal, ScrollReveal } from "@/components/FancyText";
+import { ScrollReveal } from "@/components/FancyText";
 
 const policies = [
   {
@@ -41,8 +41,8 @@ export default function PoliciesAccordion() {
               <span className="section-label">Terms &amp; Policies</span>
             </div>
 
-            <h2 className="display-title max-w-[10ch]">
-              <VerticalCutReveal>HOW IT WORKS</VerticalCutReveal>
+            <h2 className="display-title">
+              How It Works
               <span className="accent-square" aria-hidden />
             </h2>
           </div>
