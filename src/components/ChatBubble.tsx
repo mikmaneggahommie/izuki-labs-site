@@ -37,12 +37,7 @@ const formatMarkdown = (text: string) => {
 
 export default function ChatBubble() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: "Hey, I'm the design partner for the lab. What's on your mind?",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isNearBottom, setIsNearBottom] = useState(false);
@@ -52,9 +47,30 @@ export default function ChatBubble() {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Validation Patterns
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const validatePhone = (phone: string) => /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/.test(phone);
+  const validatePhone = (phone: string) => /^(\+251|0)?[97]\d{8}$/.test(phone.replace(/\s/g, ""));
   const validateTelegram = (tg: string) => /^@?[a-zA-Z0-9_]{5,32}$/.test(tg);
+
+  // Persistence: Load
+  useEffect(() => {
+    const savedMsg = sessionStorage.getItem("izuki_chat_msgs");
+    const savedInfo = sessionStorage.getItem("izuki_chat_info");
+    if (savedMsg) setMessages(JSON.parse(savedMsg));
+    else setMessages([{ role: "assistant", content: "Hey, I'm the design partner for the lab. What's on your mind?" }]);
+    
+    if (savedInfo) {
+      const info = JSON.parse(savedInfo);
+      setFormData(info);
+      if (info.email) setFlowState("CHATTING");
+    }
+  }, []);
+
+  // Persistence: Save
+  useEffect(() => {
+    if (messages.length > 0) sessionStorage.setItem("izuki_chat_msgs", JSON.stringify(messages));
+    if (Object.keys(formData).length > 0) sessionStorage.setItem("izuki_chat_info", JSON.stringify(formData));
+  }, [messages, formData]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -63,13 +79,6 @@ export default function ChatBubble() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading]);
-
-  // Restore lead capture flow when bubble is opened if info is missing
-  useEffect(() => {
-    if (isOpen && !formData.name && flowState === "CHATTING") {
-      setFlowState("COLLECTING_NAME");
-    }
-  }, [isOpen, formData.name, flowState]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -87,16 +96,27 @@ export default function ChatBubble() {
     setMessages((prev) => [...prev, { role: "assistant", content, isInfoRequest }]);
   };
 
-  const handleSkip = () => {
-    // If we have any data (name, phone, etc.), send it before skipping
-    if (Object.keys(formData).length > 0) {
-      fetch("/api/lead", {
+  const tryLeadSubmit = async (data: UserInfo) => {
+    // Only submit if we have at least one valid contact method
+    const hasContact = (data.email && validateEmail(data.email)) || 
+                       (data.phone && validatePhone(data.phone)) || 
+                       (data.telegram && validateTelegram(data.telegram));
+
+    if (!hasContact) return;
+
+    try {
+      await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
+    } catch (e) {
+      console.error("Lead submission failed:", e);
     }
+  };
 
+  const handleSkip = () => {
+    tryLeadSubmit(formData);
     setMessages((prev) => [...prev, 
       { role: "user", content: "I'll skip the details for now." },
       { role: "assistant", content: "No worries! I'm here to help. What can I tell you about my design systems or pricing?" }
@@ -115,7 +135,8 @@ export default function ChatBubble() {
         setError("Please enter your real name.");
         return;
       }
-      setFormData({ ...formData, name: val });
+      const newData = { ...formData, name: val };
+      setFormData(newData);
       setMessages(prev => [...prev, { role: "user", content: val }]);
       appendAssistantMessage(`Nice to meet you, ${val}. What's the best way to reach you? (Telegram @username or Phone)`);
       setFlowState("COLLECTING_CONTACT");
@@ -126,11 +147,12 @@ export default function ChatBubble() {
         return;
       }
       if (!isTelegram && !validatePhone(val)) {
-        setError("Please enter a valid phone number.");
+        setError("Valid formats: 09... or +251...");
         return;
       }
       
-      setFormData({ ...formData, [isTelegram ? "telegram" : "phone"]: val });
+      const newData = { ...formData, [isTelegram ? "telegram" : "phone"]: val };
+      setFormData(newData);
       setMessages(prev => [...prev, { role: "user", content: val }]);
       appendAssistantMessage("Perfect. Lastly, your email for the custom proposal?");
       setFlowState("COLLECTING_EMAIL");
@@ -139,17 +161,11 @@ export default function ChatBubble() {
         setError("Please enter a valid email address.");
         return;
       }
-      setFormData({ ...formData, email: val });
+      const newData = { ...formData, email: val };
+      setFormData(newData);
       setMessages(prev => [...prev, { role: "user", content: val }]);
       appendAssistantMessage("Got it! I'm logging your request now. How can I help with your design projects today?");
-      
-      // Submit lead to backend
-      fetch("/api/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, email: val }),
-      });
-      
+      tryLeadSubmit(newData);
       setFlowState("CHATTING");
     }
     setLeadStepInput("");
@@ -176,15 +192,14 @@ export default function ChatBubble() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.details || "Connection failed.");
+        throw new Error("Connection failed.");
       }
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let assistantContent = "";
 
-      // Append initial message
+      // Append initial assistant placeholder
       setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
       while (reader) {
@@ -199,37 +214,42 @@ export default function ChatBubble() {
           return newMessages;
         });
 
-        // Check for extraction signals
+        // AI Extraction Armor V2
         if (assistantContent.includes("@@@INFO_EXTRACTED@@@")) {
           const parts = assistantContent.split("@@@INFO_EXTRACTED@@@");
           const jsonStr = parts[1]?.trim();
           
           if (jsonStr && jsonStr.endsWith("}")) {
             try {
-              const extractedData = JSON.parse(jsonStr);
-              // Only trigger if we actually got new info
-              const hasNewInfo = Object.entries(extractedData).some(
-                ([key, val]) => val && formData[key as keyof UserInfo] !== val
-              );
+              const rawData = JSON.parse(jsonStr);
+              const cleanData: UserInfo = {};
+              
+              // Only keep valid data from AI extraction
+              if (rawData.name && rawData.name.length > 2) cleanData.name = rawData.name;
+              if (rawData.email && validateEmail(rawData.email)) cleanData.email = rawData.email;
+              if (rawData.phone && validatePhone(rawData.phone)) cleanData.phone = rawData.phone;
+              if (rawData.telegram && validateTelegram(rawData.telegram)) cleanData.telegram = rawData.telegram;
 
-              if (hasNewInfo) {
-                setFormData(prev => ({ ...prev, ...extractedData }));
-                fetch("/api/lead", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ ...formData, ...extractedData }),
-                });
+              if (Object.keys(cleanData).length > 0) {
+                const hasUpdates = Object.entries(cleanData).some(
+                  ([key, val]) => val && formData[key as keyof UserInfo] !== val
+                );
+
+                if (hasUpdates) {
+                  const updatedInfo = { ...formData, ...cleanData };
+                  setFormData(updatedInfo);
+                  tryLeadSubmit(updatedInfo);
+                }
               }
             } catch (e) {
-              // Partial JSON during stream, ignore until complete
+              // Partial JSON
             }
           }
         }
       }
     } catch (err: any) {
       console.error("Chat Error:", err);
-      // Fallback response with specific error detail if available
-      appendAssistantMessage(err.message || "I'm having a bit of trouble connecting to the network. You can reach me directly on Telegram @snowplugwalk or email me at it.mikiyas.daniel@gmail.com.");
+      appendAssistantMessage("I'm having a bit of trouble connecting. You can reach me directly on Telegram @snowplugwalk.");
     } finally {
       setIsLoading(false);
     }
