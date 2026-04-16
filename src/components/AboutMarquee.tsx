@@ -114,7 +114,7 @@ export default function AboutMarquee() {
                 >
                   <div>
                     <p className="section-label text-white/40">{column.label}</p>
-                    <h3 className="mt-14 text-[clamp(2.2rem,3.5vw,4rem)] font-black leading-[0.94] tracking-[-0.05em] text-white">
+                    <h3 className="mt-14 text-[clamp(2.2rem,3.5vw,4rem)] font-black leading-[0.94] tracking-[-0.05em] text-[#E50000]">
                       {column.title}
                     </h3>
                   </div>

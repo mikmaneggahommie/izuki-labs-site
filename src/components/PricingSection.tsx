@@ -178,7 +178,10 @@ export default function PricingSection() {
               <span className="section-label">Pricing</span>
             </div>
 
-            <h2 className="display-title">Packages</h2>
+            <MagicText
+              text="Packages"
+              className="display-title"
+            />
           </div>
 
           <MagicText
@@ -226,16 +229,20 @@ export default function PricingSection() {
                     </div>
 
                     <ul className="space-y-4">
-                      {pkg.features.map((feature) => (
-                        <li
+                      {pkg.features.map((feature, fIdx) => (
+                        <motion.li
                           key={feature}
-                          className="flex items-start gap-3 text-[15px] leading-[1.8] text-white/68"
+                          initial={{ opacity: 0, x: -8 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.1 + fIdx * 0.05, duration: 0.4 }}
+                          viewport={{ once: true }}
+                          className="flex items-start gap-3 text-[15px] leading-[1.8] text-white/68 transition-colors duration-300 group-hover:text-white/90"
                         >
                           <span className="pt-1 text-sm font-bold text-[var(--accent)]">
                             +
                           </span>
                           <span>{feature}</span>
-                        </li>
+                        </motion.li>
                       ))}
                     </ul>
                   </div>

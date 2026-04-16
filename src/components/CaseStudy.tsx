@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { ScrollReveal } from "@/components/FancyText";
+import { MagicText } from "@/components/ui/magic-text";
 
 import { assetPath } from "@/lib/asset-path";
 
@@ -67,11 +68,14 @@ export default function CaseStudy() {
             <span className="accent-square accent-square--tiny" aria-hidden />
             <span className="section-label">Design Spotlight</span>
           </div>
-          <h2 className="display-title">This Month&apos;s<br />Highlight</h2>
+          <MagicText
+            text="This Month's Highlight"
+            className="display-title"
+          />
         </div>
 
         {/* Content grid — image LEFT, text RIGHT */}
-        <div className="grid gap-12 lg:gap-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] items-start">
+        <div className="grid gap-12 lg:gap-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] items-start pt-10">
           {/* Before / After Slider — left aligned */}
           <ScrollReveal>
             <div
@@ -145,26 +149,29 @@ export default function CaseStudy() {
             <div className="space-y-10 lg:pt-4">
               <div className="space-y-4">
                 <p className="section-label text-white/42">Campaign</p>
-                <p className="text-[22px] font-semibold leading-[1.35] text-white">
-                  5th Round Student Registration
-                </p>
-                <p className="section-label text-white/35 pt-1">April 2026</p>
+                <MagicText
+                  text="5th Round Student Registration"
+                  className="text-[22px] font-semibold leading-[1.35] text-white"
+                />
+                <MagicText
+                  text="April 2026"
+                  className="section-label text-white/35 pt-1"
+                />
               </div>
 
               <div className="space-y-6">
-                <p className="body-copy">
-                  The original campaign needed stronger hierarchy, sharper
-                  messaging, and a more immediate sense of urgency for the launch.
-                </p>
-                <p className="body-copy">
-                  I rebuilt the visual system for a vertical-first format, tightened
-                  the spacing, lifted contrast, and reorganized the information so
-                  it could stop the scroll faster.
-                </p>
-                <p className="text-[18px] font-semibold leading-[1.7] text-white">
-                  The result is a cleaner campaign with better focus, stronger
-                  momentum, and a more premium registration push.
-                </p>
+                <MagicText
+                  text="The original campaign needed stronger hierarchy, sharper messaging, and a more immediate sense of urgency for the launch."
+                  className="body-copy"
+                />
+                <MagicText
+                  text="I rebuilt the visual system for a vertical-first format, tightened the spacing, lifted contrast, and reorganized the information so it could stop the scroll faster."
+                  className="body-copy"
+                />
+                <MagicText
+                  text="The result is a cleaner campaign with better focus, stronger momentum, and a more premium registration push."
+                  className="text-[18px] font-semibold leading-[1.7] text-white"
+                />
               </div>
             </div>
           </ScrollReveal>

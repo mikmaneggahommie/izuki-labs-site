@@ -21,20 +21,11 @@ const WORDMARK = (
     <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white whitespace-nowrap leading-[0.9]">
       IZUKI<span className="text-[#E50000]">.</span>LABS
     </span>
-    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white/30 whitespace-nowrap leading-[0.9] mx-[0.3em]">
-      ✦
-    </span>
-    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white whitespace-nowrap leading-[0.9]">
+    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white whitespace-nowrap leading-[0.9] ml-[0.5em]">
       IZUKI<span className="text-[#E50000]">.</span>LABS
     </span>
-    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white/30 whitespace-nowrap leading-[0.9] mx-[0.3em]">
-      ✦
-    </span>
-    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white whitespace-nowrap leading-[0.9]">
+    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white whitespace-nowrap leading-[0.9] ml-[0.5em]">
       IZUKI<span className="text-[#E50000]">.</span>LABS
-    </span>
-    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white/30 whitespace-nowrap leading-[0.9] mx-[0.3em]">
-      ✦
     </span>
   </>
 );

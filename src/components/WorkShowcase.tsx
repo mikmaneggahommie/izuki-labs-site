@@ -97,7 +97,10 @@ export default function WorkShowcase() {
               <span className="accent-square accent-square--tiny" aria-hidden />
               <span className="section-label">Works</span>
             </div>
-            <h2 className="display-title">Works</h2>
+            <MagicText
+              text="Works"
+              className="display-title"
+            />
           </div>
 
           <MagicText
@@ -115,10 +118,11 @@ export default function WorkShowcase() {
                 href={account.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative flex h-full flex-col gap-10 border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-8 transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)]"
+                className="group/card relative flex h-full flex-col gap-10 border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-8 transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)]"
               >
-                {/* Top header — blurs slightly on card hover */}
-                <div className="transition-[filter,opacity] duration-500 group-hover:blur-[2px] group-hover:opacity-50">
+                {/* Wrap all text/header in a blur-responsive container */}
+                <div className="transition-[filter,opacity] duration-500 group-has-[.work-image:hover]/card:blur-[12px] group-has-[.work-image:hover]/card:opacity-30">
+                  {/* Top header */}
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-4">
                       <div className="relative h-14 w-14 overflow-hidden rounded-full">
@@ -135,31 +139,31 @@ export default function WorkShowcase() {
                         <p className="text-sm font-medium text-white/50">{account.handle}</p>
                       </div>
                     </div>
-                    <ArrowUpRight className="h-5 w-5 text-white/40 transition-colors group-hover:text-[var(--accent)]" />
+                    <ArrowUpRight className="h-5 w-5 text-white/40 transition-colors group-hover/card:text-[var(--accent)]" />
                   </div>
+
+                  {/* Stats + summary */}
+                  <div className="mt-8 flex items-center justify-between gap-4 border-y border-white/8 py-4 text-sm">
+                    <span className="font-medium uppercase tracking-[0.15em] text-white/35">Instagram</span>
+                    <span className="font-medium text-white/75">{account.followers}</span>
+                  </div>
+
+                  <p className="body-copy mt-6">{account.summary}</p>
                 </div>
 
-                {/* Stats + summary — stays sharp */}
-                <div className="mt-8 flex items-center justify-between gap-4 border-y border-white/8 py-4 text-sm">
-                  <span className="font-medium uppercase tracking-[0.15em] text-white/35">Instagram</span>
-                  <span className="font-medium text-white/75">{account.followers}</span>
-                </div>
-
-                <p className="body-copy mt-6">{account.summary}</p>
-
-                {/* Images — each one scales individually on its own hover */}
+                {/* Images grid — siblings blur when one is hovered */}
                 <div className="grid grid-cols-3 gap-4">
                   {account.previews.map((preview, idx) => (
                     <div
                       key={`${account.handle}-${idx}`}
-                      className="work-preview overflow-hidden"
+                      className="work-image relative aspect-square overflow-hidden transition-all duration-500 group-has-[.work-image:hover]/card:blur-[4px] group-has-[.work-image:hover]/card:opacity-40 hover:!blur-none hover:!opacity-100 hover:scale-[1.15] hover:z-20 border border-white/5"
                     >
                       <Image
                         src={assetPath(preview)}
                         alt={`${account.name} preview ${idx + 1}`}
                         fill
                         sizes="(max-width: 1023px) 30vw, 150px"
-                        className="object-cover transition-transform duration-500 hover:scale-[1.08]"
+                        className="object-cover"
                       />
                     </div>
                   ))}
