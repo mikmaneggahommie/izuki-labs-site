@@ -137,6 +137,14 @@ const createClothMaterial = () => {
 	});
 };
 
+function updateMaterialTexture(mat: THREE.ShaderMaterial, tex: THREE.Texture) {
+	mat.uniforms.map.value = tex;
+}
+
+function updateMaterialHover(mat: THREE.ShaderMaterial, hovered: boolean) {
+	mat.uniforms.isHovered.value = hovered ? 1.0 : 0.0;
+}
+
 function ImagePlane({
 	texture,
 	position,
@@ -154,15 +162,13 @@ function ImagePlane({
 
 	useEffect(() => {
 		if (material && texture) {
-			const uniforms = material.uniforms;
-			uniforms.map.value = texture;
+			updateMaterialTexture(material, texture);
 		}
 	}, [material, texture]);
 
 	useEffect(() => {
 		if (material && material.uniforms) {
-			const uniforms = material.uniforms;
-			uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
+			updateMaterialHover(material, isHovered);
 		}
 	}, [material, isHovered]);
 
