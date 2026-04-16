@@ -54,7 +54,7 @@ export default function LoadingScreen() {
             {/* Spinner — sharp, minimal */}
             <div className="relative flex items-center justify-center">
               <motion.div
-                className="text-[120px] font-black tracking-[-0.04em] select-none pointer-events-none"
+                className="text-[320px] font-black tracking-[-0.04em] select-none pointer-events-none scale-y-[1.12]"
                 animate={{ 
                   rotate: 360,
                   color: ["#FFFFFF", "#E50000", "#FFFFFF", "#E50000", "#FFFFFF"]
