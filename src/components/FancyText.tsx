@@ -155,22 +155,20 @@ export function TypewriterText({
   return (
     <span ref={ref} className={className} aria-label={text}>
       {displayedText}
-      {isTyping && (
-        <motion.span
-          className="inline-block w-[4px] h-[0.9em] bg-[#E50000] ml-[4px] align-baseline"
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 1 }}
-        />
-      )}
       {!isTyping && hasDot && (
         <motion.span
-          className="inline-block text-[#E50000] font-black ml-[0.25em]"
-          animate={{ opacity: [1, 0.2] }}
-          transition={{ duration: 0.7, repeat: Infinity, repeatType: "reverse" }}
+          className="inline-block text-[#E50000] font-black ml-[0.7em]"
+          animate={{ opacity: [1, 0.4] }}
+          transition={{ duration: 1, repeat: Infinity, repeatType: "reverse" }}
         >
           .
         </motion.span>
       )}
+      <motion.span
+        className="inline-block w-[4px] h-[0.9em] bg-[#E50000] ml-[6px] align-baseline"
+        animate={isTyping ? { opacity: 1 } : { opacity: [1, 0] }}
+        transition={isTyping ? { duration: 0 } : { duration: 0.8, repeat: Infinity, repeatType: "reverse" }}
+      />
     </span>
   );
 }

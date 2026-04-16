@@ -75,7 +75,7 @@ export default function ContactFooter() {
               </div>
 
               <h2 className="display-title">
-                <TypewriterText text="Write to me." speed={120} />
+                <TypewriterText text="Write to me." speed={200} />
               </h2>
             </div>
 
