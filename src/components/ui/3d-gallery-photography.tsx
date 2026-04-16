@@ -151,22 +151,18 @@ function ImagePlane({
 	"use no memo";
 	const meshRef = useRef<THREE.Mesh>(null);
 	const [isHovered, setIsHovered] = useState(false);
-	const materialRef = useRef(material);
-	materialRef.current = material;
 
 	useEffect(() => {
-		const mat = materialRef.current;
-		if (mat && texture) {
-			mat.uniforms.map.value = texture;
+		if (material && texture) {
+			material.uniforms.map.value = texture;
 		}
-	}, [texture]);
+	}, [material, texture]);
 
 	useEffect(() => {
-		const mat = materialRef.current;
-		if (mat && mat.uniforms) {
-			mat.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
+		if (material && material.uniforms) {
+			material.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
 		}
-	}, [isHovered]);
+	}, [material, isHovered]);
 
 	return (
 		<mesh
@@ -239,7 +235,7 @@ function GalleryScene({
 	const totalImages = normalizedImages.length;
 	const depthRange = DEFAULT_DEPTH_RANGE;
 
-	const planesData = useRef<PlaneData[]>(
+	const [planesSnapshot, setPlanesSnapshot] = useState<PlaneData[]>(() =>
 		Array.from({ length: visibleCount }, (_, i) => ({
 			index: i,
 			z: visibleCount > 0 ? ((depthRange / visibleCount) * i) % depthRange : 0,
@@ -249,8 +245,10 @@ function GalleryScene({
 		}))
 	);
 
+	const planesData = useRef<PlaneData[]>(planesSnapshot);
+
 	useEffect(() => {
-		planesData.current = Array.from({ length: visibleCount }, (_, i) => ({
+		const newPlanes = Array.from({ length: visibleCount }, (_, i) => ({
 			index: i,
 			z: visibleCount > 0
 				? ((depthRange / Math.max(visibleCount, 1)) * i) % depthRange
@@ -259,6 +257,8 @@ function GalleryScene({
 			x: spatialPositions[i]?.x ?? 0,
 			y: spatialPositions[i]?.y ?? 0,
 		}));
+		planesData.current = newPlanes;
+		setPlanesSnapshot(newPlanes);
 	}, [depthRange, spatialPositions, totalImages, visibleCount]);
 
 	const handleWheel = useCallback(
@@ -425,7 +425,7 @@ function GalleryScene({
 
 	return (
 		<>
-			{planesData.current.map((plane, i) => {
+			{planesSnapshot.map((plane, i) => {
 				const texture = textures[plane.imageIndex];
 				const material = materials[i];
 
