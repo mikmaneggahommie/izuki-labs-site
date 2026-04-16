@@ -319,9 +319,9 @@ function GalleryScene({
 	}, []);
 
 	useFrame((state, delta) => {
-		const currentScrollVel = scrollVel.get() * 0.005;
+		const currentScrollVel = scrollVel.get() * 0.0008; // Much smoother multiplier
 		
-		if (Math.abs(currentScrollVel) > 0.01) {
+		if (Math.abs(currentScrollVel) > 0.001) {
 			setScrollVelocity((prev) => prev + currentScrollVel);
 			setAutoPlay(false);
 			lastInteraction.current = Date.now();
