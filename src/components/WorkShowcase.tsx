@@ -117,7 +117,7 @@ export default function WorkShowcase() {
               <div
                 data-work-reveal
                 className={`group/card relative flex h-full flex-col gap-10 border transition-all duration-700 p-8
-                  ${activeHover ? (activeHover.handle === account.handle ? "border-white/10" : "blur-sm opacity-15 scale-[0.98] grayscale") : "border-white/8 hover:border-white/20"}
+                  ${activeHover ? (activeHover.handle === account.handle ? "border-white/20 z-50 scale-[1.01]" : "blur-3xl opacity-5 pointer-events-none scale-95 grayscale") : "border-white/8 hover:border-white/20"}
                   bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))]
                 `}
               >
