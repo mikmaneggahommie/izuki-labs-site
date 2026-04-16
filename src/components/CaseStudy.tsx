@@ -106,7 +106,7 @@ export default function CaseStudy() {
                   I completely overhauled their visual presence. By replacing inconsistent, low-impact content with a precision-engineered content system, I established a sharp and unique brand identity in Adobe Photoshop.
                 </p>
                 <div className="border-t border-white/10 mt-12 pt-8">
-                  <p className="body-copy !font-medium !text-white">
+                  <p className="body-copy font-medium! text-white!">
                     Following the implementation of this new design language, the project realized a <span className="text-[#E50000] font-black">60%</span> jump in registrations.
                   </p>
                 </div>
