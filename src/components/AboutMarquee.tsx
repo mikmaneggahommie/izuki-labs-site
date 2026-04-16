@@ -112,13 +112,13 @@ export default function AboutMarquee() {
                   data-about-reveal
                   className="flex flex-col justify-start"
                 >
-                  <div className="space-y-6 lg:space-y-10">
+                  <div className="space-y-12 lg:space-y-16">
                     <p className="section-label text-white/40">{column.label}</p>
-                    <h3 className="mt-4 lg:mt-6 text-[clamp(2.2rem,3.5vw,4rem)] font-black leading-[0.94] tracking-[-0.05em] text-[#E50000]">
+                    <h3 className="mt-8 lg:mt-12 text-[clamp(2.2rem,3.5vw,4rem)] font-black leading-[0.94] tracking-[-0.05em] text-[#E50000]">
                       {column.title}
                     </h3>
                   </div>
-                  <ul className="mt-8 lg:mt-12 space-y-5 lg:space-y-7">
+                  <ul className="mt-20 lg:mt-28 space-y-6 lg:space-y-9">
                     {column.items.map((item) => (
                       <li
                         key={item}

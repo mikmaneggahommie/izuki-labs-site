@@ -204,21 +204,23 @@ export default function PricingSection() {
                       : "border-white/10 bg-[#0A0A0A]"
                   }`}
                 >
-                  <div className="space-y-14">
-                    <div className="space-y-8">
+                  <div className="space-y-28">
+                    <div className="space-y-12">
                       {pkg.featured ? (
-                        <span className="inline-flex border border-[var(--accent)]/30 bg-[var(--accent)]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
-                          Most Requested
-                        </span>
+                        <div className="pb-4">
+                          <span className="inline-flex border border-[var(--accent)]/30 bg-[var(--accent)]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
+                            Most Requested
+                          </span>
+                        </div>
                       ) : null}
 
-                      <div className="space-y-2">
-                        <h3 className="text-[30px] font-bold tracking-[-0.04em] text-white">
+                      <div className="space-y-4">
+                        <h3 className="text-[30px] font-black tracking-[-0.04em] text-white">
                           {pkg.name}
                         </h3>
                       </div>
 
-                      <div className="flex flex-wrap items-end gap-3 pt-2">
+                      <div className="flex flex-wrap items-end gap-3 pt-4">
                         <span className="text-[60px] font-black leading-none tracking-[-0.06em] text-white">
                           {pkg.price}
                         </span>
@@ -228,7 +230,7 @@ export default function PricingSection() {
                       </div>
                     </div>
 
-                    <ul className="space-y-5">
+                    <ul className="space-y-6 pt-10">
                       {pkg.features.map((feature, fIdx) => (
                         <motion.li
                           key={feature}
@@ -236,7 +238,7 @@ export default function PricingSection() {
                           whileInView={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.1 + fIdx * 0.05, duration: 0.4 }}
                           viewport={{ once: true }}
-                          className="flex items-start gap-3 text-[15px] leading-[1.8] text-white/68 transition-colors duration-300 group-hover:text-white/90"
+                          className="flex items-start gap-4 text-[15px] leading-[1.8] text-white/68 transition-colors duration-300 group-hover:text-white/90"
                         >
                           <span className="pt-1 text-sm font-bold text-[var(--accent)]">
                             +
@@ -247,7 +249,7 @@ export default function PricingSection() {
                     </ul>
                   </div>
 
-                  <div className="mt-20 space-y-8">
+                  <div className="mt-40 space-y-10">
                     <a
                       href="#contact"
                       className={`${
