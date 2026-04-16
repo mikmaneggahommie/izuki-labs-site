@@ -204,8 +204,8 @@ export default function PricingSection() {
                       : "border-white/10 bg-[#0A0A0A]"
                   }`}
                 >
-                  <div className="space-y-10">
-                    <div className="space-y-6">
+                  <div className="space-y-14">
+                    <div className="space-y-8">
                       {pkg.featured ? (
                         <span className="inline-flex border border-[var(--accent)]/30 bg-[var(--accent)]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
                           Most Requested
@@ -228,7 +228,7 @@ export default function PricingSection() {
                       </div>
                     </div>
 
-                    <ul className="space-y-4">
+                    <ul className="space-y-5">
                       {pkg.features.map((feature, fIdx) => (
                         <motion.li
                           key={feature}
@@ -247,7 +247,7 @@ export default function PricingSection() {
                     </ul>
                   </div>
 
-                  <div className="mt-12 space-y-6">
+                  <div className="mt-20 space-y-8">
                     <a
                       href="#contact"
                       className={`${

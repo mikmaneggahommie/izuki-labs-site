@@ -104,15 +104,15 @@ export default function AboutMarquee() {
           </ScrollReveal>
         </div>
 
-        <div className="grid gap-10 lg:grid-cols-3">
+        <div className="grid gap-16 lg:grid-cols-3">
           {columns.map((column, i) => (
             <ParallaxWrap key={column.title} speed={0.05 + i * 0.04}>
               <ScrollReveal delay={i * 0.1}>
                 <div
                   data-about-reveal
-                  className="border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] px-6 py-10 lg:p-12 min-h-[380px] lg:min-h-[420px] flex flex-col justify-between transition-transform duration-500 hover:-translate-y-2"
+                  className="flex flex-col justify-start"
                 >
-                  <div>
+                  <div className="space-y-4 lg:space-y-12">
                     <p className="section-label text-white/40">{column.label}</p>
                     <h3 className="mt-4 lg:mt-14 text-[clamp(2.2rem,3.5vw,4rem)] font-black leading-[0.94] tracking-[-0.05em] text-[#E50000]">
                       {column.title}
