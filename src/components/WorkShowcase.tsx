@@ -99,7 +99,7 @@ export default function WorkShowcase() {
               <span className="section-label">Works</span>
             </div>
             <MagicText
-              text="Works"
+              text="Social Media Works"
               className="display-title"
             />
           </div>
