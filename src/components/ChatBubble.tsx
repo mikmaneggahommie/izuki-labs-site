@@ -93,8 +93,6 @@ export default function ChatBubble() {
       if (rect.top < window.innerHeight * 0.6) {
         setShowTooltip(true);
         setHasShownTooltip(true);
-        // Hide tooltip after 5 seconds
-        setTimeout(() => setShowTooltip(false), 5000);
       }
     };
 
@@ -245,9 +243,16 @@ export default function ChatBubble() {
             {showTooltip && (
               <motion.div
                 initial={{ opacity: 0, y: 8, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 8, scale: 0.9 }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                animate={{ 
+                  opacity: 1, 
+                  y: 0, 
+                  scale: [1, 1.05, 1],
+                }}
+                transition={{ 
+                  duration: 2, 
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
                 className="absolute -top-14 right-0 whitespace-nowrap border border-white/10 bg-[#111] px-4 py-2 text-[13px] font-medium text-white shadow-2xl"
               >
                 Got a question?

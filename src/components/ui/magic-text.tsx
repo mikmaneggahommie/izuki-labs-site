@@ -13,7 +13,7 @@ const Word: React.FC<WordProps> = ({ children, progress, range }) => {
   const opacity = useTransform(progress, range, [0, 1]);
 
   return (
-    <span className="relative mr-[0.25em] inline-block">
+    <span className="relative inline-block">
       <span className="opacity-[0.12]">{children}</span>
       <motion.span className="absolute left-0 top-0" style={{ opacity }}>
         {children}
@@ -43,9 +43,12 @@ export function MagicText({ text, className = "" }: MagicTextProps) {
         const start = i / words.length;
         const end = start + 1 / words.length;
         return (
-          <Word key={`${word}-${i}`} progress={scrollYProgress} range={[start, end]}>
-            {word}
-          </Word>
+          <React.Fragment key={`${word}-${i}`}>
+            <Word progress={scrollYProgress} range={[start, end]}>
+              {word}
+            </Word>
+            {i !== words.length - 1 && <span className="inline-block w-[0.25em]" aria-hidden="true">&nbsp;</span>}
+          </React.Fragment>
         );
       })}
     </p>

@@ -106,7 +106,7 @@ export default function CaseStudy() {
                   alt="Before design"
                   width={1080}
                   height={1080}
-                  className="w-full h-full object-cover grayscale"
+                  className="w-full h-full object-contain grayscale"
                   sizes="(max-width: 767px) 90vw, 55vw"
                   priority
                 />

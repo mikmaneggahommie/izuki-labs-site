@@ -15,6 +15,30 @@ const HERO_IMAGES = [
   { src: "/images/1.JPG", alt: "Izuki Portfolio 1" },
 ];
 
+/* Repeat text enough to guarantee full edge-to-edge coverage */
+const WORDMARK = (
+  <>
+    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white whitespace-nowrap leading-[0.9]">
+      IZUKI<span className="text-[#E50000]">.</span>LABS
+    </span>
+    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white/30 whitespace-nowrap leading-[0.9] mx-[0.3em]">
+      ✦
+    </span>
+    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white whitespace-nowrap leading-[0.9]">
+      IZUKI<span className="text-[#E50000]">.</span>LABS
+    </span>
+    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white/30 whitespace-nowrap leading-[0.9] mx-[0.3em]">
+      ✦
+    </span>
+    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white whitespace-nowrap leading-[0.9]">
+      IZUKI<span className="text-[#E50000]">.</span>LABS
+    </span>
+    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white/30 whitespace-nowrap leading-[0.9] mx-[0.3em]">
+      ✦
+    </span>
+  </>
+);
+
 export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -33,22 +57,18 @@ export default function HeroSection() {
         className="h-full w-full"
       />
 
-      {/* IZUKI.LABS — TWO rows, edge-to-edge velocity, with edge fades */}
-      <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-50 mix-blend-exclusion gap-0">
-        <VelocityRow baseVelocity={-3} className="pointer-events-none">
-          <span className="text-[clamp(60px,12vw,160px)] font-black tracking-[-0.04em] text-white whitespace-nowrap px-[0.2em] leading-[0.9]">
-            IZUKI<span className="text-[#E50000]">.</span>LABS
-          </span>
+      {/* IZUKI.LABS — TWO packed rows, full edge-to-edge */}
+      <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-50 mix-blend-exclusion gap-1">
+        <VelocityRow baseVelocity={-4} className="pointer-events-none">
+          {WORDMARK}
         </VelocityRow>
-        <VelocityRow baseVelocity={3} className="pointer-events-none">
-          <span className="text-[clamp(60px,12vw,160px)] font-black tracking-[-0.04em] text-white whitespace-nowrap px-[0.2em] leading-[0.9]">
-            IZUKI<span className="text-[#E50000]">.</span>LABS
-          </span>
+        <VelocityRow baseVelocity={4} className="pointer-events-none">
+          {WORDMARK}
         </VelocityRow>
 
         {/* Edge fades */}
-        <div className="absolute inset-y-0 left-0 w-[15%] bg-gradient-to-r from-black to-transparent z-10" />
-        <div className="absolute inset-y-0 right-0 w-[15%] bg-gradient-to-l from-black to-transparent z-10" />
+        <div className="absolute inset-y-0 left-0 w-[12%] bg-gradient-to-r from-black to-transparent z-10" />
+        <div className="absolute inset-y-0 right-0 w-[12%] bg-gradient-to-l from-black to-transparent z-10" />
       </div>
 
       <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none z-50">

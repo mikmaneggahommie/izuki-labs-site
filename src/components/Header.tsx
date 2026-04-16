@@ -49,20 +49,20 @@ export default function Header() {
     <>
       <header className="fixed inset-x-0 top-0 z-50">
         <div className="content-shell px-[var(--section-padding-x)]">
-          <div className="grid items-center gap-4 py-5 md:grid-cols-[1fr_auto_1fr]">
+          <div className="flex items-center justify-between py-5">
             <a
               href="#top"
               onClick={(event) => handleAnchorClick(event, "#top")}
-              className="nav-copy interactive-link flex w-fit items-center tracking-[0.14em] text-white"
+              className="nav-copy interactive-link flex items-center tracking-[0.14em] text-white"
             >
               IZUKI<span className="inline-block w-[6px] h-[6px] bg-[var(--accent)] mx-[2px] translate-y-[1px]" />LABS
             </a>
 
-            <div className="justify-self-start md:justify-self-center">
+            <div className="hidden lg:block absolute left-1/2 -translate-x-1/2">
               <span className="nav-copy text-white">ADDIS ABABA</span>
             </div>
 
-            <div className="justify-self-end">
+            <div className="flex items-center">
               <button
                 type="button"
                 onClick={() => setMenuOpen((current) => !current)}

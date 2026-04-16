@@ -110,17 +110,19 @@ export default function AboutMarquee() {
               <ScrollReveal delay={i * 0.1}>
                 <div
                   data-about-reveal
-                  className="border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-10 transition-transform duration-500 hover:-translate-y-2"
+                  className="border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-12 min-h-[420px] flex flex-col justify-between transition-transform duration-500 hover:-translate-y-2"
                 >
-                  <p className="section-label text-white/40">{column.label}</p>
-                  <h3 className="mt-10 text-[clamp(2rem,3vw,3.5rem)] font-black leading-[0.94] tracking-[-0.05em] text-white">
-                    {column.title}
-                  </h3>
-                  <ul className="mt-12 space-y-6">
+                  <div>
+                    <p className="section-label text-white/40">{column.label}</p>
+                    <h3 className="mt-14 text-[clamp(2.2rem,3.5vw,4rem)] font-black leading-[0.94] tracking-[-0.05em] text-white">
+                      {column.title}
+                    </h3>
+                  </div>
+                  <ul className="mt-16 space-y-8">
                     {column.items.map((item) => (
                       <li
                         key={item}
-                        className="text-[clamp(0.95rem,1.3vw,1.35rem)] font-medium leading-[1.3] tracking-[-0.02em] text-white/80"
+                        className="text-[clamp(1rem,1.4vw,1.4rem)] font-medium leading-[1.4] tracking-[-0.02em] text-white/80"
                       >
                         {item}
                       </li>

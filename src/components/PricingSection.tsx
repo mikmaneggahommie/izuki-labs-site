@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { ScrollReveal } from "@/components/FancyText";
+import { MagicText } from "@/components/ui/magic-text";
 
 type AddOn = {
   name: string;
@@ -180,11 +181,10 @@ export default function PricingSection() {
             <h2 className="display-title">Packages</h2>
           </div>
 
-          <p className="body-copy max-w-[34ch] lg:justify-self-end">
-            Choose the level of support that matches your brand pace, content
-            volume, and approval flow. Every package is built to keep the work
-            consistent month after month.
-          </p>
+          <MagicText
+            text="Choose the level of support that matches your brand pace, content volume, and approval flow. Every package is built to keep the work consistent month after month."
+            className="body-copy max-w-[34ch] lg:justify-self-end"
+          />
         </div>
 
         <div className="grid gap-6 xl:grid-cols-3">

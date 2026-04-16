@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { ScrollReveal } from "@/components/FancyText";
+import { MagicText } from "@/components/ui/magic-text";
 
 import { assetPath } from "@/lib/asset-path";
 
@@ -99,9 +100,10 @@ export default function WorkShowcase() {
             <h2 className="display-title">Works</h2>
           </div>
 
-          <p className="body-copy max-w-[34ch] lg:justify-self-end">
-            Social media accounts I designed, managed, and grew from the ground up.
-          </p>
+          <MagicText
+            text="Social media accounts I designed, managed, and grew from the ground up."
+            className="body-copy max-w-[34ch] lg:justify-self-end"
+          />
         </div>
 
         {/* Cards with lens-focus hover effect */}
@@ -115,8 +117,8 @@ export default function WorkShowcase() {
                 rel="noopener noreferrer"
                 className="group relative flex h-full flex-col gap-10 border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-8 transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)]"
               >
-                {/* Card info — blurs on hover */}
-                <div className="transition-[filter] duration-500 group-hover:blur-[3px] group-hover:opacity-60">
+                {/* Top header — blurs slightly on card hover */}
+                <div className="transition-[filter,opacity] duration-500 group-hover:blur-[2px] group-hover:opacity-50">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-4">
                       <div className="relative h-14 w-14 overflow-hidden rounded-full">
@@ -135,25 +137,29 @@ export default function WorkShowcase() {
                     </div>
                     <ArrowUpRight className="h-5 w-5 text-white/40 transition-colors group-hover:text-[var(--accent)]" />
                   </div>
-
-                  <div className="mt-8 flex items-center justify-between gap-4 border-y border-white/8 py-4 text-sm">
-                    <span className="font-medium uppercase tracking-[0.15em] text-white/35">Instagram</span>
-                    <span className="font-medium text-white/75">{account.followers}</span>
-                  </div>
-
-                  <p className="body-copy mt-6">{account.summary}</p>
                 </div>
 
-                {/* Images — stay sharp + scale up on hover (lens focus) */}
-                <div className="grid grid-cols-3 gap-4 transition-[filter] duration-500 group-hover:blur-0">
+                {/* Stats + summary — stays sharp */}
+                <div className="mt-8 flex items-center justify-between gap-4 border-y border-white/8 py-4 text-sm">
+                  <span className="font-medium uppercase tracking-[0.15em] text-white/35">Instagram</span>
+                  <span className="font-medium text-white/75">{account.followers}</span>
+                </div>
+
+                <p className="body-copy mt-6">{account.summary}</p>
+
+                {/* Images — each one scales individually on its own hover */}
+                <div className="grid grid-cols-3 gap-4">
                   {account.previews.map((preview, idx) => (
-                    <div key={`${account.handle}-${idx}`} className="work-preview">
+                    <div
+                      key={`${account.handle}-${idx}`}
+                      className="work-preview overflow-hidden"
+                    >
                       <Image
                         src={assetPath(preview)}
                         alt={`${account.name} preview ${idx + 1}`}
                         fill
                         sizes="(max-width: 1023px) 30vw, 150px"
-                        className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                        className="object-cover transition-transform duration-500 hover:scale-[1.08]"
                       />
                     </div>
                   ))}

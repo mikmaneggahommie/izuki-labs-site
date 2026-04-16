@@ -205,8 +205,7 @@ function GalleryScene({
 	},
 }: Omit<InfiniteGalleryProps, 'className' | 'style'>) {
 	const [scrollVelocity, setScrollVelocity] = useState(0);
-	const [autoPlay, setAutoPlay] = useState(false);
-	const hasInteracted = useRef(false);
+	const [autoPlay, setAutoPlay] = useState(true);
 	const lastInteraction = useRef(Date.now());
 
 	const normalizedImages = useMemo(
@@ -284,7 +283,6 @@ function GalleryScene({
 				event.preventDefault();
 			}
 			setScrollVelocity((prev) => prev + event.deltaY * 0.01 * speed);
-			hasInteracted.current = true;
 			setAutoPlay(false);
 			lastInteraction.current = Date.now();
 		},
@@ -320,10 +318,10 @@ function GalleryScene({
 		}
 	}, [handleWheel, handleKeyDown, isLocked]);
 
-	// Auto-play logic — only after first interaction
+	// Auto-play logic
 	useEffect(() => {
 		const interval = setInterval(() => {
-			if (hasInteracted.current && Date.now() - lastInteraction.current > 3000) {
+			if (Date.now() - lastInteraction.current > 3000) {
 				setAutoPlay(true);
 			}
 		}, 1000);
@@ -500,18 +498,19 @@ function FallbackGallery({ images }: { images: ImageItem[] }) {
 	);
 
 	return (
-		<div className="flex flex-col items-center justify-center h-full bg-gray-100 p-4">
-			<p className="text-gray-600 mb-4">
-				WebGL not supported. Showing image list:
-			</p>
-			<div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+		<div className="relative h-full w-full bg-black">
+			<div className="grid grid-cols-2 gap-[1px] bg-white/10 h-full overflow-y-auto chat-scroll">
 				{normalizedImages.map((img, i) => (
-					<img
-						key={i}
-						src={img.src || '/placeholder.svg'}
-						alt={img.alt}
-						className="w-full h-32 object-cover rounded"
-					/>
+					<div key={i} className="relative aspect-[3/4] bg-black overflow-hidden group">
+						<img
+							src={img.src || '/placeholder.svg'}
+							alt={img.alt}
+							className="w-full h-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0 group-hover:scale-110"
+						/>
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+               <span className="text-[10px] font-bold uppercase tracking-widest text-white">Project {i + 1}</span>
+            </div>
+					</div>
 				))}
 			</div>
 		</div>
