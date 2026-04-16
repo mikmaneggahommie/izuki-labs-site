@@ -30,27 +30,29 @@ const WORDMARK = (
 
 export default function HeroSection() {
   return (
-    <section className="relative h-screen w-full bg-black overflow-hidden z-0">
-      <InfiniteGallery
-        images={HERO_IMAGES.map(img => ({ ...img, src: assetPath(img.src) }))}
-        speed={1.0}
-        zSpacing={3.5}
-        visibleCount={7}
-        className="h-full w-full"
-      />
+    <section className="relative h-[350vh] w-full bg-black z-0">
+      <div className="sticky top-0 h-screen w-full overflow-hidden">
+        <InfiniteGallery
+          images={HERO_IMAGES.map(img => ({ ...img, src: assetPath(img.src) }))}
+          speed={1.0}
+          zSpacing={3.5}
+          visibleCount={7}
+          className="h-full w-full"
+        />
 
-      {/* IZUKI.LABS — TWO packed rows, full edge-to-edge */}
-      <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-50 mix-blend-exclusion gap-1">
-        <VelocityRow baseVelocity={-4} className="pointer-events-none">
-          {WORDMARK}
-        </VelocityRow>
-        <VelocityRow baseVelocity={4} className="pointer-events-none">
-          {WORDMARK}
-        </VelocityRow>
+        {/* IZUKI.LABS — TWO packed rows, full edge-to-edge */}
+        <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-50 mix-blend-exclusion gap-1">
+          <VelocityRow baseVelocity={-4} className="pointer-events-none">
+            {WORDMARK}
+          </VelocityRow>
+          <VelocityRow baseVelocity={4} className="pointer-events-none">
+            {WORDMARK}
+          </VelocityRow>
 
-        {/* Edge fades */}
-        <div className="absolute inset-y-0 left-0 w-[12%] bg-linear-to-r from-black to-transparent z-10" />
-        <div className="absolute inset-y-0 right-0 w-[12%] bg-linear-to-l from-black to-transparent z-10" />
+          {/* Edge fades */}
+          <div className="absolute inset-y-0 left-0 w-[12%] bg-linear-to-r from-black to-transparent z-10" />
+          <div className="absolute inset-y-0 right-0 w-[12%] bg-linear-to-l from-black to-transparent z-10" />
+        </div>
       </div>
     </section>
   );

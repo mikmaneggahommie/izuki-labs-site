@@ -113,7 +113,7 @@ export default function AboutMarquee() {
                   className="flex flex-col justify-start pt-14 md:pt-24 gap-24 lg:gap-44"
                 >
                   <div className="space-y-6 lg:space-y-8">
-                    <p className="section-label text-white/40">{column.label}</p>
+                    <p className="section-label text-white">{column.label}</p>
                     <h3 className="text-[clamp(2.2rem,3.5vw,4rem)] font-black leading-[1.1] tracking-[-0.05em] text-[#E50000]">
                       {column.title}
                     </h3>
@@ -122,7 +122,7 @@ export default function AboutMarquee() {
                     {column.items.map((item) => (
                       <li
                         key={item}
-                        className="text-[clamp(1rem,1.4vw,1.4rem)] font-medium leading-[1.4] tracking-[-0.02em] text-white/80"
+                        className="text-[clamp(1rem,1.4vw,1.4rem)] font-light leading-[1.4] tracking-[-0.02em] text-white"
                       >
                         {item}
                       </li>
