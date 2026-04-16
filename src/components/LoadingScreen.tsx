@@ -57,11 +57,10 @@ export default function LoadingScreen() {
                 className="relative overflow-hidden w-[24px] h-[280px] md:w-[32px] md:h-[440px]"
                 animate={{ 
                   rotate: 360,
-                  backgroundColor: ["#FFFFFF", "#E50000", "#FFFFFF", "#E50000", "#FFFFFF"]
+                  backgroundColor: "#FFFFFF"
                 }}
                 transition={{ 
-                  rotate: { duration: 1.2, repeat: Infinity, ease: "linear" },
-                  backgroundColor: { duration: 1.2, repeat: Infinity, ease: "linear" }
+                  rotate: { duration: 1.2, repeat: Infinity, ease: "linear" }
                 }}
               />
             </div>

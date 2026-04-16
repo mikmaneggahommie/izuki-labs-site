@@ -5,13 +5,13 @@ import InfiniteGallery from "@/components/ui/3d-gallery-photography";
 import { VelocityRow } from "@/components/ui/scroll-velocity";
 
 const HERO_IMAGES = [
-  { src: "/images/7.jpg", alt: "Izuki Portfolio 7" },
-  { src: "/images/6.jpg", alt: "Izuki Portfolio 6" },
-  { src: "/images/5.jpg", alt: "Izuki Portfolio 5" },
-  { src: "/images/4.jpg", alt: "Izuki Portfolio 4" },
   { src: "/images/3.jpg", alt: "Izuki Portfolio 3" },
-  { src: "/images/2.jpg", alt: "Izuki Portfolio 2" },
   { src: "/images/1.JPG", alt: "Izuki Portfolio 1" },
+  { src: "/images/2.jpg", alt: "Izuki Portfolio 2" },
+  { src: "/images/4.jpg", alt: "Izuki Portfolio 4" },
+  { src: "/images/5.jpg", alt: "Izuki Portfolio 5" },
+  { src: "/images/6.jpg", alt: "Izuki Portfolio 6" },
+  { src: "/images/7.jpg", alt: "Izuki Portfolio 7" },
 ];
 
 const WORDMARK = (
@@ -30,13 +30,13 @@ const WORDMARK = (
 
 export default function HeroSection() {
   return (
-    <section className="relative h-[350vh] w-full bg-black z-0">
+    <section className="relative h-[200vh] w-full bg-black z-0">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         <InfiniteGallery
           images={HERO_IMAGES.map(img => ({ ...img, src: assetPath(img.src) }))}
           speed={1.0}
-          zSpacing={3.5}
-          visibleCount={7}
+          zSpacing={5.5}
+          visibleCount={4}
           className="h-full w-full"
         />
 
