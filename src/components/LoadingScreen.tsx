@@ -54,18 +54,17 @@ export default function LoadingScreen() {
             {/* Spinner — sharp, minimal */}
             <div className="relative flex items-center justify-center">
               <motion.div
-                className="text-[320px] font-black tracking-[-0.04em] select-none pointer-events-none scale-y-[1.12]"
+                className="relative overflow-hidden"
+                style={{ width: "24px", height: "380px" }}
                 animate={{ 
                   rotate: 360,
-                  color: ["#FFFFFF", "#E50000", "#FFFFFF", "#E50000", "#FFFFFF"]
+                  backgroundColor: ["#FFFFFF", "#E50000", "#FFFFFF", "#E50000", "#FFFFFF"]
                 }}
                 transition={{ 
                   rotate: { duration: 1.2, repeat: Infinity, ease: "linear" },
-                  color: { duration: 1.2, repeat: Infinity, ease: "linear" }
+                  backgroundColor: { duration: 1.2, repeat: Infinity, ease: "linear" }
                 }}
-              >
-                I
-              </motion.div>
+              />
             </div>
           </motion.div>
         </>
