@@ -172,10 +172,10 @@ function ImagePlane({
 	}, [material, texture]);
 
 	useEffect(() => {
-		if (material && material.uniforms) {
-			material.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
+		const mat = materialRef.current;
+		if (mat && mat.uniforms) {
+			mat.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isHovered, material]);
 
 	return (
@@ -264,8 +264,16 @@ function GalleryScene({
 			y: spatialPositions[i]?.y ?? 0,
 		}))
 	);
-	// Render-safe snapshot for JSX mapping (avoids ref access during render)
-	const [planesSnapshot, setPlanesSnapshot] = useState(() => planesDataRef.current);
+	// Render-safe snapshot for JSX mapping
+	const [planesSnapshot, setPlanesSnapshot] = useState(() => 
+		Array.from({ length: visibleCount }, (_, i) => ({
+			index: i,
+			z: visibleCount > 0 ? ((depthRange / visibleCount) * i) % depthRange : 0,
+			imageIndex: totalImages > 0 ? i % totalImages : 0,
+			x: spatialPositions[i]?.x ?? 0,
+			y: spatialPositions[i]?.y ?? 0,
+		}))
+	);
 
 	useEffect(() => {
 		const next = Array.from({ length: visibleCount }, (_, i) => ({
@@ -347,7 +355,6 @@ function GalleryScene({
 		});
 
 		const totalRange = depthRange;
-		const halfRange = totalRange / 2;
 		const imageAdvance = totalImages > 0 ? visibleCount % totalImages || totalImages : 0;
 
 		// Absolute scroll contribution (if on a pinned track)
