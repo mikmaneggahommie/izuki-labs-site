@@ -151,18 +151,22 @@ function ImagePlane({
 	"use no memo";
 	const meshRef = useRef<THREE.Mesh>(null);
 	const [isHovered, setIsHovered] = useState(false);
+	const materialRef = useRef(material);
+	materialRef.current = material;
 
 	useEffect(() => {
-		if (material && texture) {
-			material.uniforms.map.value = texture;
+		const mat = materialRef.current;
+		if (mat && texture) {
+			mat.uniforms.map.value = texture;
 		}
-	}, [material, texture]);
+	}, [texture]);
 
 	useEffect(() => {
-		if (material && material.uniforms) {
-			material.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
+		const mat = materialRef.current;
+		if (mat && mat.uniforms) {
+			mat.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
 		}
-	}, [material, isHovered]);
+	}, [isHovered]);
 
 	return (
 		<mesh
@@ -196,7 +200,8 @@ function GalleryScene({
 	const { gl } = useThree();
 	const [scrollVelocity, setScrollVelocity] = useState(0);
 	const [autoPlay, setAutoPlay] = useState(true);
-	const lastInteraction = useRef(Date.now());
+	const lastInteraction = useRef(0);
+	useEffect(() => { lastInteraction.current = Date.now(); }, []);
 
 	const normalizedImages = useMemo(
 		() =>
@@ -428,8 +433,9 @@ function GalleryScene({
 
 				const worldZ = plane.z - depthRange / 2;
 
-				const aspect = texture.image
-					? texture.image.width / texture.image.height
+				const texImage = texture.image as HTMLImageElement | undefined;
+				const aspect = texImage
+					? texImage.width / texImage.height
 					: 1;
 				const scale: [number, number, number] =
 					aspect > 1 ? [2 * aspect, 2, 1] : [2, 2 / aspect, 1];
@@ -492,20 +498,17 @@ export default function InfiniteGallery({
 		maxBlur: 8.0,
 	},
 }: InfiniteGalleryProps) {
-	const [webglSupported, setWebglSupported] = useState(true);
-
-	useEffect(() => {
+	const [webglSupported] = useState(() => {
+		if (typeof window === "undefined") return true;
 		try {
 			const canvas = document.createElement('canvas');
 			const gl =
 				canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-			if (!gl) {
-				setWebglSupported(false);
-			}
+			return !!gl;
 		} catch {
-			setWebglSupported(false);
+			return false;
 		}
-	}, []);
+	});
 
 	if (!webglSupported) {
 		return (
