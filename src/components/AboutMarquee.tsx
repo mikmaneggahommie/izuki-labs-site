@@ -110,7 +110,7 @@ export default function AboutMarquee() {
               <ScrollReveal delay={i * 0.1}>
                 <div
                   data-about-reveal
-                  className="flex flex-col justify-start pt-0 gap-24 lg:gap-44"
+                  className="flex flex-col justify-start pt-14 md:pt-24 gap-24 lg:gap-44"
                 >
                   <div className="space-y-6 lg:space-y-8">
                     <p className="section-label text-white/40">{column.label}</p>
