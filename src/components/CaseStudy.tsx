@@ -161,11 +161,11 @@ export default function CaseStudy() {
 
               <div className="space-y-6">
                 <MagicText
-                  text="I completely overhauled their design. They used to make dull social media posts that didn't draw attention that much and I rebuilt everything from scratch on PS and gave them a unique visual identity."
+                  text="I completely overhauled their visual presence. By replacing inconsistent, low-impact content with a precision-engineered system build from the ground up in Adobe Photoshop, I established a sharp and unique brand identity."
                   className="body-copy"
                 />
-                <div className="text-[18px] font-semibold leading-[1.7] text-white">
-                  After using my design they saw a <span className="text-[#E50000]">60%</span> jump in their registration.
+                <div className="text-[18px] font-semibold leading-[1.7] text-white mt-12 pt-8 border-t border-white/5">
+                  Following the implementation of this new design language, the project realized a <span className="text-[#E50000]">60%</span> jump in registrations.
                 </div>
               </div>
             </div>

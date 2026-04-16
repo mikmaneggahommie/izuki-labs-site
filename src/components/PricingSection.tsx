@@ -230,7 +230,7 @@ export default function PricingSection() {
                       </div>
                     </div>
 
-                    <ul className="space-y-6 pt-2 md:pt-10">
+                    <ul className="space-y-6 pt-10 md:pt-10">
                       {pkg.features.map((feature, fIdx) => (
                         <motion.li
                           key={feature}
