@@ -243,16 +243,8 @@ export default function ChatBubble() {
             {showTooltip && (
               <motion.div
                 initial={{ opacity: 0, y: 8, scale: 0.9 }}
-                animate={{ 
-                  opacity: 1, 
-                  y: 0, 
-                  scale: [1, 1.05, 1],
-                }}
-                transition={{ 
-                  duration: 2, 
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 className="absolute -top-14 right-0 whitespace-nowrap border border-white/10 bg-[#111] px-4 py-2 text-[13px] font-medium text-white shadow-2xl"
               >
                 Got a question?
@@ -289,7 +281,7 @@ export default function ChatBubble() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 32, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-4 right-4 z-[110] flex h-[520px] w-[calc(100vw-32px)] max-w-[400px] flex-col overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_32px_128px_rgba(0,0,0,0.8)] backdrop-blur-xl md:bottom-10 md:right-10"
+            className="fixed bottom-4 right-4 z-[110] flex h-[min(540px,80dvh)] w-[calc(100vw-32px)] max-w-[400px] flex-col overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_32px_128px_rgba(0,0,0,0.8)] backdrop-blur-xl md:bottom-10 md:right-10 md:h-[520px]"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/5 bg-[#111111] px-6 py-4">
