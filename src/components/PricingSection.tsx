@@ -196,6 +196,8 @@ export default function PricingSection() {
 
             return (
               <ScrollReveal key={pkg.id} delay={pkgIndex * 0.12}>
+                <article
+                  data-price-reveal
                   className={`group relative flex h-full flex-col justify-between border p-8 transition-transform duration-500 hover:-translate-y-2 xl:min-h-[720px] ${
                     pkg.featured
                       ? "border-(--accent) bg-[linear-gradient(180deg,rgba(229,0,0,0.06),rgba(10,10,10,1)_18%)]"
