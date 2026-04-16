@@ -3,6 +3,7 @@ import { useRef, useMemo, useCallback, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
+import { useScroll, useVelocity } from 'framer-motion';
 
 type ImageItem = string | { src: string; alt?: string };
 
@@ -203,6 +204,8 @@ function GalleryScene({
 	"use no memo";
 	const { gl } = useThree();
 	const [scrollVelocity, setScrollVelocity] = useState(0);
+	const { scrollY } = useScroll();
+	const scrollVel = useVelocity(scrollY);
 	const [autoPlay, setAutoPlay] = useState(true);
 	const lastInteraction = useRef(0);
 	useEffect(() => { lastInteraction.current = Date.now(); }, []);
@@ -316,6 +319,14 @@ function GalleryScene({
 	}, []);
 
 	useFrame((state, delta) => {
+		const currentScrollVel = scrollVel.get() * 0.005;
+		
+		if (Math.abs(currentScrollVel) > 0.01) {
+			setScrollVelocity((prev) => prev + currentScrollVel);
+			setAutoPlay(false);
+			lastInteraction.current = Date.now();
+		}
+
 		if (autoPlay) {
 			setScrollVelocity((prev) => prev + 0.3 * delta);
 		}
