@@ -263,7 +263,6 @@ function GalleryScene({
 
 	const handleWheel = useCallback(
 		(event: WheelEvent) => {
-			event.preventDefault();
 			setScrollVelocity((prev) => prev + event.deltaY * 0.01 * speed);
 			setAutoPlay(false);
 			lastInteraction.current = Date.now();
@@ -289,7 +288,7 @@ function GalleryScene({
 	useEffect(() => {
 		const canvas = gl.domElement;
 		if (canvas) {
-			canvas.addEventListener('wheel', handleWheel, { passive: false });
+			canvas.addEventListener('wheel', handleWheel, { passive: true });
 			document.addEventListener('keydown', handleKeyDown);
 
 			return () => {
