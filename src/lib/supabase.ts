@@ -1,16 +1,24 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+let _client: SupabaseClient | null = null;
+let _initialized = false;
 
-// Only initialize if variables are present and valid to prevent build-time crashes
-// We use a lazy getter to ensure this only runs during request handling, not module loading
-export const supabase = (function() {
-  if (typeof window === "undefined" && (!supabaseUrl || !supabaseAnonKey || supabaseUrl === "undefined" || supabaseAnonKey === "undefined")) {
-    return null as any;
+/** Lazy Supabase client — only created on first access, never at build time. */
+export function getSupabase(): SupabaseClient | null {
+  if (_initialized) return _client;
+  _initialized = true;
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key || url === "undefined" || key === "undefined") {
+    _client = null;
+    return null;
   }
-  
-  if (!supabaseUrl || !supabaseAnonKey) return null as any;
 
-  return createClient(supabaseUrl, supabaseAnonKey);
-})();
+  _client = createClient(url, key);
+  return _client;
+}
+
+/** @deprecated Use getSupabase() instead */
+export const supabase = null;

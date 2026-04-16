@@ -162,6 +162,7 @@ function ImagePlane({
 	scale: [number, number, number];
 	material: THREE.ShaderMaterial;
 }) {
+	"use no memo";
 	const meshRef = useRef<THREE.Mesh>(null);
 	const [isHovered, setIsHovered] = useState(false);
 
@@ -172,9 +173,8 @@ function ImagePlane({
 	}, [material, texture]);
 
 	useEffect(() => {
-		const mat = materialRef.current;
-		if (mat && mat.uniforms) {
-			mat.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
+		if (material && material.uniforms) {
+			material.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
 		}
 	}, [isHovered, material]);
 
@@ -208,6 +208,7 @@ function GalleryScene({
 		maxBlur: 3.0,
 	},
 }: Omit<InfiniteGalleryProps, 'className' | 'style'>) {
+	"use no memo";
 	const { gl } = useThree();
 	const scrollVelocity = useRef(0);
 	const autoPlay = useRef(true);
