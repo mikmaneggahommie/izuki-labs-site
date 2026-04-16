@@ -67,13 +67,13 @@ export default function CaseStudy() {
         <div className="grid gap-12 lg:gap-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] items-start pt-10">
           {/* Before / After Slider — left aligned */}
           <ScrollReveal>
-            <div className="relative w-full aspect-4/5 md:aspect-3/4 overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_28px_90px_rgba(0,0,0,0.42)]">
+            <div className="relative w-full overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_28px_90px_rgba(0,0,0,0.42)]">
               <Compare
                 firstImage={assetPath("/images/case-study/before.jpg")}
                 secondImage={assetPath("/images/case-study/after.jpg")}
-                firstImageClassName="object-contain grayscale lg:object-cover"
-                secondImageClassname="object-contain lg:object-cover"
-                className="w-full h-full"
+                firstImageClassName="object-contain"
+                secondImageClassname="object-contain"
+                className="w-full h-[400px] md:h-[550px] lg:h-[600px]"
                 slideMode="hover"
                 showHandlebar={true}
               />

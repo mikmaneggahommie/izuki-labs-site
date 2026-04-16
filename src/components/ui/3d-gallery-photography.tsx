@@ -1,6 +1,5 @@
 import type React from 'react';
 import { useRef, useMemo, useCallback, useState, useEffect } from 'react';
-import Image from 'next/image';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
@@ -40,8 +39,6 @@ interface InfiniteGalleryProps {
 	blurSettings?: BlurSettings;
 	className?: string;
 	style?: React.CSSProperties;
-	isLocked?: boolean; 
-	scrollProgress?: { get: () => number }; // framer-motion MotionValue
 }
 
 interface PlaneData {
@@ -49,7 +46,7 @@ interface PlaneData {
 	z: number;
 	imageIndex: number;
 	x: number;
-	y: number; 
+	y: number;
 }
 
 const DEFAULT_DEPTH_RANGE = 50;
@@ -80,34 +77,25 @@ const createClothMaterial = () => {
         
         vec3 pos = position;
         
-        // Create smooth curving based on scroll force
         float curveIntensity = scrollForce * 0.3;
-        
-        // Base curve across the plane based on distance from center
         float distanceFromCenter = length(pos.xy);
         float curve = distanceFromCenter * distanceFromCenter * curveIntensity;
         
-        // Add gentle cloth-like ripples
         float ripple1 = sin(pos.x * 2.0 + scrollForce * 3.0) * 0.02;
         float ripple2 = sin(pos.y * 2.5 + scrollForce * 2.0) * 0.015;
         float clothEffect = (ripple1 + ripple2) * abs(curveIntensity) * 2.0;
         
-        // Flag waving effect when hovered
         float flagWave = 0.0;
         if (isHovered > 0.5) {
-          // Create flag-like wave from left to right
           float wavePhase = pos.x * 3.0 + time * 8.0;
           float waveAmplitude = sin(wavePhase) * 0.1;
-          // Damping effect - stronger wave on the right side (free edge)
           float dampening = smoothstep(-0.5, 0.5, pos.x);
           flagWave = waveAmplitude * dampening;
           
-          // Add secondary smaller waves for more realistic flag motion
           float secondaryWave = sin(pos.x * 5.0 + time * 12.0) * 0.03 * dampening;
           flagWave += secondaryWave;
         }
         
-        // Apply Z displacement for curving effect (inverted) with cloth ripples and flag wave
         pos.z -= (curve + clothEffect + flagWave);
         
         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
@@ -124,7 +112,6 @@ const createClothMaterial = () => {
       void main() {
         vec4 color = texture2D(map, vUv);
         
-        // Simple blur approximation
         if (blurAmount > 0.0) {
           vec2 texelSize = 1.0 / vec2(textureSize(map, 0));
           vec4 blurred = vec4(0.0);
@@ -141,7 +128,6 @@ const createClothMaterial = () => {
           color = blurred / total;
         }
         
-        // Add subtle lighting effect based on curving
         float curveHighlight = abs(scrollForce) * 0.05;
         color.rgb += vec3(curveHighlight * 0.1);
         
@@ -176,7 +162,7 @@ function ImagePlane({
 		if (material && material.uniforms) {
 			material.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
 		}
-	}, [isHovered, material]);
+	}, [material, isHovered]);
 
 	return (
 		<mesh
@@ -196,8 +182,6 @@ function GalleryScene({
 	images,
 	speed = 1,
 	visibleCount = 8,
-	isLocked = true,
-	scrollProgress, // New absolute driver
 	fadeSettings = {
 		fadeIn: { start: 0.05, end: 0.15 },
 		fadeOut: { start: 0.85, end: 0.95 },
@@ -210,11 +194,9 @@ function GalleryScene({
 }: Omit<InfiniteGalleryProps, 'className' | 'style'>) {
 	"use no memo";
 	const { gl } = useThree();
-	const scrollVelocity = useRef(0);
-	const autoPlay = useRef(true);
-	const lastInteraction = useRef(0);
-	useEffect(() => { lastInteraction.current = Date.now(); }, []);
-	const internalAutoProgress = useRef(0); // For the bombardment effect
+	const [scrollVelocity, setScrollVelocity] = useState(0);
+	const [autoPlay, setAutoPlay] = useState(true);
+	const lastInteraction = useRef(Date.now());
 
 	const normalizedImages = useMemo(
 		() =>
@@ -226,7 +208,6 @@ function GalleryScene({
 
 	const textures = useTexture(normalizedImages.map((img) => img.src));
 
-	// Create materials pool
 	const materials = useMemo(
 		() => Array.from({ length: visibleCount }, () => createClothMaterial()),
 		[visibleCount]
@@ -238,15 +219,12 @@ function GalleryScene({
 		const maxVerticalOffset = MAX_VERTICAL_OFFSET;
 
 		for (let i = 0; i < visibleCount; i++) {
-			const horizontalAngle = (i * 2.618) % (Math.PI * 2); 
-			const verticalAngle = (i * 1.618 + Math.PI / 3) % (Math.PI * 2); 
-
-			const horizontalRadius = (i % 3) * 1.2; 
-			const verticalRadius = ((i + 1) % 4) * 0.8; 
-
+			const horizontalAngle = (i * 2.618) % (Math.PI * 2);
+			const verticalAngle = (i * 1.618 + Math.PI / 3) % (Math.PI * 2);
+			const horizontalRadius = (i % 3) * 1.2;
+			const verticalRadius = ((i + 1) % 4) * 0.8;
 			const x = (Math.sin(horizontalAngle) * horizontalRadius * maxHorizontalOffset) / 3;
 			const y = (Math.cos(verticalAngle) * verticalRadius * maxVerticalOffset) / 4;
-
 			positions.push({ x, y });
 		}
 
@@ -256,17 +234,7 @@ function GalleryScene({
 	const totalImages = normalizedImages.length;
 	const depthRange = DEFAULT_DEPTH_RANGE;
 
-	const planesDataRef = useRef<PlaneData[]>(
-		Array.from({ length: visibleCount }, (_, i) => ({
-			index: i,
-			z: visibleCount > 0 ? ((depthRange / visibleCount) * i) % depthRange : 0,
-			imageIndex: totalImages > 0 ? i % totalImages : 0,
-			x: spatialPositions[i]?.x ?? 0,
-			y: spatialPositions[i]?.y ?? 0,
-		}))
-	);
-	// Render-safe snapshot for JSX mapping
-	const [planesSnapshot, setPlanesSnapshot] = useState(() => 
+	const planesData = useRef<PlaneData[]>(
 		Array.from({ length: visibleCount }, (_, i) => ({
 			index: i,
 			z: visibleCount > 0 ? ((depthRange / visibleCount) * i) % depthRange : 0,
@@ -277,39 +245,36 @@ function GalleryScene({
 	);
 
 	useEffect(() => {
-		const next = Array.from({ length: visibleCount }, (_, i) => ({
+		planesData.current = Array.from({ length: visibleCount }, (_, i) => ({
 			index: i,
-			z:
-				visibleCount > 0
-					? ((depthRange / Math.max(visibleCount, 1)) * i) % depthRange
-					: 0,
+			z: visibleCount > 0
+				? ((depthRange / Math.max(visibleCount, 1)) * i) % depthRange
+				: 0,
 			imageIndex: totalImages > 0 ? i % totalImages : 0,
 			x: spatialPositions[i]?.x ?? 0,
 			y: spatialPositions[i]?.y ?? 0,
 		}));
-		planesDataRef.current = next;
-		setPlanesSnapshot(next);
 	}, [depthRange, spatialPositions, totalImages, visibleCount]);
 
 	const handleWheel = useCallback(
 		(event: WheelEvent) => {
-			if (isLocked) event.preventDefault();
-			scrollVelocity.current += event.deltaY * 0.01 * speed;
-			autoPlay.current = false;
+			event.preventDefault();
+			setScrollVelocity((prev) => prev + event.deltaY * 0.01 * speed);
+			setAutoPlay(false);
 			lastInteraction.current = Date.now();
 		},
-		[speed, isLocked]
+		[speed]
 	);
 
 	const handleKeyDown = useCallback(
 		(event: KeyboardEvent) => {
 			if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
-				scrollVelocity.current -= 2 * speed;
-				autoPlay.current = false;
+				setScrollVelocity((prev) => prev - 2 * speed);
+				setAutoPlay(false);
 				lastInteraction.current = Date.now();
 			} else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-				scrollVelocity.current += 2 * speed;
-				autoPlay.current = false;
+				setScrollVelocity((prev) => prev + 2 * speed);
+				setAutoPlay(false);
 				lastInteraction.current = Date.now();
 			}
 		},
@@ -319,7 +284,7 @@ function GalleryScene({
 	useEffect(() => {
 		const canvas = gl.domElement;
 		if (canvas) {
-			canvas.addEventListener('wheel', handleWheel, { passive: !isLocked });
+			canvas.addEventListener('wheel', handleWheel, { passive: false });
 			document.addEventListener('keydown', handleKeyDown);
 
 			return () => {
@@ -327,53 +292,39 @@ function GalleryScene({
 				document.removeEventListener('keydown', handleKeyDown);
 			};
 		}
-	}, [gl, handleWheel, handleKeyDown, isLocked]);
+	}, [gl, handleWheel, handleKeyDown]);
 
 	useEffect(() => {
 		const interval = setInterval(() => {
 			if (Date.now() - lastInteraction.current > 3000) {
-				autoPlay.current = true;
+				setAutoPlay(true);
 			}
 		}, 1000);
 		return () => clearInterval(interval);
 	}, []);
 
 	useFrame((state, delta) => {
-		// subtle background auto-flow (bombardment)
-		if (autoPlay.current) {
-			internalAutoProgress.current += 0.3 * delta;
+		if (autoPlay) {
+			setScrollVelocity((prev) => prev + 0.3 * delta);
 		}
 
-		// Heavy damping on manual velocity
-		scrollVelocity.current *= 0.95;
+		setScrollVelocity((prev) => prev * 0.95);
 
 		const time = state.clock.getElapsedTime();
 		materials.forEach((material) => {
 			if (material && material.uniforms) {
 				material.uniforms.time.value = time;
-				material.uniforms.scrollForce.value = scrollVelocity.current;
+				material.uniforms.scrollForce.value = scrollVelocity;
 			}
 		});
 
+		const imageAdvance =
+			totalImages > 0 ? visibleCount % totalImages || totalImages : 0;
 		const totalRange = depthRange;
-		const imageAdvance = totalImages > 0 ? visibleCount % totalImages || totalImages : 0;
+		const halfRange = totalRange / 2;
 
-		// Absolute scroll contribution (if on a pinned track)
-		const progressValue = scrollProgress ? scrollProgress.get() : 0;
-		// Map 0-1 to a healthy multi-wrap distance (e.g. 100)
-		const absoluteScrollZ = progressValue * totalRange * 4; 
-
-		planesDataRef.current.forEach((plane, i) => {
-			// COMBINED MOVEMENT: 
-			// 1. Absolute Scroll (pinned positioning)
-			// 2. Velocity Momentum (manual flicking)
-			// 3. Auto-play (subtle flow)
-			let newZ = plane.z + (scrollVelocity.current * delta * 15) + (0.3 * delta * 5);
-			
-			// If we are scrolling via pinned progress, we can apply an additive shift
-			// or replace it. For 'persistence', we combine them.
-			newZ += (progressValue > 0 ? absoluteScrollZ * 0.05 : 0);
-
+		planesData.current.forEach((plane, i) => {
+			let newZ = plane.z + scrollVelocity * delta * 10;
 			let wrapsForward = 0;
 			let wrapsBackward = 0;
 
@@ -386,7 +337,8 @@ function GalleryScene({
 			}
 
 			if (wrapsForward > 0 && imageAdvance > 0 && totalImages > 0) {
-				plane.imageIndex = (plane.imageIndex + wrapsForward * imageAdvance) % totalImages;
+				plane.imageIndex =
+					(plane.imageIndex + wrapsForward * imageAdvance) % totalImages;
 			}
 
 			if (wrapsBackward > 0 && imageAdvance > 0 && totalImages > 0) {
@@ -395,11 +347,12 @@ function GalleryScene({
 			}
 
 			plane.z = ((newZ % totalRange) + totalRange) % totalRange;
-			// worldZ used implicitly via plane.z in render snapshot
+			plane.x = spatialPositions[i]?.x ?? 0;
+			plane.y = spatialPositions[i]?.y ?? 0;
 
-			// ... [REST OF SHADER LOGIC]
-			// Calculate opacity based on fade settings
-			const normalizedPosition = plane.z / totalRange; // 0 to 1
+			const worldZ = plane.z - halfRange;
+
+			const normalizedPosition = plane.z / totalRange;
 			let opacity = 1;
 
 			if (
@@ -427,6 +380,7 @@ function GalleryScene({
 			opacity = Math.max(0, Math.min(1, opacity));
 
 			let blur = 0;
+
 			if (
 				normalizedPosition >= blurSettings.blurIn.start &&
 				normalizedPosition <= blurSettings.blurIn.end
@@ -456,16 +410,17 @@ function GalleryScene({
 				material.uniforms.opacity.value = opacity;
 				material.uniforms.blurAmount.value = blur;
 			}
+
+			// worldZ is used below in render via plane.z
+			void worldZ;
 		});
-		// Sync snapshot for render after each animation frame
-		setPlanesSnapshot([...planesDataRef.current]);
 	});
 
 	if (normalizedImages.length === 0) return null;
 
 	return (
 		<>
-			{planesSnapshot.map((plane, i) => {
+			{planesData.current.map((plane, i) => {
 				const texture = textures[plane.imageIndex];
 				const material = materials[i];
 
@@ -473,8 +428,9 @@ function GalleryScene({
 
 				const worldZ = plane.z - depthRange / 2;
 
-				const texImage = texture.image as HTMLImageElement | undefined;
-				const aspect = texImage ? texImage.width / texImage.height : 1;
+				const aspect = texture.image
+					? texture.image.width / texture.image.height
+					: 1;
 				const scale: [number, number, number] =
 					aspect > 1 ? [2 * aspect, 2, 1] : [2, 2 / aspect, 1];
 
@@ -482,7 +438,7 @@ function GalleryScene({
 					<ImagePlane
 						key={plane.index}
 						texture={texture}
-						position={[plane.x, plane.y, worldZ]} 
+						position={[plane.x, plane.y, worldZ]}
 						scale={scale}
 						material={material}
 					/>
@@ -503,21 +459,19 @@ function FallbackGallery({ images }: { images: ImageItem[] }) {
 	);
 
 	return (
-		<div className="relative h-full w-full bg-black">
-			<div className="grid grid-cols-2 gap-px bg-white/10 h-full overflow-y-auto chat-scroll">
+		<div className="flex flex-col items-center justify-center h-full bg-gray-100 p-4">
+			<p className="text-gray-600 mb-4">
+				WebGL not supported. Showing image list:
+			</p>
+			<div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
 				{normalizedImages.map((img, i) => (
-					<div key={i} className="relative aspect-3/4 bg-black overflow-hidden group">
-						<Image
-							src={img.src || '/placeholder.svg'}
-							alt={img.alt || ''}
-							fill
-							sizes="50vw"
-							className="w-full h-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0 group-hover:scale-110"
-						/>
-            <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-               <span className="text-[10px] font-bold uppercase tracking-widest text-white">Project {i + 1}</span>
-            </div>
-					</div>
+					// eslint-disable-next-line @next/next/no-img-element
+					<img
+						key={i}
+						src={img.src || '/placeholder.svg'}
+						alt={img.alt || ''}
+						className="w-full h-32 object-cover rounded"
+					/>
 				))}
 			</div>
 		</div>
@@ -528,8 +482,6 @@ export default function InfiniteGallery({
 	images,
 	className = 'h-96 w-full',
 	style,
-	isLocked = true,
-	scrollProgress, // Consumption
 	fadeSettings = {
 		fadeIn: { start: 0.05, end: 0.25 },
 		fadeOut: { start: 0.4, end: 0.43 },
@@ -540,17 +492,20 @@ export default function InfiniteGallery({
 		maxBlur: 8.0,
 	},
 }: InfiniteGalleryProps) {
-	const [webglSupported] = useState(() => {
-		if (typeof window === 'undefined') return true;
+	const [webglSupported, setWebglSupported] = useState(true);
+
+	useEffect(() => {
 		try {
 			const canvas = document.createElement('canvas');
 			const gl =
 				canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-			return !!gl;
+			if (!gl) {
+				setWebglSupported(false);
+			}
 		} catch {
-			return false;
+			setWebglSupported(false);
 		}
-	});
+	}, []);
 
 	if (!webglSupported) {
 		return (
@@ -568,8 +523,6 @@ export default function InfiniteGallery({
 			>
 				<GalleryScene
 					images={images}
-					isLocked={isLocked}
-					scrollProgress={scrollProgress} // Pass to scene
 					fadeSettings={fadeSettings}
 					blurSettings={blurSettings}
 				/>
@@ -577,4 +530,3 @@ export default function InfiniteGallery({
 		</div>
 	);
 }
-
