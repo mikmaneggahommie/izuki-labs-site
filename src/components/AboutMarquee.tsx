@@ -110,15 +110,15 @@ export default function AboutMarquee() {
               <ScrollReveal delay={i * 0.1}>
                 <div
                   data-about-reveal
-                  className="flex flex-col justify-start pt-20 lg:pt-32"
+                  className="flex flex-col justify-start"
                 >
-                  <div className="space-y-16 lg:space-y-24">
+                  <div className="space-y-8 lg:space-y-12">
                     <p className="section-label text-white/40">{column.label}</p>
-                    <h3 className="mt-8 lg:mt-12 text-[clamp(2.2rem,3.5vw,4rem)] font-black leading-[0.94] tracking-[-0.05em] text-[#E50000]">
+                    <h3 className="mt-2 text-[clamp(2.2rem,3.5vw,4rem)] font-black leading-[0.94] tracking-[-0.05em] text-[#E50000]">
                       {column.title}
                     </h3>
                   </div>
-                  <ul className="mt-40 lg:mt-56 space-y-8 lg:space-y-12">
+                  <ul className="mt-14 lg:mt-20 space-y-6 lg:space-y-8">
                     {column.items.map((item) => (
                       <li
                         key={item}

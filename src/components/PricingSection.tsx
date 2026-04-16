@@ -198,39 +198,39 @@ export default function PricingSection() {
               <ScrollReveal key={pkg.id} delay={pkgIndex * 0.12}>
                 <article
                   data-price-reveal
-                  className={`group flex h-full flex-col justify-between border p-8 pt-20 transition-transform duration-500 hover:-translate-y-2 xl:min-h-[900px] lg:pt-32 ${
+                  className={`group relative flex h-full flex-col justify-between border p-8 transition-transform duration-500 hover:-translate-y-2 xl:min-h-[720px] ${
                     pkg.featured
                       ? "border-[var(--accent)] bg-[linear-gradient(180deg,rgba(229,0,0,0.06),rgba(10,10,10,1)_18%)]"
                       : "border-white/10 bg-[#0A0A0A]"
                   }`}
                 >
-                  <div className="space-y-40">
-                    <div className="space-y-20">
+                  <div className="space-y-20">
+                    <div className="space-y-12">
                       {pkg.featured ? (
-                        <div className="pb-8">
+                        <div className="absolute top-8 left-8">
                           <span className="inline-flex border border-[var(--accent)]/30 bg-[var(--accent)]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
                             Most Requested
                           </span>
                         </div>
                       ) : null}
 
-                      <div className="space-y-6">
-                        <h3 className="text-[34px] font-black tracking-[-0.04em] text-white">
+                      <div className={pkg.featured ? "pt-12" : ""}>
+                        <h3 className="text-[30px] font-black tracking-[-0.04em] text-white">
                           {pkg.name}
                         </h3>
                       </div>
 
-                      <div className="flex flex-wrap items-end gap-3 pt-10">
-                        <span className="text-[72px] font-black leading-none tracking-[-0.06em] text-white">
+                      <div className="flex flex-wrap items-end gap-3 pt-6">
+                        <span className="text-[60px] font-black leading-none tracking-[-0.06em] text-white">
                           {pkg.price}
                         </span>
-                        <span className="pb-3 text-lg text-white/42">
+                        <span className="pb-2 text-base text-white/42">
                           {pkg.period}
                         </span>
                       </div>
                     </div>
 
-                    <ul className="space-y-10 pt-20">
+                    <ul className="space-y-6 pt-10">
                       {pkg.features.map((feature, fIdx) => (
                         <motion.li
                           key={feature}
@@ -249,7 +249,7 @@ export default function PricingSection() {
                     </ul>
                   </div>
 
-                  <div className="mt-64 space-y-12 lg:mt-80">
+                  <div className="mt-32 space-y-10">
                     <a
                       href="#contact"
                       className={`${
