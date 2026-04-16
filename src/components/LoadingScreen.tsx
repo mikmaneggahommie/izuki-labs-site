@@ -60,7 +60,7 @@ export default function LoadingScreen() {
                   backgroundColor: "#FFFFFF"
                 }}
                 transition={{ 
-                  rotate: { duration: 1.2, repeat: Infinity, ease: "linear" }
+                  rotate: { duration: 2.4, repeat: Infinity, ease: "linear" }
                 }}
               />
             </div>
