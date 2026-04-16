@@ -5,10 +5,10 @@ import InfiniteGallery from "@/components/ui/3d-gallery-photography";
 import { VelocityRow } from "@/components/ui/scroll-velocity";
 
 const HERO_IMAGES = [
-  { src: "/images/1.JPG", alt: "Izuki Portfolio 1" },
   { src: "/images/3.jpg", alt: "Izuki Portfolio 3" },
-  { src: "/images/2.jpg", alt: "Izuki Portfolio 2" },
   { src: "/images/4.jpg", alt: "Izuki Portfolio 4" },
+  { src: "/images/2.jpg", alt: "Izuki Portfolio 2" },
+  { src: "/images/1.JPG", alt: "Izuki Portfolio 1" },
   { src: "/images/5.jpg", alt: "Izuki Portfolio 5" },
   { src: "/images/6.jpg", alt: "Izuki Portfolio 6" },
   { src: "/images/7.jpg", alt: "Izuki Portfolio 7" },
