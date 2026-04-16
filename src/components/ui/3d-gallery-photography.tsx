@@ -321,9 +321,11 @@ function GalleryScene({
 
 	useFrame((state, delta) => {
 		if (autoPlay.current) {
-			scrollVelocity.current += 3.5 * delta;
+			// Exactly matching the reference's stable accumulation
+			scrollVelocity.current += 0.3 * delta;
 		}
 
+		// Matching the reference's damping factor
 		scrollVelocity.current *= 0.95;
 
 		const time = state.clock.getElapsedTime();
