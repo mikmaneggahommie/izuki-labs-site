@@ -172,8 +172,29 @@ export const Compare = ({
           }}
           transition={{ duration: 0 }}
         >
-          <div className="w-36 h-full mask-[radial-gradient(100px_at_left,white,transparent)] absolute top-1/2 -translate-y-1/2 left-0 bg-linear-to-r from-red-600 via-transparent to-transparent z-20 opacity-50" />
-          <div className="w-10 h-1/2 mask-[radial-gradient(50px_at_left,white,transparent)] absolute top-1/2 -translate-y-1/2 left-0 bg-linear-to-r from-red-500 via-transparent to-transparent z-10 opacity-100" />
+          <motion.div
+            className="w-36 h-full mask-[radial-gradient(100px_at_left,white,transparent)] absolute top-1/2 -translate-y-1/2 left-0 bg-linear-to-r from-red-600 via-transparent to-transparent z-20"
+            animate={{
+              opacity: [0.3, 0.7, 0.3],
+            }}
+            transition={{
+              duration: 2.2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+          <motion.div
+            className="w-10 h-1/2 mask-[radial-gradient(50px_at_left,white,transparent)] absolute top-1/2 -translate-y-1/2 left-0 bg-linear-to-r from-red-400 via-transparent to-transparent z-10"
+            animate={{
+              opacity: [0.5, 1, 0.5],
+              scaleY: [0.75, 1.3, 0.75],
+            }}
+            transition={{
+              duration: 1.4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
           
           {showHandlebar && (
             <div className="h-5 w-5 rounded-md top-1/2 -translate-y-1/2 bg-white z-30 -right-2.5 absolute flex items-center justify-center shadow-[0px_-1px_0px_0px_#FFFFFF40]">
