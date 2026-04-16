@@ -106,7 +106,7 @@ export default function CaseStudy() {
 
               <div className="space-y-6">
                  <DoubleWordText
-                  text="I completely overhauled their visual presence. By replacing inconsistent, low-impact content with a precision-engineered system build from the ground up in Adobe Photoshop, I established a sharp and unique brand identity."
+            text="I completely overhauled their visual presence. By replacing inconsistent, low-impact content with a precision-engineered content system, I established a sharp and unique brand identity in Adobe Photoshop."
                   className="text-[14px] font-medium leading-[1.6] text-white/50"
                 />
                 <div className="border-t border-white/5 mt-12 pt-8">

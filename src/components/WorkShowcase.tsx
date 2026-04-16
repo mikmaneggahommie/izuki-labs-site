@@ -105,7 +105,7 @@ export default function WorkShowcase() {
           </div>
 
           <MagicText
-            text="Social media accounts I designed, managed, and grew from the ground up."
+            text="Social media accounts I designed, managed, and grew."
             className="body-copy max-w-[34ch] lg:justify-self-end"
           />
         </div>

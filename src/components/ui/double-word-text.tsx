@@ -12,7 +12,7 @@ export function DoubleWordText({ text, className = "", delay = 0 }: DoubleWordTe
   const words = text.split(" ");
 
   return (
-    <div className={`flex flex-wrap gap-x-[0.35em] gap-y-[0em] ${className}`}>
+    <div className={`flex flex-wrap gap-x-[0.35em] gap-y-0 ${className}`}>
       {words.map((word, i) => {
         return (
           <motion.span
