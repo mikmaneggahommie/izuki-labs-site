@@ -74,7 +74,8 @@ export default function CaseStudy() {
                 firstImageClassName="object-contain"
                 secondImageClassname="object-contain"
                 className="w-full h-[400px] md:h-[550px] lg:h-[600px]"
-                slideMode="hover"
+                slideMode="drag"
+                autoplay={false}
                 showHandlebar={true}
               />
               {/* Labels */}
