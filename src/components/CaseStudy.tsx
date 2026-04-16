@@ -161,17 +161,12 @@ export default function CaseStudy() {
 
               <div className="space-y-6">
                 <MagicText
-                  text="The original campaign needed stronger hierarchy, sharper messaging, and a more immediate sense of urgency for the launch."
+                  text="I completely overhauled their design. They used to make dull social media posts that didn't draw attention that much and I rebuilt everything from scratch on PS and gave them a unique visual identity."
                   className="body-copy"
                 />
-                <MagicText
-                  text="I rebuilt the visual system for a vertical-first format, tightened the spacing, lifted contrast, and reorganized the information so it could stop the scroll faster."
-                  className="body-copy"
-                />
-                <MagicText
-                  text="The result is a cleaner campaign with better focus, stronger momentum, and a more premium registration push."
-                  className="text-[18px] font-semibold leading-[1.7] text-white"
-                />
+                <div className="text-[18px] font-semibold leading-[1.7] text-white">
+                  After using my design they saw a <span className="text-[#E50000]">60%</span> jump in their registration.
+                </div>
               </div>
             </div>
           </ScrollReveal>

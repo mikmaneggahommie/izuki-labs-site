@@ -118,7 +118,9 @@ export default function WorkShowcase() {
                 href={account.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group/card relative flex h-full flex-col gap-10 border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-8 transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)]"
+                className={`group/card relative flex h-full flex-col gap-10 border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-8 transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)]
+                  ${account.name === "Atmosphere" ? "blur-[12px] opacity-20 pointer-events-none select-none" : ""}
+                `}
               >
                 {/* Wrap all text/header in a blur-responsive container */}
                 <div className="transition-[filter,opacity] duration-500 group-has-[.work-image:hover]/card:blur-[12px] group-has-[.work-image:hover]/card:opacity-30">
@@ -156,7 +158,9 @@ export default function WorkShowcase() {
                   {account.previews.map((preview, idx) => (
                     <div
                       key={`${account.handle}-${idx}`}
-                      className="work-image relative aspect-square overflow-hidden transition-all duration-500 group-has-[.work-image:hover]/card:blur-[4px] group-has-[.work-image:hover]/card:opacity-40 hover:!blur-none hover:!opacity-100 hover:scale-[1.15] hover:z-20 border border-white/5"
+                      className={`work-image relative aspect-square overflow-hidden transition-all duration-500 group-has-[.work-image:hover]/card:blur-[4px] group-has-[.work-image:hover]/card:opacity-40 hover:!blur-none hover:!opacity-100 hover:scale-[1.15] hover:z-20 border border-white/5 
+                        ${account.name === "Loline Mag | Ethiopian Digital Magazine" && idx !== 0 ? "blur-[8px] opacity-40" : ""}
+                      `}
                     >
                       <Image
                         src={assetPath(preview)}

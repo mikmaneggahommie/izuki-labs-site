@@ -185,7 +185,7 @@ export default function PricingSection() {
           </div>
 
           <MagicText
-            text="Choose the level of support that matches your brand pace, content volume, and approval flow. Every package is built to keep the work consistent month after month."
+            text="Choose the level of design package that matches your brand pace, content volume, and approval flow. Every package is built to keep the work consistent month after month."
             className="body-copy max-w-[34ch] lg:justify-self-end"
           />
         </div>
