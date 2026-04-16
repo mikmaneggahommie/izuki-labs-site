@@ -321,7 +321,7 @@ function GalleryScene({
 
 	useFrame((state, delta) => {
 		if (autoPlay.current) {
-			scrollVelocity.current += 0.3 * delta;
+			scrollVelocity.current += 3.5 * delta;
 		}
 
 		scrollVelocity.current *= 0.95;

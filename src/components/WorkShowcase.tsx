@@ -123,8 +123,8 @@ export default function WorkShowcase() {
               >
                 {/* Header Section — blurs if ANY image in this card is hovered */}
                 <div 
-                  className={`transition-all duration-500 
-                  ${activeHover && activeHover.handle === account.handle ? "blur-md opacity-20 scale-[0.95]" : ""}
+                  className={`transition-all duration-700 
+                  ${activeHover && activeHover.handle === account.handle ? "opacity-100 scale-[1.02]" : activeHover ? "blur-xl opacity-5 scale-95" : "opacity-100"}
                 `}>
                   {/* Top header */}
                   <div className="flex items-start justify-between gap-4">

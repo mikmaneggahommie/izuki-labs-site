@@ -41,7 +41,7 @@ export default function HeroSection() {
     >
       <InfiniteGallery
         images={HERO_IMAGES.map(img => ({ ...img, src: assetPath(img.src) }))}
-        speed={4.8}
+        speed={1.0}
         zSpacing={3.5}
         visibleCount={7}
         isLocked={false}
