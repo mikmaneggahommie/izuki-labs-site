@@ -17,13 +17,13 @@ const HERO_IMAGES = [
 const WORDMARK = (
   <>
     <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white whitespace-nowrap leading-[0.9]">
-      IZUKI<span className="text-[#E50000]">.</span>LABS
+      IZUKI<span className="text-[#E50000]">.</span>LABS<span className="text-[#E50000]">.</span>
     </span>
-    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white whitespace-nowrap leading-[0.9] ml-[0.5em]">
-      IZUKI<span className="text-[#E50000]">.</span>LABS
+    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white whitespace-nowrap leading-[0.9] ml-[0.1em]">
+      IZUKI<span className="text-[#E50000]">.</span>LABS<span className="text-[#E50000]">.</span>
     </span>
-    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white whitespace-nowrap leading-[0.9] ml-[0.5em]">
-      IZUKI<span className="text-[#E50000]">.</span>LABS
+    <span className="text-[clamp(56px,11vw,150px)] font-black tracking-[-0.04em] text-white whitespace-nowrap leading-[0.9] ml-[0.1em]">
+      IZUKI<span className="text-[#E50000]">.</span>LABS<span className="text-[#E50000]">.</span>
     </span>
   </>
 );
