@@ -79,10 +79,10 @@ export default function CaseStudy() {
                 showHandlebar={true}
               />
               {/* Labels */}
-              <div className="absolute left-3 top-3 z-30 border border-white/5 bg-black/40 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white pointer-events-none">
+              <div className="absolute left-3 bottom-4 z-30 border border-white/5 bg-black/40 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white pointer-events-none">
                 Before
               </div>
-              <div className="absolute right-3 top-3 z-30 border border-white/5 bg-black/40 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white pointer-events-none">
+              <div className="absolute right-3 bottom-4 z-30 border border-white/5 bg-black/40 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white pointer-events-none">
                 After
               </div>
             </div>

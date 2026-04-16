@@ -90,7 +90,7 @@ export default function ContactFooter() {
 
           <div
             data-contact-reveal
-            className="flex flex-col gap-4 sm:flex-row"
+            className="flex flex-col gap-4 sm:flex-row pt-6 lg:pt-2"
           >
             <a href="mailto:it.mikiyas.daniel@gmail.com" className="primary-button">
               Start A Project
