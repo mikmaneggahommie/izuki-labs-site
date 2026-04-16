@@ -285,8 +285,16 @@ button {
 }
 
 .primary-button:hover {
-  box-shadow: 4px 4px 0px var(--accent);
-  transform: translate(-2px, -2px);
+  background: var(--accent);
+  color: #000000;
+  transform: scale(1.02);
+}
+
+@media (hover: hover) {
+  .primary-button:hover {
+    box-shadow: 4px 4px 0px var(--accent);
+    transform: translate(-2px, -2px);
+  }
 }
 
 .secondary-button:hover {

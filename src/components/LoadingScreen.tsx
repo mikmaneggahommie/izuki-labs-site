@@ -53,26 +53,19 @@ export default function LoadingScreen() {
           >
             {/* Spinner — sharp, minimal */}
             <div className="relative flex items-center justify-center">
-              {/* Outer ring */}
               <motion.div
-                className="absolute h-20 w-20 border-2 border-white/10"
-                style={{ borderTopColor: "#E50000" }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              />
-              {/* Inner ring — counter-rotate */}
-              <motion.div
-                className="absolute h-12 w-12 border-2 border-white/5"
-                style={{ borderBottomColor: "#E50000" }}
-                animate={{ rotate: -360 }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-              />
-              {/* Center dot */}
-              <motion.div
-                className="h-3 w-3 bg-[#E50000]"
-                animate={{ scale: [1, 1.3, 1] }}
-                transition={{ duration: 0.8, repeat: Infinity }}
-              />
+                className="text-[120px] font-black tracking-[-0.04em] select-none pointer-events-none"
+                animate={{ 
+                  rotate: 360,
+                  color: ["#FFFFFF", "#E50000", "#FFFFFF", "#E50000", "#FFFFFF"]
+                }}
+                transition={{ 
+                  rotate: { duration: 1.2, repeat: Infinity, ease: "linear" },
+                  color: { duration: 1.2, repeat: Infinity, ease: "linear" }
+                }}
+              >
+                I
+              </motion.div>
             </div>
           </motion.div>
         </>

@@ -135,10 +135,10 @@ export default function CaseStudy() {
               </motion.div>
 
               {/* Labels */}
-              <div className="absolute left-4 top-4 z-30 border border-white/10 bg-black/72 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white/68">
+              <div className="absolute left-3 top-3 z-30 border border-white/5 bg-black/40 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
                 Before
               </div>
-              <div className="absolute right-4 top-4 z-30 border border-white/10 bg-black/72 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white/68">
+              <div className="absolute right-3 top-3 z-30 border border-white/5 bg-black/40 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
                 After
               </div>
             </div>

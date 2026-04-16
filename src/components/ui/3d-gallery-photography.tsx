@@ -204,8 +204,9 @@ function GalleryScene({
 		maxBlur: 3.0,
 	},
 }: Omit<InfiniteGalleryProps, 'className' | 'style'>) {
-	const [scrollVelocity, setScrollVelocity] = useState(0);
-	const [autoPlay, setAutoPlay] = useState(true);
+	const { gl } = useThree();
+	const scrollVelocity = useRef(0);
+	const autoPlay = useRef(true);
 	const lastInteraction = useRef(Date.now());
 
 	const normalizedImages = useMemo(
@@ -230,18 +231,14 @@ function GalleryScene({
 		const maxVerticalOffset = MAX_VERTICAL_OFFSET;
 
 		for (let i = 0; i < visibleCount; i++) {
-			// Create varied distribution patterns for both axes
-			const horizontalAngle = (i * 2.618) % (Math.PI * 2); // Golden angle for natural distribution
-			const verticalAngle = (i * 1.618 + Math.PI / 3) % (Math.PI * 2); // Offset angle for vertical
+			const horizontalAngle = (i * 2.618) % (Math.PI * 2); 
+			const verticalAngle = (i * 1.618 + Math.PI / 3) % (Math.PI * 2); 
 
-			const horizontalRadius = (i % 3) * 1.2; // Vary the distance from center
-			const verticalRadius = ((i + 1) % 4) * 0.8; // Different pattern for vertical
+			const horizontalRadius = (i % 3) * 1.2; 
+			const verticalRadius = ((i + 1) % 4) * 0.8; 
 
-			const x =
-				(Math.sin(horizontalAngle) * horizontalRadius * maxHorizontalOffset) /
-				3;
-			const y =
-				(Math.cos(verticalAngle) * verticalRadius * maxVerticalOffset) / 4;
+			const x = (Math.sin(horizontalAngle) * horizontalRadius * maxHorizontalOffset) / 3;
+			const y = (Math.cos(verticalAngle) * verticalRadius * maxVerticalOffset) / 4;
 
 			positions.push({ x, y });
 		}
@@ -252,14 +249,13 @@ function GalleryScene({
 	const totalImages = normalizedImages.length;
 	const depthRange = DEFAULT_DEPTH_RANGE;
 
-	// Initialize plane data
 	const planesData = useRef<PlaneData[]>(
 		Array.from({ length: visibleCount }, (_, i) => ({
 			index: i,
 			z: visibleCount > 0 ? ((depthRange / visibleCount) * i) % depthRange : 0,
 			imageIndex: totalImages > 0 ? i % totalImages : 0,
-			x: spatialPositions[i]?.x ?? 0, // Use spatial positions for x
-			y: spatialPositions[i]?.y ?? 0, // Use spatial positions for y
+			x: spatialPositions[i]?.x ?? 0,
+			y: spatialPositions[i]?.y ?? 0,
 		}))
 	);
 
@@ -276,29 +272,25 @@ function GalleryScene({
 		}));
 	}, [depthRange, spatialPositions, totalImages, visibleCount]);
 
-	// Handle scroll input
 	const handleWheel = useCallback(
 		(event: WheelEvent) => {
-			if (isLocked) {
-				event.preventDefault();
-			}
-			setScrollVelocity((prev) => prev + event.deltaY * 0.01 * speed);
-			setAutoPlay(false);
+			if (isLocked) event.preventDefault();
+			scrollVelocity.current += event.deltaY * 0.01 * speed;
+			autoPlay.current = false;
 			lastInteraction.current = Date.now();
 		},
 		[speed, isLocked]
 	);
 
-	// Handle keyboard input
 	const handleKeyDown = useCallback(
 		(event: KeyboardEvent) => {
 			if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
-				setScrollVelocity((prev) => prev - 2 * speed);
-				setAutoPlay(false);
+				scrollVelocity.current -= 2 * speed;
+				autoPlay.current = false;
 				lastInteraction.current = Date.now();
 			} else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-				setScrollVelocity((prev) => prev + 2 * speed);
-				setAutoPlay(false);
+				scrollVelocity.current += 2 * speed;
+				autoPlay.current = false;
 				lastInteraction.current = Date.now();
 			}
 		},
@@ -306,7 +298,7 @@ function GalleryScene({
 	);
 
 	useEffect(() => {
-		const canvas = document.querySelector('canvas');
+		const canvas = gl.domElement;
 		if (canvas) {
 			canvas.addEventListener('wheel', handleWheel, { passive: !isLocked });
 			document.addEventListener('keydown', handleKeyDown);
@@ -316,44 +308,38 @@ function GalleryScene({
 				document.removeEventListener('keydown', handleKeyDown);
 			};
 		}
-	}, [handleWheel, handleKeyDown, isLocked]);
+	}, [gl, handleWheel, handleKeyDown, isLocked]);
 
-	// Auto-play logic
 	useEffect(() => {
 		const interval = setInterval(() => {
 			if (Date.now() - lastInteraction.current > 3000) {
-				setAutoPlay(true);
+				autoPlay.current = true;
 			}
 		}, 1000);
 		return () => clearInterval(interval);
 	}, []);
 
 	useFrame((state, delta) => {
-		// Apply auto-play
-		if (autoPlay) {
-			setScrollVelocity((prev) => prev + 0.3 * delta);
+		if (autoPlay.current) {
+			scrollVelocity.current += 0.3 * delta;
 		}
 
-		// Damping
-		setScrollVelocity((prev) => prev * 0.95);
+		scrollVelocity.current *= 0.95;
 
-		// Update time uniform for all materials
 		const time = state.clock.getElapsedTime();
 		materials.forEach((material) => {
 			if (material && material.uniforms) {
 				material.uniforms.time.value = time;
-				material.uniforms.scrollForce.value = scrollVelocity;
+				material.uniforms.scrollForce.value = scrollVelocity.current;
 			}
 		});
 
-		// Update plane positions
-		const imageAdvance =
-			totalImages > 0 ? visibleCount % totalImages || totalImages : 0;
+		const imageAdvance = totalImages > 0 ? visibleCount % totalImages || totalImages : 0;
 		const totalRange = depthRange;
 		const halfRange = totalRange / 2;
 
 		planesData.current.forEach((plane, i) => {
-			let newZ = plane.z + scrollVelocity * delta * 10;
+			let newZ = plane.z + scrollVelocity.current * delta * 10;
 			let wrapsForward = 0;
 			let wrapsBackward = 0;
 
