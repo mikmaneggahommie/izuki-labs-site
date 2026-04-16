@@ -140,7 +140,7 @@ export default function WorkShowcase() {
                       </div>
                       <div className="space-y-1">
                         <p className="text-[22px] font-bold tracking-[-0.03em] text-white">{account.name}</p>
-                        <p className="text-sm font-medium text-white/50">{account.handle}</p>
+                        <p className="text-sm font-medium text-white">{account.handle}</p>
                       </div>
                     </div>
                     <a 
@@ -155,8 +155,8 @@ export default function WorkShowcase() {
 
                   {/* Stats + summary */}
                   <div className="mt-8 flex items-center justify-between gap-4 border-y border-white/8 py-4 text-sm">
-                    <span className="font-medium uppercase tracking-[0.15em] text-white/35">Instagram</span>
-                    <span className="font-medium text-white/75">{account.followers}</span>
+                    <span className="font-medium uppercase tracking-[0.15em] text-white">Instagram</span>
+                    <span className="font-medium text-white">{account.followers}</span>
                   </div>
 
                   <p className="body-copy mt-6">{account.summary}</p>

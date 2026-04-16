@@ -79,10 +79,10 @@ export default function CaseStudy() {
                 showHandlebar={true}
               />
               {/* Labels */}
-              <div className="absolute left-3 top-3 z-30 border border-white/5 bg-black/40 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 pointer-events-none">
+              <div className="absolute left-3 top-3 z-30 border border-white/5 bg-black/40 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white pointer-events-none">
                 Before
               </div>
-              <div className="absolute right-3 top-3 z-30 border border-white/5 bg-black/40 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 pointer-events-none">
+              <div className="absolute right-3 top-3 z-30 border border-white/5 bg-black/40 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white pointer-events-none">
                 After
               </div>
             </div>
@@ -92,14 +92,14 @@ export default function CaseStudy() {
           <ScrollReveal delay={0.2}>
             <div className="space-y-10 lg:pt-4">
               <div className="space-y-4">
-                <p className="section-label text-white/42">Campaign</p>
+                <p className="section-label text-white">Campaign</p>
                 <MagicText
                   text="5th Round Student Registration"
                   className="text-[22px] font-semibold leading-[1.35] text-white"
                 />
                 <MagicText
                   text="April 2026"
-                  className="section-label text-white/35 pt-1"
+                  className="section-label text-white pt-1"
                 />
               </div>
 

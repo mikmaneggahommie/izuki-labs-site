@@ -229,7 +229,7 @@ button {
 .body-copy {
   font-size: clamp(16px, 1.3vw, 18px);
   line-height: 1.6;
-  color: var(--text-secondary);
+  color: var(--text-primary);
 }
 
 .nav-copy {
