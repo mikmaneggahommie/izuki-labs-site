@@ -91,7 +91,7 @@ export default function AboutMarquee() {
             {/* MagicText — scroll-based word reveal */}
             <MagicText
               text="I build visual systems that make brands feel sharper, cleaner, and harder to ignore."
-              className="text-[clamp(32px,5.5vw,80px)] font-black leading-[1.05] tracking-[-0.04em] text-white"
+              className="text-[clamp(32px,5.5vw,80px)] font-black leading-[1.05] tracking-[-0.04em] text-white text-left w-full"
             />
           </div>
 
@@ -110,15 +110,15 @@ export default function AboutMarquee() {
               <ScrollReveal delay={i * 0.1}>
                 <div
                   data-about-reveal
-                  className="border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-12 min-h-[420px] flex flex-col justify-between transition-transform duration-500 hover:-translate-y-2"
+                  className="border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] px-6 py-10 lg:p-12 min-h-[380px] lg:min-h-[420px] flex flex-col justify-between transition-transform duration-500 hover:-translate-y-2"
                 >
                   <div>
                     <p className="section-label text-white/40">{column.label}</p>
-                    <h3 className="mt-14 text-[clamp(2.2rem,3.5vw,4rem)] font-black leading-[0.94] tracking-[-0.05em] text-[#E50000]">
+                    <h3 className="mt-4 lg:mt-14 text-[clamp(2.2rem,3.5vw,4rem)] font-black leading-[0.94] tracking-[-0.05em] text-[#E50000]">
                       {column.title}
                     </h3>
                   </div>
-                  <ul className="mt-16 space-y-8">
+                  <ul className="mt-6 lg:mt-16 space-y-6 lg:space-y-8">
                     {column.items.map((item) => (
                       <li
                         key={item}

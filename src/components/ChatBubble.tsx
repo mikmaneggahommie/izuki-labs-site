@@ -281,7 +281,7 @@ export default function ChatBubble() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 32, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-4 right-4 z-[110] flex h-[min(540px,80dvh)] w-[calc(100vw-32px)] max-w-[400px] flex-col overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_32px_128px_rgba(0,0,0,0.8)] backdrop-blur-xl md:bottom-10 md:right-10 md:h-[520px]"
+            className="fixed bottom-4 right-4 z-[110] flex h-[min(480px,65dvh)] w-[calc(100vw-32px)] max-w-[400px] flex-col overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_32px_128px_rgba(0,0,0,0.8)] backdrop-blur-xl md:bottom-10 md:right-10 md:h-[520px]"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/5 bg-[#111111] px-6 py-4">
