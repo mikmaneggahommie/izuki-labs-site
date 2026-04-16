@@ -47,6 +47,7 @@ const workAccounts = [
 
 export default function WorkShowcase() {
   const sectionRef = useRef<HTMLElement>(null);
+  const [activeHover, setActiveHover] = useState<{ handle: string; idx: number } | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -113,17 +114,18 @@ export default function WorkShowcase() {
         <div className="grid gap-10 lg:grid-cols-2">
           {workAccounts.map((account) => (
             <ScrollReveal key={account.handle}>
-              <a
+              <div
                 data-work-reveal
-                href={account.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`group/card relative flex h-full flex-col gap-10 border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-8 transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)]
-                  ${account.name === "Atmosphere" ? "blur-[12px] opacity-20 pointer-events-none select-none" : ""}
+                className={`group/card relative flex h-full flex-col gap-10 border transition-all duration-700 p-8
+                  ${activeHover ? (activeHover.handle === account.handle ? "border-white/10" : "blur-[8px] opacity-15 scale-[0.98] grayscale") : "border-white/8 hover:border-white/20"}
+                  bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))]
                 `}
               >
-                {/* Wrap all text/header in a blur-responsive container */}
-                <div className="transition-[filter,opacity] duration-500 group-has-[.work-image:hover]/card:blur-[12px] group-has-[.work-image:hover]/card:opacity-30">
+                {/* Header Section — blurs if ANY image in this card is hovered */}
+                <div 
+                  className={`transition-all duration-500 
+                  ${activeHover && activeHover.handle === account.handle ? "blur-[12px] opacity-20 scale-[0.95]" : ""}
+                `}>
                   {/* Top header */}
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-4">
@@ -141,7 +143,14 @@ export default function WorkShowcase() {
                         <p className="text-sm font-medium text-white/50">{account.handle}</p>
                       </div>
                     </div>
-                    <ArrowUpRight className="h-5 w-5 text-white/40 transition-colors group-hover/card:text-[var(--accent)]" />
+                    <a 
+                      href={account.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group/link flex items-center justify-center h-10 w-10 border border-white/10 hover:border-white/30 transition-all active:scale-95"
+                    >
+                      <ArrowUpRight className="h-5 w-5 text-white/40 transition-colors group-hover/link:text-[var(--accent)]" />
+                    </a>
                   </div>
 
                   {/* Stats + summary */}
@@ -155,24 +164,32 @@ export default function WorkShowcase() {
 
                 {/* Images grid — siblings blur when one is hovered */}
                 <div className="grid grid-cols-3 gap-4">
-                  {account.previews.map((preview, idx) => (
-                    <div
-                      key={`${account.handle}-${idx}`}
-                      className={`work-image relative aspect-square overflow-hidden transition-all duration-500 group-has-[.work-image:hover]/card:blur-[4px] group-has-[.work-image:hover]/card:opacity-40 hover:!blur-none hover:!opacity-100 hover:scale-[1.15] hover:z-20 border border-white/5 
-                        ${account.name === "Loline Mag | Ethiopian Digital Magazine" && idx !== 0 ? "blur-[8px] opacity-40" : ""}
-                      `}
-                    >
-                      <Image
-                        src={assetPath(preview)}
-                        alt={`${account.name} preview ${idx + 1}`}
-                        fill
-                        sizes="(max-width: 1023px) 30vw, 150px"
-                        className="object-cover"
-                      />
-                    </div>
-                  ))}
+                  {account.previews.map((preview, idx) => {
+                    const isHovered = activeHover?.handle === account.handle && activeHover?.idx === idx;
+                    const isOtherHoveredInSameCard = activeHover?.handle === account.handle && activeHover?.idx !== idx;
+
+                    return (
+                      <div
+                        key={`${account.handle}-${idx}`}
+                        onMouseEnter={() => setActiveHover({ handle: account.handle, idx })}
+                        onMouseLeave={() => setActiveHover(null)}
+                        className={`relative aspect-square overflow-hidden transition-all duration-500 cursor-pointer border border-white/5 
+                          ${isHovered ? "z-30 scale-[1.2] !blur-none !opacity-100 shadow-[0_30px_90px_rgba(0,0,0,0.8)] border-white/20" : ""}
+                          ${isOtherHoveredInSameCard ? "blur-[4px] opacity-30 grayscale scale-[0.9]" : ""}
+                        `}
+                      >
+                        <Image
+                          src={assetPath(preview)}
+                          alt={`${account.name} preview ${idx + 1}`}
+                          fill
+                          sizes="(max-width: 1023px) 30vw, 150px"
+                          className="object-cover"
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
-              </a>
+              </div>
             </ScrollReveal>
           ))}
         </div>
