@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollReveal } from "@/components/FancyText";
 import { MagicText } from "@/components/ui/magic-text";
 
@@ -117,14 +117,14 @@ export default function WorkShowcase() {
               <div
                 data-work-reveal
                 className={`group/card relative flex h-full flex-col gap-10 border transition-all duration-700 p-8
-                  ${activeHover ? (activeHover.handle === account.handle ? "border-white/10" : "blur-[8px] opacity-15 scale-[0.98] grayscale") : "border-white/8 hover:border-white/20"}
+                  ${activeHover ? (activeHover.handle === account.handle ? "border-white/10" : "blur-sm opacity-15 scale-[0.98] grayscale") : "border-white/8 hover:border-white/20"}
                   bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))]
                 `}
               >
                 {/* Header Section — blurs if ANY image in this card is hovered */}
                 <div 
                   className={`transition-all duration-500 
-                  ${activeHover && activeHover.handle === account.handle ? "blur-[12px] opacity-20 scale-[0.95]" : ""}
+                  ${activeHover && activeHover.handle === account.handle ? "blur-md opacity-20 scale-[0.95]" : ""}
                 `}>
                   {/* Top header */}
                   <div className="flex items-start justify-between gap-4">
@@ -149,7 +149,7 @@ export default function WorkShowcase() {
                       rel="noopener noreferrer"
                       className="group/link flex items-center justify-center h-10 w-10 border border-white/10 hover:border-white/30 transition-all active:scale-95"
                     >
-                      <ArrowUpRight className="h-5 w-5 text-white/40 transition-colors group-hover/link:text-[var(--accent)]" />
+                      <ArrowUpRight className="h-5 w-5 text-white/40 transition-colors group-hover/link:text-(--accent)" />
                     </a>
                   </div>
 
@@ -174,8 +174,8 @@ export default function WorkShowcase() {
                         onMouseEnter={() => setActiveHover({ handle: account.handle, idx })}
                         onMouseLeave={() => setActiveHover(null)}
                         className={`relative aspect-square overflow-hidden transition-all duration-500 cursor-pointer border border-white/5 
-                          ${isHovered ? "z-30 scale-[1.2] !blur-none !opacity-100 shadow-[0_30px_90px_rgba(0,0,0,0.8)] border-white/20" : ""}
-                          ${isOtherHoveredInSameCard ? "blur-[4px] opacity-30 grayscale scale-[0.9]" : ""}
+                          ${isHovered ? "z-30 scale-[1.2] blur-none! opacity-100! shadow-[0_30px_90px_rgba(0,0,0,0.8)] border-white/20" : ""}
+                          ${isOtherHoveredInSameCard ? "blur-xs opacity-30 grayscale scale-[0.9]" : ""}
                         `}
                       >
                         <Image

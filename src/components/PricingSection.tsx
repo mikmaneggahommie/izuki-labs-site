@@ -196,11 +196,9 @@ export default function PricingSection() {
 
             return (
               <ScrollReveal key={pkg.id} delay={pkgIndex * 0.12}>
-                <article
-                  data-price-reveal
                   className={`group relative flex h-full flex-col justify-between border p-8 transition-transform duration-500 hover:-translate-y-2 xl:min-h-[720px] ${
                     pkg.featured
-                      ? "border-[var(--accent)] bg-[linear-gradient(180deg,rgba(229,0,0,0.06),rgba(10,10,10,1)_18%)]"
+                      ? "border-(--accent) bg-[linear-gradient(180deg,rgba(229,0,0,0.06),rgba(10,10,10,1)_18%)]"
                       : "border-white/10 bg-[#0A0A0A]"
                   }`}
                 >
@@ -208,7 +206,7 @@ export default function PricingSection() {
                     <div className="pt-2"> 
                       {pkg.featured ? (
                         <div className="absolute top-8 left-8">
-                          <span className="inline-flex border border-[var(--accent)]/30 bg-[var(--accent)]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
+                          <span className="inline-flex border border-(--accent)/30 bg-(--accent)/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-(--accent)">
                             Most Requested
                           </span>
                         </div>
@@ -240,7 +238,7 @@ export default function PricingSection() {
                           viewport={{ once: true }}
                           className="flex items-start gap-4 text-[16px] leading-[1.8] text-white/68 transition-colors duration-300 group-hover:text-white/90"
                         >
-                          <span className="pt-1 text-sm font-bold text-[var(--accent)]">
+                          <span className="pt-1 text-sm font-bold text-(--accent)">
                             +
                           </span>
                           <span>{feature}</span>

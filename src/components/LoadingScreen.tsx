@@ -33,21 +33,21 @@ export default function LoadingScreen() {
         <>
           <motion.div
             key="curtain-left"
-            className="fixed inset-y-0 left-0 z-[9999] bg-black"
+            className="fixed inset-y-0 left-0 z-9999 bg-black"
             style={{ width: "50%" }}
             exit={{ x: "-100%" }}
             transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
           />
           <motion.div
             key="curtain-right"
-            className="fixed inset-y-0 right-0 z-[9999] bg-black"
+            className="fixed inset-y-0 right-0 z-9999 bg-black"
             style={{ width: "50%" }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
           />
           <motion.div
             key="loading-content"
-            className="fixed inset-0 z-[10000] flex items-center justify-center bg-black"
+            className="fixed inset-0 z-10000 flex items-center justify-center bg-black"
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
@@ -71,7 +71,7 @@ export default function LoadingScreen() {
         <>
           <motion.div
             key="curtain-left-exit"
-            className="fixed inset-y-0 left-0 z-[9999] bg-black"
+            className="fixed inset-y-0 left-0 z-9999 bg-black"
             style={{ width: "50%" }}
             initial={{ x: "0%" }}
             animate={{ x: "-100%" }}
@@ -79,7 +79,7 @@ export default function LoadingScreen() {
           />
           <motion.div
             key="curtain-right-exit"
-            className="fixed inset-y-0 right-0 z-[9999] bg-black"
+            className="fixed inset-y-0 right-0 z-9999 bg-black"
             style={{ width: "50%" }}
             initial={{ x: "0%" }}
             animate={{ x: "100%" }}
