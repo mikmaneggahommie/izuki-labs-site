@@ -157,7 +157,7 @@ export function TypewriterText({
       {displayedText}
       {!isTyping && hasDot && (
         <span className="inline-flex items-baseline">
-          <span className="w-[1.5em] inline-block" />
+          <span className="w-[0.5em] inline-block" />
           <motion.span
             className="inline-block text-[#E50000] font-black"
             animate={{ opacity: [1, 0.4] }}
