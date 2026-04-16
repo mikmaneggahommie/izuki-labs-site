@@ -164,22 +164,19 @@ function ImagePlane({
 }) {
 	const meshRef = useRef<THREE.Mesh>(null);
 	const [isHovered, setIsHovered] = useState(false);
-	const materialRef = useRef(material);
-	materialRef.current = material;
 
 	useEffect(() => {
-		const mat = materialRef.current;
-		if (mat && texture) {
-			mat.uniforms.map.value = texture;
+		if (material && texture) {
+			material.uniforms.map.value = texture;
 		}
-	}, [texture]);
+	}, [material, texture]);
 
 	useEffect(() => {
-		const mat = materialRef.current;
-		if (mat && mat.uniforms) {
-			mat.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
+		if (material && material.uniforms) {
+			material.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
 		}
-	}, [isHovered]);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isHovered, material]);
 
 	return (
 		<mesh
@@ -258,7 +255,7 @@ function GalleryScene({
 	const totalImages = normalizedImages.length;
 	const depthRange = DEFAULT_DEPTH_RANGE;
 
-	const planesData = useRef<PlaneData[]>(
+	const planesDataRef = useRef<PlaneData[]>(
 		Array.from({ length: visibleCount }, (_, i) => ({
 			index: i,
 			z: visibleCount > 0 ? ((depthRange / visibleCount) * i) % depthRange : 0,
@@ -267,9 +264,11 @@ function GalleryScene({
 			y: spatialPositions[i]?.y ?? 0,
 		}))
 	);
+	// Render-safe snapshot for JSX mapping (avoids ref access during render)
+	const [planesSnapshot, setPlanesSnapshot] = useState(() => planesDataRef.current);
 
 	useEffect(() => {
-		planesData.current = Array.from({ length: visibleCount }, (_, i) => ({
+		const next = Array.from({ length: visibleCount }, (_, i) => ({
 			index: i,
 			z:
 				visibleCount > 0
@@ -279,6 +278,8 @@ function GalleryScene({
 			x: spatialPositions[i]?.x ?? 0,
 			y: spatialPositions[i]?.y ?? 0,
 		}));
+		planesDataRef.current = next;
+		setPlanesSnapshot(next);
 	}, [depthRange, spatialPositions, totalImages, visibleCount]);
 
 	const handleWheel = useCallback(
@@ -354,7 +355,7 @@ function GalleryScene({
 		// Map 0-1 to a healthy multi-wrap distance (e.g. 100)
 		const absoluteScrollZ = progressValue * totalRange * 4; 
 
-		planesData.current.forEach((plane, i) => {
+		planesDataRef.current.forEach((plane, i) => {
 			// COMBINED MOVEMENT: 
 			// 1. Absolute Scroll (pinned positioning)
 			// 2. Velocity Momentum (manual flicking)
@@ -386,7 +387,7 @@ function GalleryScene({
 			}
 
 			plane.z = ((newZ % totalRange) + totalRange) % totalRange;
-			const _worldZ = plane.z - halfRange;
+			// worldZ used implicitly via plane.z in render snapshot
 
 			// ... [REST OF SHADER LOGIC]
 			// Calculate opacity based on fade settings
@@ -448,13 +449,15 @@ function GalleryScene({
 				material.uniforms.blurAmount.value = blur;
 			}
 		});
+		// Sync snapshot for render after each animation frame
+		setPlanesSnapshot([...planesDataRef.current]);
 	});
 
 	if (normalizedImages.length === 0) return null;
 
 	return (
 		<>
-			{planesData.current.map((plane, i) => {
+			{planesSnapshot.map((plane, i) => {
 				const texture = textures[plane.imageIndex];
 				const material = materials[i];
 
@@ -529,7 +532,7 @@ export default function InfiniteGallery({
 		maxBlur: 8.0,
 	},
 }: InfiniteGalleryProps) {
-	const [webglSupported, setWebglSupported] = useState(() => {
+	const [webglSupported] = useState(() => {
 		if (typeof window === 'undefined') return true;
 		try {
 			const canvas = document.createElement('canvas');
