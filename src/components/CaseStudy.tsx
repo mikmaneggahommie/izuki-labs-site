@@ -52,16 +52,15 @@ export default function CaseStudy() {
   return (
     <section ref={sectionRef} id="cases" className="section-shell">
       <div className="content-shell space-y-20">
-        {/* Title block */}
-        <div data-case-reveal className="space-y-6">
+        {/* Title block — Always visible to ensure the design is 'there' */}
+        <div className="space-y-6 mb-16">
           <div className="section-label-row">
             <span className="accent-square accent-square--tiny" aria-hidden />
-            <span className="section-label">Design Spotlight</span>
+            <span className="section-label">DESIGN SPOTLIGHT</span>
           </div>
-          <MagicText
-            text="This Month's Highlight"
-            className="display-title"
-          />
+          <h2 className="display-title text-white">
+            This Month&apos;s Highlight
+          </h2>
         </div>
 
         {/* Content grid — image LEFT, text RIGHT */}
