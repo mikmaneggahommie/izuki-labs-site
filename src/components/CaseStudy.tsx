@@ -3,8 +3,6 @@
 import { useEffect, useRef } from "react";
 import { ScrollReveal } from "@/components/FancyText";
 import { MagicText } from "@/components/ui/magic-text";
-import { DoubleWordText } from "@/components/ui/double-word-text";
-
 import { assetPath } from "@/lib/asset-path";
 import { Compare } from "@/components/ui/compare";
 
@@ -104,12 +102,12 @@ export default function CaseStudy() {
               </div>
 
               <div className="space-y-6">
-                <p className="text-[17px] font-bold leading-[1.6] text-white">
+                <p className="body-copy">
                   I completely overhauled their visual presence. By replacing inconsistent, low-impact content with a precision-engineered content system, I established a sharp and unique brand identity in Adobe Photoshop.
                 </p>
                 <div className="border-t border-white/10 mt-12 pt-8">
-                  <p className="text-[20px] font-black leading-[1.5] text-white uppercase tracking-tight">
-                    Following the implementation of this new design language, the project realized a <span className="text-[#E50000]">60%</span> jump in registrations.
+                  <p className="body-copy !font-medium !text-white">
+                    Following the implementation of this new design language, the project realized a <span className="text-[#E50000] font-black">60%</span> jump in registrations.
                   </p>
                 </div>
               </div>
