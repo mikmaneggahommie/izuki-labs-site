@@ -204,8 +204,8 @@ export default function PricingSection() {
                       : "border-white/10 bg-[#0A0A0A]"
                   }`}
                 >
-                  <div className="space-y-20">
-                    <div className="space-y-12">
+                  <div className="space-y-16 md:space-y-20">
+                    <div className="pt-2"> 
                       {pkg.featured ? (
                         <div className="absolute top-8 left-8">
                           <span className="inline-flex border border-[var(--accent)]/30 bg-[var(--accent)]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
@@ -214,7 +214,7 @@ export default function PricingSection() {
                         </div>
                       ) : null}
 
-                      <div className={pkg.featured ? "pt-12" : ""}>
+                      <div className="pt-14">
                         <h3 className="text-[30px] font-black tracking-[-0.04em] text-white">
                           {pkg.name}
                         </h3>
@@ -230,7 +230,7 @@ export default function PricingSection() {
                       </div>
                     </div>
 
-                    <ul className="space-y-6 pt-10">
+                    <ul className="space-y-6 pt-2 md:pt-10">
                       {pkg.features.map((feature, fIdx) => (
                         <motion.li
                           key={feature}
@@ -249,7 +249,7 @@ export default function PricingSection() {
                     </ul>
                   </div>
 
-                  <div className="mt-32 space-y-10">
+                  <div className="mt-auto pt-20 md:pt-32 space-y-10">
                     <a
                       href="#contact"
                       className={`${

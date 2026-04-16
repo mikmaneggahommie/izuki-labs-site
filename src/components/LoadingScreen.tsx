@@ -54,8 +54,7 @@ export default function LoadingScreen() {
             {/* Spinner — sharp, minimal */}
             <div className="relative flex items-center justify-center">
               <motion.div
-                className="relative overflow-hidden"
-                style={{ width: "24px", height: "380px" }}
+                className="relative overflow-hidden w-[32px] h-[260px] md:w-[32px] md:h-[420px]"
                 animate={{ 
                   rotate: 360,
                   backgroundColor: ["#FFFFFF", "#E50000", "#FFFFFF", "#E50000", "#FFFFFF"]
