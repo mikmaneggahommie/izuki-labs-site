@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { ScrollReveal } from "@/components/FancyText";
 import { MagicText } from "@/components/ui/magic-text";
+import { DoubleWordText } from "@/components/ui/double-word-text";
 
 import { assetPath } from "@/lib/asset-path";
 import { Compare } from "@/components/ui/compare";
@@ -104,12 +105,15 @@ export default function CaseStudy() {
               </div>
 
               <div className="space-y-6">
-                <MagicText
+                 <DoubleWordText
                   text="I completely overhauled their visual presence. By replacing inconsistent, low-impact content with a precision-engineered system build from the ground up in Adobe Photoshop, I established a sharp and unique brand identity."
-                  className="body-copy"
+                  className="text-[14px] font-medium leading-[1.6] text-white/50"
                 />
-                <div className="text-[18px] font-semibold leading-[1.7] text-white mt-12 pt-8 border-t border-white/5">
-                  Following the implementation of this new design language, the project realized a <span className="text-[#E50000]">60%</span> jump in registrations.
+                <div className="border-t border-white/5 mt-12 pt-8">
+                  <DoubleWordText
+                    text="Following the implementation of this new design language, the project realized a 60% jump in registrations."
+                    className="text-[14px] font-medium leading-[1.6] text-white/50"
+                  />
                 </div>
               </div>
             </div>
