@@ -157,9 +157,9 @@ export function TypewriterText({
       {displayedText}
       {isTyping && (
         <motion.span
-          className="inline-block w-[3px] h-[0.75em] bg-[#E50000] ml-[2px] align-baseline"
-          animate={{ opacity: [1, 0] }}
-          transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
+          className="inline-block w-[4px] h-[0.9em] bg-[#E50000] ml-[4px] align-baseline"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
         />
       )}
       {!isTyping && hasDot && (
