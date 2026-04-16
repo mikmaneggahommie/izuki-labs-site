@@ -1,20 +1,14 @@
 "use client";
 
-import Image from "next/image";
-import { motion, useMotionValue, useTransform } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { ScrollReveal } from "@/components/FancyText";
 import { MagicText } from "@/components/ui/magic-text";
 
 import { assetPath } from "@/lib/asset-path";
+import { Compare } from "@/components/ui/compare";
 
 export default function CaseStudy() {
-  const [dragging, setDragging] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
-  const sliderX = useMotionValue(50);
-  const clipPath = useTransform(sliderX, (value) => `inset(0 ${100 - value}% 0 0)`);
-  const sliderLeft = useTransform(sliderX, (value) => `${value}%`);
 
   useEffect(() => {
     let active = true;
@@ -52,12 +46,7 @@ export default function CaseStudy() {
     return () => { active = false; cleanup?.(); };
   }, []);
 
-  const updateSlider = (clientX: number) => {
-    if (!containerRef.current) return;
-    const bounds = containerRef.current.getBoundingClientRect();
-    const clamped = Math.max(0, Math.min(clientX - bounds.left, bounds.width));
-    sliderX.set((clamped / bounds.width) * 100);
-  };
+
 
   return (
     <section ref={sectionRef} id="cases" className="section-shell">
@@ -78,67 +67,21 @@ export default function CaseStudy() {
         <div className="grid gap-12 lg:gap-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] items-start pt-10">
           {/* Before / After Slider — left aligned */}
           <ScrollReveal>
-            <div
-              ref={containerRef}
-              className="relative w-full overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_28px_90px_rgba(0,0,0,0.42)]"
-              onPointerDown={(event) => {
-                setDragging(true);
-                updateSlider(event.clientX);
-              }}
-              onPointerMove={(event) => {
-                if (dragging) updateSlider(event.clientX);
-              }}
-              onPointerUp={() => setDragging(false)}
-              onPointerLeave={() => setDragging(false)}
-              style={{ touchAction: "none" }}
-            >
-              {/* After image — this is the base (taller portrait), sets container height */}
-              <Image
-                src={assetPath("/images/case-study/after.jpg")}
-                alt="After design"
-                width={2803}
-                height={3480}
-                className="block w-full h-auto"
-                sizes="(max-width: 767px) 90vw, 55vw"
-                priority
+            <div className="relative w-full aspect-4/5 md:aspect-3/4 overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_28px_90px_rgba(0,0,0,0.42)]">
+              <Compare
+                firstImage={assetPath("/images/case-study/before.jpg")}
+                secondImage={assetPath("/images/case-study/after.jpg")}
+                firstImageClassName="object-contain grayscale lg:object-cover"
+                secondImageClassname="object-contain lg:object-cover"
+                className="w-full h-full"
+                slideMode="hover"
+                showHandlebar={true}
               />
-
-              {/* Before image — clipped overlay from left */}
-              <motion.div className="absolute inset-0" style={{ clipPath }}>
-                <Image
-                  src={assetPath("/images/case-study/before.jpg")}
-                  alt="Before design"
-                  width={1080}
-                  height={1080}
-                  className="w-full h-full object-contain grayscale"
-                  sizes="(max-width: 767px) 90vw, 55vw"
-                  priority
-                />
-              </motion.div>
-
-              {/* Slider handle */}
-              <motion.div
-                className="absolute bottom-0 top-0 z-20 w-px bg-white"
-                style={{ left: sliderLeft }}
-              >
-                <div className="absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center border border-white/15 bg-black text-white shadow-[0_14px_40px_rgba(0,0,0,0.45)]">
-                  <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" aria-hidden>
-                    <path
-                      d="M6 10H2m0 0 3-3m-3 3 3 3m9-3h4m0 0-3-3m3 3-3 3"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.5"
-                    />
-                  </svg>
-                </div>
-              </motion.div>
-
               {/* Labels */}
-              <div className="absolute left-3 top-3 z-30 border border-white/5 bg-black/40 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
+              <div className="absolute left-3 top-3 z-30 border border-white/5 bg-black/40 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 pointer-events-none">
                 Before
               </div>
-              <div className="absolute right-3 top-3 z-30 border border-white/5 bg-black/40 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
+              <div className="absolute right-3 top-3 z-30 border border-white/5 bg-black/40 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 pointer-events-none">
                 After
               </div>
             </div>

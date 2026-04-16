@@ -109,6 +109,7 @@ const packages: Package[] = [
 
 export default function PricingSection() {
   const [openAddOns, setOpenAddOns] = useState<Record<string, boolean>>({});
+  const [hoveredPkg, setHoveredPkg] = useState<string | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -193,16 +194,23 @@ export default function PricingSection() {
         <div className="grid gap-6 xl:grid-cols-3">
           {packages.map((pkg, pkgIndex) => {
             const isOpen = openAddOns[pkg.id];
+            const isHovered = hoveredPkg === pkg.id;
+            const isOtherHovered = hoveredPkg !== null && !isHovered;
 
             return (
               <ScrollReveal key={pkg.id} delay={pkgIndex * 0.12}>
                 <article
+                  onMouseEnter={() => setHoveredPkg(pkg.id)}
+                  onMouseLeave={() => setHoveredPkg(null)}
                   data-price-reveal
-                  className={`group relative flex h-full flex-col justify-between border p-8 transition-transform duration-500 hover:-translate-y-2 xl:min-h-[720px] ${
-                    pkg.featured
+                  className={`group relative flex h-full flex-col justify-between border p-8 transition-all duration-500 xl:min-h-[720px] 
+                    ${isHovered ? "border-white/20 z-10 scale-[1.01] blur-0! opacity-100!" : ""}
+                    ${isOtherHovered ? "blur-2xl! opacity-10! grayscale scale-95 pointer-events-none" : "hover:-translate-y-2"}
+                    ${pkg.featured
                       ? "border-(--accent) bg-[linear-gradient(180deg,rgba(229,0,0,0.06),rgba(10,10,10,1)_18%)]"
                       : "border-white/10 bg-[#0A0A0A]"
-                  }`}
+                    }
+                  `}
                 >
                   <div className="space-y-16 md:space-y-20">
                     <div className="pt-2"> 

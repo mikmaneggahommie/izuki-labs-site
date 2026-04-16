@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useRef, useMemo, useCallback, useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
@@ -39,7 +40,8 @@ interface InfiniteGalleryProps {
 	blurSettings?: BlurSettings;
 	className?: string;
 	style?: React.CSSProperties;
-	isLocked?: boolean; // Prop to control if we should preventDefault or not
+	isLocked?: boolean; 
+	scrollProgress?: { get: () => number }; // framer-motion MotionValue
 }
 
 interface PlaneData {
@@ -162,18 +164,22 @@ function ImagePlane({
 }) {
 	const meshRef = useRef<THREE.Mesh>(null);
 	const [isHovered, setIsHovered] = useState(false);
+	const materialRef = useRef(material);
+	materialRef.current = material;
 
 	useEffect(() => {
-		if (material && texture) {
-			material.uniforms.map.value = texture;
+		const mat = materialRef.current;
+		if (mat && texture) {
+			mat.uniforms.map.value = texture;
 		}
-	}, [material, texture]);
+	}, [texture]);
 
 	useEffect(() => {
-		if (material && material.uniforms) {
-			material.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
+		const mat = materialRef.current;
+		if (mat && mat.uniforms) {
+			mat.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
 		}
-	}, [material, isHovered]);
+	}, [isHovered]);
 
 	return (
 		<mesh
@@ -194,6 +200,7 @@ function GalleryScene({
 	speed = 1,
 	visibleCount = 8,
 	isLocked = true,
+	scrollProgress, // New absolute driver
 	fadeSettings = {
 		fadeIn: { start: 0.05, end: 0.15 },
 		fadeOut: { start: 0.85, end: 0.95 },
@@ -207,7 +214,9 @@ function GalleryScene({
 	const { gl } = useThree();
 	const scrollVelocity = useRef(0);
 	const autoPlay = useRef(true);
-	const lastInteraction = useRef(Date.now());
+	const lastInteraction = useRef(0);
+	useEffect(() => { lastInteraction.current = Date.now(); }, []);
+	const internalAutoProgress = useRef(0); // For the bombardment effect
 
 	const normalizedImages = useMemo(
 		() =>
@@ -320,12 +329,12 @@ function GalleryScene({
 	}, []);
 
 	useFrame((state, delta) => {
+		// subtle background auto-flow (bombardment)
 		if (autoPlay.current) {
-			// Exactly matching the reference's stable accumulation
-			scrollVelocity.current += 0.3 * delta;
+			internalAutoProgress.current += 0.3 * delta;
 		}
 
-		// Matching the reference's damping factor
+		// Heavy damping on manual velocity
 		scrollVelocity.current *= 0.95;
 
 		const time = state.clock.getElapsedTime();
@@ -336,12 +345,26 @@ function GalleryScene({
 			}
 		});
 
-		const imageAdvance = totalImages > 0 ? visibleCount % totalImages || totalImages : 0;
 		const totalRange = depthRange;
 		const halfRange = totalRange / 2;
+		const imageAdvance = totalImages > 0 ? visibleCount % totalImages || totalImages : 0;
+
+		// Absolute scroll contribution (if on a pinned track)
+		const progressValue = scrollProgress ? scrollProgress.get() : 0;
+		// Map 0-1 to a healthy multi-wrap distance (e.g. 100)
+		const absoluteScrollZ = progressValue * totalRange * 4; 
 
 		planesData.current.forEach((plane, i) => {
-			let newZ = plane.z + scrollVelocity.current * delta * 10;
+			// COMBINED MOVEMENT: 
+			// 1. Absolute Scroll (pinned positioning)
+			// 2. Velocity Momentum (manual flicking)
+			// 3. Auto-play (subtle flow)
+			let newZ = plane.z + (scrollVelocity.current * delta * 15) + (0.3 * delta * 5);
+			
+			// If we are scrolling via pinned progress, we can apply an additive shift
+			// or replace it. For 'persistence', we combine them.
+			newZ += (progressValue > 0 ? absoluteScrollZ * 0.05 : 0);
+
 			let wrapsForward = 0;
 			let wrapsBackward = 0;
 
@@ -354,8 +377,7 @@ function GalleryScene({
 			}
 
 			if (wrapsForward > 0 && imageAdvance > 0 && totalImages > 0) {
-				plane.imageIndex =
-					(plane.imageIndex + wrapsForward * imageAdvance) % totalImages;
+				plane.imageIndex = (plane.imageIndex + wrapsForward * imageAdvance) % totalImages;
 			}
 
 			if (wrapsBackward > 0 && imageAdvance > 0 && totalImages > 0) {
@@ -364,11 +386,9 @@ function GalleryScene({
 			}
 
 			plane.z = ((newZ % totalRange) + totalRange) % totalRange;
-			plane.x = spatialPositions[i]?.x ?? 0;
-			plane.y = spatialPositions[i]?.y ?? 0;
+			const _worldZ = plane.z - halfRange;
 
-			const worldZ = plane.z - halfRange;
-
+			// ... [REST OF SHADER LOGIC]
 			// Calculate opacity based on fade settings
 			const normalizedPosition = plane.z / totalRange; // 0 to 1
 			let opacity = 1;
@@ -377,64 +397,51 @@ function GalleryScene({
 				normalizedPosition >= fadeSettings.fadeIn.start &&
 				normalizedPosition <= fadeSettings.fadeIn.end
 			) {
-				// Fade in: opacity goes from 0 to 1 within the fade in range
 				const fadeInProgress =
 					(normalizedPosition - fadeSettings.fadeIn.start) /
 					(fadeSettings.fadeIn.end - fadeSettings.fadeIn.start);
 				opacity = fadeInProgress;
 			} else if (normalizedPosition < fadeSettings.fadeIn.start) {
-				// Before fade in starts: fully transparent
 				opacity = 0;
 			} else if (
 				normalizedPosition >= fadeSettings.fadeOut.start &&
 				normalizedPosition <= fadeSettings.fadeOut.end
 			) {
-				// Fade out: opacity goes from 1 to 0 within the fade out range
 				const fadeOutProgress =
 					(normalizedPosition - fadeSettings.fadeOut.start) /
 					(fadeSettings.fadeOut.end - fadeSettings.fadeOut.start);
 				opacity = 1 - fadeOutProgress;
 			} else if (normalizedPosition > fadeSettings.fadeOut.end) {
-				// After fade out ends: fully transparent
 				opacity = 0;
 			}
 
-			// Clamp opacity between 0 and 1
 			opacity = Math.max(0, Math.min(1, opacity));
 
-			// Calculate blur based on blur settings
 			let blur = 0;
-
 			if (
 				normalizedPosition >= blurSettings.blurIn.start &&
 				normalizedPosition <= blurSettings.blurIn.end
 			) {
-				// Blur in: blur goes from maxBlur to 0 within the blur in range
 				const blurInProgress =
 					(normalizedPosition - blurSettings.blurIn.start) /
 					(blurSettings.blurIn.end - blurSettings.blurIn.start);
 				blur = blurSettings.maxBlur * (1 - blurInProgress);
 			} else if (normalizedPosition < blurSettings.blurIn.start) {
-				// Before blur in starts: full blur
 				blur = blurSettings.maxBlur;
 			} else if (
 				normalizedPosition >= blurSettings.blurOut.start &&
 				normalizedPosition <= blurSettings.blurOut.end
 			) {
-				// Blur out: blur goes from 0 to maxBlur within the blur out range
 				const blurOutProgress =
 					(normalizedPosition - blurSettings.blurOut.start) /
 					(blurSettings.blurOut.end - blurSettings.blurOut.start);
 				blur = blurSettings.maxBlur * blurOutProgress;
 			} else if (normalizedPosition > blurSettings.blurOut.end) {
-				// After blur out ends: full blur
 				blur = blurSettings.maxBlur;
 			}
 
-			// Clamp blur to reasonable values
 			blur = Math.max(0, Math.min(blurSettings.maxBlur, blur));
 
-			// Update material uniforms
 			const material = materials[i];
 			if (material && material.uniforms) {
 				material.uniforms.opacity.value = opacity;
@@ -455,9 +462,8 @@ function GalleryScene({
 
 				const worldZ = plane.z - depthRange / 2;
 
-				// Calculate scale to maintain aspect ratio
-				const img = texture.image as any;
-				const aspect = img ? img.width / img.height : 1;
+				const texImage = texture.image as HTMLImageElement | undefined;
+				const aspect = texImage ? texImage.width / texImage.height : 1;
 				const scale: [number, number, number] =
 					aspect > 1 ? [2 * aspect, 2, 1] : [2, 2 / aspect, 1];
 
@@ -465,7 +471,7 @@ function GalleryScene({
 					<ImagePlane
 						key={plane.index}
 						texture={texture}
-						position={[plane.x, plane.y, worldZ]} // Position planes relative to camera center
+						position={[plane.x, plane.y, worldZ]} 
 						scale={scale}
 						material={material}
 					/>
@@ -487,15 +493,17 @@ function FallbackGallery({ images }: { images: ImageItem[] }) {
 
 	return (
 		<div className="relative h-full w-full bg-black">
-			<div className="grid grid-cols-2 gap-[1px] bg-white/10 h-full overflow-y-auto chat-scroll">
+			<div className="grid grid-cols-2 gap-px bg-white/10 h-full overflow-y-auto chat-scroll">
 				{normalizedImages.map((img, i) => (
-					<div key={i} className="relative aspect-[3/4] bg-black overflow-hidden group">
-						<img
+					<div key={i} className="relative aspect-3/4 bg-black overflow-hidden group">
+						<Image
 							src={img.src || '/placeholder.svg'}
-							alt={img.alt}
+							alt={img.alt || ''}
+							fill
+							sizes="50vw"
 							className="w-full h-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0 group-hover:scale-110"
 						/>
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
                <span className="text-[10px] font-bold uppercase tracking-widest text-white">Project {i + 1}</span>
             </div>
 					</div>
@@ -510,6 +518,7 @@ export default function InfiniteGallery({
 	className = 'h-96 w-full',
 	style,
 	isLocked = true,
+	scrollProgress, // Consumption
 	fadeSettings = {
 		fadeIn: { start: 0.05, end: 0.25 },
 		fadeOut: { start: 0.4, end: 0.43 },
@@ -520,21 +529,17 @@ export default function InfiniteGallery({
 		maxBlur: 8.0,
 	},
 }: InfiniteGalleryProps) {
-	const [webglSupported, setWebglSupported] = useState(true);
-
-	useEffect(() => {
-		// Check WebGL support
+	const [webglSupported, setWebglSupported] = useState(() => {
+		if (typeof window === 'undefined') return true;
 		try {
 			const canvas = document.createElement('canvas');
 			const gl =
 				canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-			if (!gl) {
-				setWebglSupported(false);
-			}
-		} catch (e) {
-			setWebglSupported(false);
+			return !!gl;
+		} catch {
+			return false;
 		}
-	}, []);
+	});
 
 	if (!webglSupported) {
 		return (
@@ -553,6 +558,7 @@ export default function InfiniteGallery({
 				<GalleryScene
 					images={images}
 					isLocked={isLocked}
+					scrollProgress={scrollProgress} // Pass to scene
 					fadeSettings={fadeSettings}
 					blurSettings={blurSettings}
 				/>
@@ -560,3 +566,4 @@ export default function InfiniteGallery({
 		</div>
 	);
 }
+
