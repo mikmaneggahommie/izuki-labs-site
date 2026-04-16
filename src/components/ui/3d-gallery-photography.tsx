@@ -154,13 +154,15 @@ function ImagePlane({
 
 	useEffect(() => {
 		if (material && texture) {
-			material.uniforms.map.value = texture;
+			const uniforms = material.uniforms;
+			uniforms.map.value = texture;
 		}
 	}, [material, texture]);
 
 	useEffect(() => {
 		if (material && material.uniforms) {
-			material.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
+			const uniforms = material.uniforms;
+			uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
 		}
 	}, [material, isHovered]);
 
@@ -258,7 +260,7 @@ function GalleryScene({
 			y: spatialPositions[i]?.y ?? 0,
 		}));
 		planesData.current = newPlanes;
-		setPlanesSnapshot(newPlanes);
+		Promise.resolve().then(() => setPlanesSnapshot(newPlanes));
 	}, [depthRange, spatialPositions, totalImages, visibleCount]);
 
 	const handleWheel = useCallback(
