@@ -177,7 +177,7 @@ export default function PricingSection() {
               <span className="section-label">Pricing</span>
             </div>
 
-            <h2 className="display-title">Pricing</h2>
+            <h2 className="display-title">Packages</h2>
           </div>
 
           <p className="body-copy max-w-[34ch] lg:justify-self-end">

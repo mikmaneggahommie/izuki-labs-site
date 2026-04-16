@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const menuItems = [
@@ -25,23 +25,25 @@ export default function Header() {
     };
   }, [menuOpen]);
 
-  const handleAnchorClick = (
-    event: React.MouseEvent<HTMLAnchorElement>,
-    href: string
-  ) => {
-    event.preventDefault();
-    setMenuOpen(false);
+  const handleAnchorClick = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+      event.preventDefault();
+      setMenuOpen(false);
 
-    if (!href.startsWith("#")) {
-      return;
-    }
+      // Force overflow reset immediately
+      document.body.style.overflow = "";
 
-    // Delay scroll to let menu close & overflow reset
-    setTimeout(() => {
-      const target = document.getElementById(href.slice(1));
-      target?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 350);
-  };
+      if (!href.startsWith("#")) return;
+
+      setTimeout(() => {
+        const target = document.getElementById(href.slice(1));
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    },
+    []
+  );
 
   return (
     <>
@@ -81,7 +83,7 @@ export default function Header() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            exit={{ opacity: 0, pointerEvents: "none" as const }}
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-0 z-40 overflow-y-auto bg-black/95 backdrop-blur-2xl"
           >

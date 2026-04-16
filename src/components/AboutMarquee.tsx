@@ -78,8 +78,8 @@ export default function AboutMarquee() {
 
   return (
     <section ref={sectionRef} id="about" className="section-shell">
-      <div className="content-shell space-y-20">
-        <div className="grid gap-10 border-b border-white/10 pb-16 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,0.48fr)] lg:items-end">
+      <div className="content-shell space-y-28">
+        <div className="grid gap-14 border-b border-white/10 pb-20 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,0.48fr)] lg:items-end">
           <div className="space-y-6">
             <ScrollReveal>
               <div className="section-label-row">
@@ -104,7 +104,7 @@ export default function AboutMarquee() {
           </ScrollReveal>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div className="grid gap-10 lg:grid-cols-3">
           {columns.map((column, i) => (
             <ParallaxWrap key={column.title} speed={0.05 + i * 0.04}>
               <ScrollReveal delay={i * 0.1}>
@@ -113,10 +113,10 @@ export default function AboutMarquee() {
                   className="border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-10 transition-transform duration-500 hover:-translate-y-2"
                 >
                   <p className="section-label text-white/40">{column.label}</p>
-                  <h3 className="mt-8 text-[clamp(2rem,3vw,3.5rem)] font-black leading-[0.94] tracking-[-0.05em] text-white">
+                  <h3 className="mt-10 text-[clamp(2rem,3vw,3.5rem)] font-black leading-[0.94] tracking-[-0.05em] text-white">
                     {column.title}
                   </h3>
-                  <ul className="mt-10 space-y-5">
+                  <ul className="mt-12 space-y-6">
                     {column.items.map((item) => (
                       <li
                         key={item}

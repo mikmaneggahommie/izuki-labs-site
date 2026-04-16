@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { VelocityRow } from "@/components/ui/scroll-velocity";
+import { ScrollReveal } from "@/components/FancyText";
 
 import { assetPath } from "@/lib/asset-path";
 
@@ -85,76 +85,81 @@ export default function WorkShowcase() {
 
   return (
     <section ref={sectionRef} id="work" className="section-shell">
-      {/* Edge-to-edge velocity title */}
-      <div className="overflow-hidden mb-12 md:mb-16">
-        <VelocityRow baseVelocity={-2}>
-          <span className="text-[clamp(64px,12vw,180px)] font-black tracking-[-0.05em] text-white uppercase whitespace-nowrap px-[0.2em] leading-[0.85]">
-            Works
-          </span>
-        </VelocityRow>
-      </div>
-
-      <div className="content-shell">
+      <div className="content-shell space-y-20">
+        {/* Title — same style as Pricing */}
         <div
           data-work-reveal
-          className="grid gap-10 border-b border-white/10 pb-12 md:grid-cols-[minmax(0,1fr)_minmax(280px,400px)] md:items-end"
+          className="grid gap-14 border-b border-white/10 pb-16 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.48fr)] lg:items-end"
         >
-          <div />
-          <p className="body-copy max-w-[36ch] md:justify-self-end">
+          <div className="space-y-6">
+            <div className="section-label-row">
+              <span className="accent-square accent-square--tiny" aria-hidden />
+              <span className="section-label">Works</span>
+            </div>
+            <h2 className="display-title">Works</h2>
+          </div>
+
+          <p className="body-copy max-w-[34ch] lg:justify-self-end">
             Social media accounts I designed, managed, and grew from the ground up.
           </p>
         </div>
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-2">
+        {/* Cards with lens-focus hover effect */}
+        <div className="grid gap-10 lg:grid-cols-2">
           {workAccounts.map((account) => (
-            <a
-              key={account.handle}
-              data-work-reveal
-              href={account.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex h-full flex-col gap-9 border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-8 transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)]"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="relative h-14 w-14 overflow-hidden rounded-full">
-                    <Image
-                      src={assetPath(account.avatar)}
-                      alt={account.name}
-                      fill
-                      sizes="56px"
-                      className="object-cover"
-                    />
+            <ScrollReveal key={account.handle}>
+              <a
+                data-work-reveal
+                href={account.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative flex h-full flex-col gap-10 border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(10,10,10,1))] p-8 transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)]"
+              >
+                {/* Card info — blurs on hover */}
+                <div className="transition-[filter] duration-500 group-hover:blur-[3px] group-hover:opacity-60">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="relative h-14 w-14 overflow-hidden rounded-full">
+                        <Image
+                          src={assetPath(account.avatar)}
+                          alt={account.name}
+                          fill
+                          sizes="56px"
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[22px] font-bold tracking-[-0.03em] text-white">{account.name}</p>
+                        <p className="text-sm font-medium text-white/50">{account.handle}</p>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="h-5 w-5 text-white/40 transition-colors group-hover:text-[var(--accent)]" />
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-[22px] font-bold tracking-[-0.03em] text-white">{account.name}</p>
-                    <p className="text-sm font-medium text-white/50">{account.handle}</p>
+
+                  <div className="mt-8 flex items-center justify-between gap-4 border-y border-white/8 py-4 text-sm">
+                    <span className="font-medium uppercase tracking-[0.15em] text-white/35">Instagram</span>
+                    <span className="font-medium text-white/75">{account.followers}</span>
                   </div>
+
+                  <p className="body-copy mt-6">{account.summary}</p>
                 </div>
-                <ArrowUpRight className="h-5 w-5 text-white/40 transition-colors group-hover:text-[var(--accent)]" />
-              </div>
 
-              <div className="flex items-center justify-between gap-4 border-y border-white/8 py-4 text-sm">
-                <span className="font-medium uppercase tracking-[0.15em] text-white/35">Instagram</span>
-                <span className="font-medium text-white/75">{account.followers}</span>
-              </div>
-
-              <p className="body-copy">{account.summary}</p>
-
-              <div className="grid grid-cols-3 gap-4">
-                {account.previews.map((preview, idx) => (
-                  <div key={`${account.handle}-${idx}`} className="work-preview">
-                    <Image
-                      src={assetPath(preview)}
-                      alt={`${account.name} preview ${idx + 1}`}
-                      fill
-                      sizes="(max-width: 1023px) 30vw, 150px"
-                      className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                    />
-                  </div>
-                ))}
-              </div>
-            </a>
+                {/* Images — stay sharp + scale up on hover (lens focus) */}
+                <div className="grid grid-cols-3 gap-4 transition-[filter] duration-500 group-hover:blur-0">
+                  {account.previews.map((preview, idx) => (
+                    <div key={`${account.handle}-${idx}`} className="work-preview">
+                      <Image
+                        src={assetPath(preview)}
+                        alt={`${account.name} preview ${idx + 1}`}
+                        fill
+                        sizes="(max-width: 1023px) 30vw, 150px"
+                        className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </a>
+            </ScrollReveal>
           ))}
         </div>
       </div>

@@ -205,7 +205,8 @@ function GalleryScene({
 	},
 }: Omit<InfiniteGalleryProps, 'className' | 'style'>) {
 	const [scrollVelocity, setScrollVelocity] = useState(0);
-	const [autoPlay, setAutoPlay] = useState(true);
+	const [autoPlay, setAutoPlay] = useState(false);
+	const hasInteracted = useRef(false);
 	const lastInteraction = useRef(Date.now());
 
 	const normalizedImages = useMemo(
@@ -283,6 +284,7 @@ function GalleryScene({
 				event.preventDefault();
 			}
 			setScrollVelocity((prev) => prev + event.deltaY * 0.01 * speed);
+			hasInteracted.current = true;
 			setAutoPlay(false);
 			lastInteraction.current = Date.now();
 		},
@@ -318,10 +320,10 @@ function GalleryScene({
 		}
 	}, [handleWheel, handleKeyDown, isLocked]);
 
-	// Auto-play logic
+	// Auto-play logic — only after first interaction
 	useEffect(() => {
 		const interval = setInterval(() => {
-			if (Date.now() - lastInteraction.current > 3000) {
+			if (hasInteracted.current && Date.now() - lastInteraction.current > 3000) {
 				setAutoPlay(true);
 			}
 		}, 1000);

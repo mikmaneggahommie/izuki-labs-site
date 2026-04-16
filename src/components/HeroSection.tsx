@@ -33,16 +33,24 @@ export default function HeroSection() {
         className="h-full w-full"
       />
 
-      {/* IZUKI.LABS — edge-to-edge velocity scroll */}
-      <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-50 mix-blend-exclusion">
+      {/* IZUKI.LABS — TWO rows, edge-to-edge velocity, with edge fades */}
+      <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-50 mix-blend-exclusion gap-0">
         <VelocityRow baseVelocity={-3} className="pointer-events-none">
-          <span className="text-[20vw] font-black tracking-[-0.04em] text-white whitespace-nowrap px-[0.15em] leading-[0.85]">
+          <span className="text-[clamp(60px,12vw,160px)] font-black tracking-[-0.04em] text-white whitespace-nowrap px-[0.2em] leading-[0.9]">
             IZUKI<span className="text-[#E50000]">.</span>LABS
           </span>
         </VelocityRow>
+        <VelocityRow baseVelocity={3} className="pointer-events-none">
+          <span className="text-[clamp(60px,12vw,160px)] font-black tracking-[-0.04em] text-white whitespace-nowrap px-[0.2em] leading-[0.9]">
+            IZUKI<span className="text-[#E50000]">.</span>LABS
+          </span>
+        </VelocityRow>
+
+        {/* Edge fades */}
+        <div className="absolute inset-y-0 left-0 w-[15%] bg-gradient-to-r from-black to-transparent z-10" />
+        <div className="absolute inset-y-0 right-0 w-[15%] bg-gradient-to-l from-black to-transparent z-10" />
       </div>
 
-      {/* Subtle scroll hint */}
       <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none z-50">
         <p className="font-mono uppercase text-[10px] tracking-widest text-white/30">
           Scroll to explore

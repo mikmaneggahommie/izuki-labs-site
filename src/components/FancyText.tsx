@@ -164,7 +164,7 @@ export function TypewriterText({
       )}
       {!isTyping && hasDot && (
         <motion.span
-          className="inline-block text-[#E50000] font-black"
+          className="inline-block text-[#E50000] font-black ml-[0.12em]"
           animate={{ opacity: [1, 0.2] }}
           transition={{ duration: 0.7, repeat: Infinity, repeatType: "reverse" }}
         >
