@@ -113,7 +113,7 @@ export default function ContactFooter() {
           >
             <div className="space-y-5">
               <p className="section-label">Sitemap</p>
-              <div className="space-y-2.5 text-[15px] leading-[2.2] text-white">
+              <div className="space-y-2 text-[13.5px] leading-[1.8] text-white">
                 <a href="#top" className="interactive-link block">
                   <LetterSwapHover>Home</LetterSwapHover>
                 </a>
@@ -131,7 +131,7 @@ export default function ContactFooter() {
 
             <div className="space-y-5">
               <p className="section-label">Connect</p>
-              <div className="space-y-2.5 text-[15px] leading-[2.2] text-white">
+              <div className="space-y-2 text-[13.5px] leading-[1.8] text-white">
                 <a href="tel:+251954676421" className="interactive-link block">
                   Phone — +251 954 676 421
                 </a>
@@ -154,7 +154,7 @@ export default function ContactFooter() {
 
             <div className="col-span-2 space-y-5 md:col-span-1">
               <p className="section-label">Channels</p>
-              <div className="space-y-2.5 text-[15px] leading-[2.2] text-white">
+              <div className="space-y-2 text-[13.5px] leading-[1.8] text-white">
                 <a
                   href="https://t.me/IZUKILABS"
                   target="_blank"
