@@ -237,7 +237,7 @@ export default function ChatBubble() {
   return (
     <>
       {!isOpen ? (
-        <div className="fixed bottom-8 right-8 z-[100] md:bottom-10 md:right-10">
+        <div className="fixed bottom-8 right-8 z-100 md:bottom-10 md:right-10">
           {/* Tooltip bubble */}
           <AnimatePresence>
             {showTooltip && (
@@ -281,7 +281,7 @@ export default function ChatBubble() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 32, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-4 right-4 z-[110] flex h-[min(480px,65dvh)] w-[calc(100vw-32px)] max-w-[400px] flex-col overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_32px_128px_rgba(0,0,0,0.8)] backdrop-blur-xl md:bottom-10 md:right-10 md:h-[520px]"
+            className="fixed bottom-4 right-4 z-110 flex h-[min(480px,65dvh)] w-[calc(100vw-32px)] max-w-[400px] flex-col overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_32px_128px_rgba(0,0,0,0.8)] backdrop-blur-xl md:bottom-10 md:right-10 md:h-[520px]"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/5 bg-[#111111] px-6 py-4">
@@ -367,7 +367,7 @@ export default function ChatBubble() {
                         "Enter your email..."
                       }
                       className={`w-full border py-3 pl-4 pr-14 text-[14px] text-white placeholder:text-white/20 focus:outline-none transition-all ${
-                        error ? "border-[var(--accent)]/60 bg-[var(--accent)]/5" : "border-white/10 bg-[#1A1A1A] focus:border-white/20"
+                        error ? "border-(--accent)/60 bg-(--accent)/5" : "border-white/10 bg-[#1A1A1A] focus:border-white/20"
                       }`}
                     />
                     <button
@@ -383,7 +383,7 @@ export default function ChatBubble() {
                       <motion.span
                         initial={{ opacity: 0, y: -4 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="block text-[11px] font-medium text-[var(--accent)]"
+                        className="block text-[11px] font-medium text-(--accent)"
                       >
                         {error}
                       </motion.span>

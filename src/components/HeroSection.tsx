@@ -3,11 +3,9 @@
 import { assetPath } from "@/lib/asset-path";
 import dynamic from "next/dynamic";
 import { VelocityRow } from "@/components/ui/scroll-velocity";
-import GalleryLoading from "./ui/GalleryLoading";
 
 const InfiniteGallery = dynamic(() => import("@/components/ui/3d-gallery-photography"), {
   ssr: false,
-  loading: () => <GalleryLoading />
 });
 
 const HERO_IMAGES = [
