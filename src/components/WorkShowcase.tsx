@@ -134,6 +134,8 @@ export default function WorkShowcase() {
                           src={assetPath(account.avatar)}
                           alt={account.name}
                           fill
+                          priority={true}
+                          quality={90}
                           sizes="56px"
                           className="object-cover"
                         />
@@ -182,6 +184,8 @@ export default function WorkShowcase() {
                           src={assetPath(preview)}
                           alt={`${account.name} preview ${idx + 1}`}
                           fill
+                          priority={true}
+                          quality={80}
                           sizes="(max-width: 640px) 30vw, (max-width: 1024px) 25vw, 250px"
                           className="object-cover"
                         />
