@@ -89,76 +89,81 @@ export default function Header() {
           >
             <div className="content-shell flex min-h-full flex-col justify-between px-(--section-padding-x) pb-10 pt-28">
               <nav className="grid gap-2">
-                {menuItems.map((item, index) => (
-                  <motion.a
-                    key={item.label}
-                    href={item.href}
-                    onClick={(event) => handleAnchorClick(event, item.href)}
-                    initial="initial"
-                    whileHover="hovered"
-                    animate="animate"
-                    exit="exit"
-                    className="group relative block overflow-hidden py-2"
-                  >
-                    <motion.div
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={{
+                    visible: {
+                      transition: {
+                        staggerChildren: 0.08,
+                      },
+                    },
+                  }}
+                >
+                  {menuItems.map((item) => (
+                    <motion.a
+                      key={item.label}
+                      href={item.href}
+                      onClick={(event) => handleAnchorClick(event, item.href)}
+                      initial="initial"
+                      whileHover="hovered"
                       variants={{
-                        initial: { opacity: 0, y: 24 },
-                        animate: {
-                          opacity: 1,
+                        hidden: { opacity: 0, y: 30 },
+                        visible: { 
+                          opacity: 1, 
                           y: 0,
-                          transition: {
-                            duration: 0.7,
-                            delay: index * 0.08,
-                            ease: [0.16, 1, 0.3, 1],
-                          },
+                          transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } 
                         },
-                        exit: {
-                          opacity: 0,
+                        exit: { 
+                          opacity: 0, 
                           y: -20,
-                          transition: { duration: 0.3 },
+                          transition: { duration: 0.3 } 
                         },
                       }}
-                      className="relative flex overflow-hidden text-[clamp(48px,11vw,120px)] font-bold leading-[0.85] tracking-[-0.04em] uppercase"
+                      className="group relative block overflow-hidden py-2"
                     >
-                      {item.label.split("").map((char, charIdx) => (
-                        <span
-                          key={charIdx}
-                          className="relative inline-block overflow-hidden"
-                        >
-                          <motion.span
-                            className="inline-block text-white transition-colors duration-500 group-hover:text-(--accent)"
-                            variants={{
-                              initial: { y: 0 },
-                              hovered: { y: "-100%" },
-                            }}
-                            transition={{
-                              duration: 0.45,
-                              delay: charIdx * 0.015,
-                              ease: [0.19, 1, 0.22, 1],
-                            }}
+                      <div className="relative flex overflow-hidden text-[clamp(48px,11vw,120px)] font-bold uppercase leading-[0.85] tracking-[-0.04em]">
+                        {item.label.split("").map((char, charIdx) => (
+                          <span
+                            key={charIdx}
+                            className="relative inline-block overflow-hidden"
                           >
-                            {char === " " ? "\u00A0" : char}
-                          </motion.span>
-                          <motion.span
-                            className="absolute left-0 top-full inline-block text-(--accent) select-none"
-                            variants={{
-                              initial: { y: 0 },
-                              hovered: { y: "-100%" },
-                            }}
-                            transition={{
-                              duration: 0.45,
-                              delay: charIdx * 0.015,
-                              ease: [0.19, 1, 0.22, 1],
-                            }}
-                            aria-hidden="true"
-                          >
-                            {char === " " ? "\u00A0" : char}
-                          </motion.span>
-                        </span>
-                      ))}
-                    </motion.div>
-                  </motion.a>
-                ))}
+                            <motion.span
+                              className="inline-block text-white transition-colors duration-500 group-hover:text-(--accent)"
+                              variants={{
+                                initial: { y: 0 },
+                                hovered: { y: "-100%" },
+                              }}
+                              transition={{
+                                duration: 0.45,
+                                delay: charIdx * 0.015,
+                                ease: [0.19, 1, 0.22, 1],
+                              }}
+                            >
+                              {char === " " ? "\u00A0" : char}
+                            </motion.span>
+                            <motion.span
+                              className="absolute left-0 top-full inline-block text-(--accent) select-none"
+                              variants={{
+                                initial: { y: 0 },
+                                hovered: { y: "-100%" },
+                              }}
+                              transition={{
+                                duration: 0.45,
+                                delay: charIdx * 0.015,
+                                ease: [0.19, 1, 0.22, 1],
+                              }}
+                              aria-hidden="true"
+                            >
+                              {char === " " ? "\u00A0" : char}
+                            </motion.span>
+                          </span>
+                        ))}
+                      </div>
+                    </motion.a>
+                  ))}
+                </motion.div>
               </nav>
 
               <div className="mt-12 grid gap-8 border-t border-white/10 pt-8 text-left md:grid-cols-3">
