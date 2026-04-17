@@ -96,7 +96,7 @@ export default function ContactFooter() {
               Start A Project
             </a>
             <a
-              href="https://t.me/IZUKILABS"
+              href="https://t.me/snowplugwalk"
               target="_blank"
               rel="noopener noreferrer"
               className="secondary-button"
