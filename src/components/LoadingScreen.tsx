@@ -17,9 +17,11 @@ export default function LoadingScreen() {
   const hasStartedLoading = useRef(false);
 
   // Safely mark if loading ever kicked off without triggering re-renders
-  if (active || progress > 0) {
-    hasStartedLoading.current = true;
-  }
+  useEffect(() => {
+    if (active || progress > 0) {
+      hasStartedLoading.current = true;
+    }
+  }, [active, progress]);
 
   // Timer Effect
   useEffect(() => {
