@@ -209,6 +209,7 @@ button {
   font-weight: 900;
   letter-spacing: -0.03em;
   line-height: 1;
+  will-change: transform;
 }
 
   .hero-wordmark {
@@ -217,6 +218,7 @@ button {
     letter-spacing: -0.06em;
     font-family: inherit;
     font-weight: 800;
+    will-change: transform;
   }
 
 .statement-copy {

@@ -1,3 +1,5 @@
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import localFont from "next/font/local";
 import type { Metadata } from "next";
 import "./globals.css";
@@ -48,7 +50,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={neueHaasDisplay.variable}>{children}</body>
+      <body className={neueHaasDisplay.variable}>
+        {children}
+        <Analytics />
+        <SpeedInsights />
+      </body>
     </html>
   );
 }

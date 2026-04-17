@@ -182,7 +182,7 @@ export default function WorkShowcase() {
                           src={assetPath(preview)}
                           alt={`${account.name} preview ${idx + 1}`}
                           fill
-                          sizes="(max-width: 1023px) 30vw, 150px"
+                          sizes="(max-width: 640px) 30vw, (max-width: 1024px) 25vw, 250px"
                           className="object-cover"
                         />
                       </div>
