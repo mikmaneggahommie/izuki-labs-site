@@ -94,17 +94,68 @@ export default function Header() {
                     key={item.label}
                     href={item.href}
                     onClick={(event) => handleAnchorClick(event, item.href)}
-                    initial={{ opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -18 }}
-                    transition={{
-                      duration: 0.4,
-                      delay: index * 0.06,
-                      ease: [0.16, 1, 0.3, 1],
-                    }}
-                    className="block text-[clamp(32px,8vw,80px)] font-black leading-[1.15] tracking-[-0.03em] text-white transition-colors duration-200 hover:text-[var(--accent)]"
+                    initial="initial"
+                    whileHover="hovered"
+                    animate="animate"
+                    exit="exit"
+                    className="group relative block overflow-hidden py-2"
                   >
-                    {item.label}
+                    <motion.div
+                      variants={{
+                        initial: { opacity: 0, y: 24 },
+                        animate: {
+                          opacity: 1,
+                          y: 0,
+                          transition: {
+                            duration: 0.7,
+                            delay: index * 0.08,
+                            ease: [0.16, 1, 0.3, 1],
+                          },
+                        },
+                        exit: {
+                          opacity: 0,
+                          y: -20,
+                          transition: { duration: 0.3 },
+                        },
+                      }}
+                      className="relative flex overflow-hidden text-[clamp(48px,11vw,120px)] font-bold leading-[0.85] tracking-[-0.04em] uppercase"
+                    >
+                      {item.label.split("").map((char, charIdx) => (
+                        <span
+                          key={charIdx}
+                          className="relative inline-block overflow-hidden"
+                        >
+                          <motion.span
+                            className="inline-block text-white transition-colors duration-500 group-hover:text-[var(--accent)]"
+                            variants={{
+                              initial: { y: 0 },
+                              hovered: { y: "-100%" },
+                            }}
+                            transition={{
+                              duration: 0.45,
+                              delay: charIdx * 0.015,
+                              ease: [0.19, 1, 0.22, 1],
+                            }}
+                          >
+                            {char === " " ? "\u00A0" : char}
+                          </motion.span>
+                          <motion.span
+                            className="absolute left-0 top-full inline-block text-[var(--accent)]"
+                            variants={{
+                              initial: { y: 0 },
+                              hovered: { y: "-100%" },
+                            }}
+                            transition={{
+                              duration: 0.45,
+                              delay: charIdx * 0.015,
+                              ease: [0.19, 1, 0.22, 1],
+                            }}
+                          >
+                            {char === " " ? "\u00A0" : char}
+                          </motion.span>
+                        </span>
+                      ))}
+                    </motion.div>
                   </motion.a>
                 ))}
               </nav>
