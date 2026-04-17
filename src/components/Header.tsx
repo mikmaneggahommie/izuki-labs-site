@@ -140,7 +140,7 @@ export default function Header() {
                             {char === " " ? "\u00A0" : char}
                           </motion.span>
                           <motion.span
-                            className="absolute left-0 top-full inline-block text-(--accent)"
+                            className="absolute left-0 top-full inline-block text-(--accent) select-none"
                             variants={{
                               initial: { y: 0 },
                               hovered: { y: "-100%" },
@@ -150,6 +150,7 @@ export default function Header() {
                               delay: charIdx * 0.015,
                               ease: [0.19, 1, 0.22, 1],
                             }}
+                            aria-hidden="true"
                           >
                             {char === " " ? "\u00A0" : char}
                           </motion.span>

@@ -14,7 +14,7 @@ const Word: React.FC<WordProps> = ({ children, progress, range }) => {
 
   return (
     <span className="relative inline-block">
-      <span className="opacity-[0.12]">{children}</span>
+      <span className="opacity-[0.12] select-none" aria-hidden="true">{children}</span>
       <motion.span className="absolute left-0 top-0" style={{ opacity }}>
         {children}
       </motion.span>

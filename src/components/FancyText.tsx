@@ -92,14 +92,14 @@ export function LetterSwapHover({
             {letter === " " ? "\u00A0" : letter}
           </motion.span>
           <motion.span
-            className="absolute left-0 top-full inline-block"
+            className="absolute left-0 top-full inline-block select-none"
             animate={{ y: isHovered ? "-100%" : "0%" }}
             transition={{
               duration: 0.35,
               delay: i * 0.02,
               ease: [0.16, 1, 0.3, 1],
             }}
-            aria-hidden
+            aria-hidden="true"
           >
             {letter === " " ? "\u00A0" : letter}
           </motion.span>
