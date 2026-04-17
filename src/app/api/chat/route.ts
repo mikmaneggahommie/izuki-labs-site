@@ -2,9 +2,8 @@ import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 import { studioSystemPrompt } from "@/lib/studio-concierge";
 
-// Vercel Production Shield
-export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+// Vercel Edge Network
+export const runtime = "edge";
 
 export async function POST(req: Request) {
   try {

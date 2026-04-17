@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import localFont from "next/font/local";
 import type { Metadata } from "next";
+import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
 
 const neueHaasDisplay = localFont({
@@ -51,7 +52,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={neueHaasDisplay.variable}>
-        {children}
+        <SmoothScroll>
+          {children}
+        </SmoothScroll>
         <Analytics />
         <SpeedInsights />
       </body>
