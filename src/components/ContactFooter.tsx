@@ -109,7 +109,7 @@ export default function ContactFooter() {
         <div>
           <div
             data-contact-reveal
-            className="grid gap-10 border-t border-white/10 pt-14 md:grid-cols-3"
+            className="grid grid-cols-2 gap-x-4 gap-y-10 border-t border-white/10 pt-14 md:grid-cols-3"
           >
             <div className="space-y-5">
               <p className="section-label">Sitemap</p>
@@ -144,7 +144,7 @@ export default function ContactFooter() {
               </div>
             </div>
 
-            <div className="space-y-5">
+            <div className="col-span-2 space-y-5 md:col-span-1">
               <p className="section-label">Channels</p>
               <div className="space-y-2.5 text-[15px] leading-[2.2] text-white">
                 <a
@@ -162,6 +162,14 @@ export default function ContactFooter() {
                   className="interactive-link block"
                 >
                   Telegram — t.me/netlaserz
+                </a>
+                <a
+                  href="https://t.me/snowplugwalk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="interactive-link block"
+                >
+                  Telegram — t.me/snowplugwalk
                 </a>
               </div>
             </div>
