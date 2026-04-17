@@ -42,7 +42,7 @@ export async function POST(req: Request) {
       message: "Lead processed (Telegram)" 
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Lead API Error:", error);
     return NextResponse.json({ error: "Failed to process lead" }, { status: 500 });
   }

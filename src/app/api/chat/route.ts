@@ -94,11 +94,12 @@ IDENTIFIED VISITOR:
       headers: { "Content-Type": "text/plain; charset=utf-8" },
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[IZUKI-API] Fatal:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json({ 
       error: "Engine Failure", 
-      message: error.message 
+      message: errorMessage 
     }, { status: 500 });
   }
 }
