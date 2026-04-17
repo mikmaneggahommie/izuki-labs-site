@@ -48,14 +48,14 @@ export default function Header() {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50">
-        <div className="content-shell px-[var(--section-padding-x)]">
+        <div className="content-shell px-(--section-padding-x)">
           <div className="flex items-center justify-between py-5">
             <a
               href="#top"
               onClick={(event) => handleAnchorClick(event, "#top")}
               className="nav-copy interactive-link flex items-center tracking-[0.14em] text-white"
             >
-              IZUKI<span className="inline-block w-[6px] h-[6px] bg-[var(--accent)] mx-[2px] translate-y-[1px]" />LABS
+              IZUKI<span className="inline-block w-[6px] h-[6px] bg-(--accent) mx-[2px] translate-y-px" />LABS
             </a>
 
             <div className="hidden lg:block absolute left-1/2 -translate-x-1/2">
@@ -87,7 +87,7 @@ export default function Header() {
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-0 z-40 overflow-y-auto bg-black/95 backdrop-blur-2xl"
           >
-            <div className="content-shell flex min-h-full flex-col justify-between px-[var(--section-padding-x)] pb-10 pt-28">
+            <div className="content-shell flex min-h-full flex-col justify-between px-(--section-padding-x) pb-10 pt-28">
               <nav className="grid gap-2">
                 {menuItems.map((item, index) => (
                   <motion.a
@@ -126,7 +126,7 @@ export default function Header() {
                           className="relative inline-block overflow-hidden"
                         >
                           <motion.span
-                            className="inline-block text-white transition-colors duration-500 group-hover:text-[var(--accent)]"
+                            className="inline-block text-white transition-colors duration-500 group-hover:text-(--accent)"
                             variants={{
                               initial: { y: 0 },
                               hovered: { y: "-100%" },
@@ -140,7 +140,7 @@ export default function Header() {
                             {char === " " ? "\u00A0" : char}
                           </motion.span>
                           <motion.span
-                            className="absolute left-0 top-full inline-block text-[var(--accent)]"
+                            className="absolute left-0 top-full inline-block text-(--accent)"
                             variants={{
                               initial: { y: 0 },
                               hovered: { y: "-100%" },
