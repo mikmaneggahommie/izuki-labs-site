@@ -227,8 +227,8 @@ button {
 }
 
 .body-copy {
-  font-size: clamp(16px, 1.3vw, 18px);
-  line-height: 1.6;
+  font-size: clamp(13px, 1vw, 15px);
+  line-height: 1.65;
   color: var(--text-primary);
   font-weight: 300;
 }
