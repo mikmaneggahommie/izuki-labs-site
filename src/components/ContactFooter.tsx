@@ -133,13 +133,13 @@ export default function ContactFooter() {
               <p className="section-label">Connect</p>
               <div className="space-y-2.5 text-[15px] leading-[2.2] text-white">
                 <a href="tel:+251954676421" className="interactive-link block">
-                  +251 954 676 421
+                  Phone — +251 954 676 421
                 </a>
                 <a
                   href="mailto:it.mikiyas.daniel@gmail.com"
                   className="interactive-link block"
                 >
-                  it.mikiyas.daniel@gmail.com
+                  Email — it.mikiyas.daniel@gmail.com
                 </a>
                 <a
                   href="https://t.me/snowplugwalk"
