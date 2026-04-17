@@ -141,6 +141,14 @@ export default function ContactFooter() {
                 >
                   it.mikiyas.daniel@gmail.com
                 </a>
+                <a
+                  href="https://t.me/snowplugwalk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="interactive-link block"
+                >
+                  Telegram — @snowplugwalk
+                </a>
               </div>
             </div>
 
@@ -162,14 +170,6 @@ export default function ContactFooter() {
                   className="interactive-link block"
                 >
                   Telegram — t.me/netlaserz
-                </a>
-                <a
-                  href="https://t.me/snowplugwalk"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="interactive-link block"
-                >
-                  Telegram — t.me/snowplugwalk
                 </a>
               </div>
             </div>
