@@ -204,8 +204,8 @@ export default function PricingSection() {
                   onMouseLeave={() => setHoveredPkg(null)}
                   data-price-reveal
                   className={`group relative flex h-full flex-col justify-between border p-8 transition-all duration-500 xl:min-h-[720px] 
-                    ${isHovered ? "border-white/20 z-10 scale-[1.01] blur-0! opacity-100!" : ""}
-                    ${isOtherHovered ? "blur-2xl! opacity-10! grayscale scale-95 pointer-events-none" : "hover:-translate-y-2"}
+                    ${isHovered ? "xl:border-white/20 xl:z-10 xl:scale-[1.01] xl:blur-0! xl:opacity-100!" : ""}
+                    ${isOtherHovered ? "xl:blur-2xl! xl:opacity-10! xl:grayscale xl:scale-95 xl:pointer-events-none" : "xl:hover:-translate-y-2"}
                     ${pkg.featured
                       ? "border-(--accent) bg-[linear-gradient(180deg,rgba(229,0,0,0.06),rgba(10,10,10,1)_18%)]"
                       : "border-white/10 bg-[#0A0A0A]"
